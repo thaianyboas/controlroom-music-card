@@ -6,6 +6,10 @@ Change are listed in reverse chronological order (newest to oldest).
 
 <span class="changelog">
 
+###### [ 1.0.77 ] - 2026/09/10
+
+  * Replaced various calls to HA media_player functions (e.g. pause, resume, seek, skip next, skip previous) to call the SpotifyPlus integration equivalents, which add support for targeted device id's / names.
+
 ###### [ 1.0.76 ] - 2026/07/18
 
   * Handle special ":collection" type url's when determining whether to use play context / tracks.

@@ -103,13 +103,18 @@ class Progress extends AlertUpdatesBase {
       // calculate the desired position based on the mouse pointer position.
       const progressWidth = this.progressBar!.offsetWidth;
       const percent = args.offsetX / progressWidth;
-      const position = this.mediaDuration * percent;
+      let position = this.mediaDuration * percent;
+
+      // convert from seconds to milliseconds for spotifyplus service (ha service uses seconds).
+      if (position > 0) {
+        position = position * 1000;
+      }
 
       // show progress indicator.
       this.progressShow();
 
       // call service to seek to track position.
-      await this.store.mediaControlService.media_seek(this.player, position);
+      await this.store.spotifyPlusService.PlayerMediaSeek(this.player, null, position, 0);
       return true;
 
     }

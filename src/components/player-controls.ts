@@ -436,15 +436,15 @@ class PlayerControls extends AlertUpdatesBase {
       // call async service based on requested action.
       if (action == PAUSE) {
 
-        await this.mediaControlService.media_pause(this.player);
+        await this.spotifyPlusService.PlayerMediaPause(this.player, null);
 
       } else if (action == PLAY) {
 
-        await this.mediaControlService.media_play(this.player);
+        await this.spotifyPlusService.PlayerMediaResume(this.player, null);
 
       } else if (action == NEXT_TRACK) {
 
-        await this.mediaControlService.media_next_track(this.player);
+        await this.spotifyPlusService.PlayerMediaSkipNext(this.player, null);
 
       } else if (action == PREVIOUS_TRACK) {
 
@@ -463,9 +463,9 @@ class PlayerControls extends AlertUpdatesBase {
         // if more than 8 seconds have passed then just restart the track;
         // otherwise, select the previous track.
         if (playingProgress > 8) {
-          await this.mediaControlService.media_seek(this.player, 0);
+          await this.spotifyPlusService.PlayerMediaSeek(this.player, null, 0, 0);
         } else {
-          await this.mediaControlService.media_previous_track(this.player);
+          await this.spotifyPlusService.PlayerMediaSkipPrevious(this.player, null);
         }
 
       } else if (action == REPEAT_SET) {

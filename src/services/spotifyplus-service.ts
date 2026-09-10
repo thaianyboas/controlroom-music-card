@@ -2954,6 +2954,64 @@ export class SpotifyPlusService {
 
 
   /**
+   * Pause media play for the specified Spotify Connect device.
+   * 
+   * @param player 
+   *    MediaPlayer instance that will process the request.
+   * @param device_id
+   *    The name or id of the device this command is targeting.  
+   *    If not supplied, the user's currently active device is the target.  
+   *    Example: `Office`, `0d1841b0976bae2a3a310dd74c0f3df354899bc8`
+   * @param delay
+   *    Time delay (in seconds) to wait AFTER issuing the command to the player.  
+   *    This delay will give the spotify web api time to process the change before 
+   *    another command is issued.  
+   *    Default is 0.50; value range is 0 - 10.
+  */
+  public async PlayerMediaPause(
+    player: MediaPlayer,
+    device_id: string | undefined | null = null,
+    delay: number | null = null,
+  ): Promise<void> {
+
+    try {
+
+      // spotify premium account (or elevated credentials) required for this function.
+      if (!player.isUserProductPremium() && (!player.attributes.sp_user_has_web_player_credentials)) {
+        throw new Error(ALERT_ERROR_SPOTIFY_PREMIUM_REQUIRED);
+      }
+
+      // resolve a device_id value, if one was not specified.
+      device_id = this.getDeviceId(player, device_id);
+
+      // create service data (with required parameters).
+      const serviceData: { [key: string]: any } = {
+        entity_id: player.id,
+      };
+
+      // update service data parameters (with optional parameters).
+      if (device_id != null)
+        serviceData['device_id'] = device_id;
+      if (delay != null)
+        serviceData['delay'] = delay;
+
+      // create service request.
+      const serviceRequest: ServiceCallRequest = {
+        domain: DOMAIN_SPOTIFYPLUS,
+        service: 'player_media_pause',
+        serviceData: serviceData
+      };
+
+      // call the service (no response).
+      await this.CallService(serviceRequest);
+
+    }
+    finally {
+    }
+  }
+
+
+  /**
    * Start playing one or more tracks of the specified context on a Spotify Connect device.
    * 
    * @param player 
@@ -3234,6 +3292,142 @@ export class SpotifyPlusService {
 
 
   /**
+   * Resume media play for the specified Spotify Connect device.
+   * 
+   * @param player 
+   *    MediaPlayer instance that will process the request.
+   * @param device_id
+   *    The name or id of the device this command is targeting.  
+   *    If not supplied, the user's currently active device is the target.  
+   *    Example: `Office`, `0d1841b0976bae2a3a310dd74c0f3df354899bc8`
+   * @param delay
+   *    Time delay (in seconds) to wait AFTER issuing the command to the player.  
+   *    This delay will give the spotify web api time to process the change before 
+   *    another command is issued.  
+   *    Default is 0.50; value range is 0 - 10.
+  */
+  public async PlayerMediaResume(
+    player: MediaPlayer,
+    device_id: string | undefined | null = null,
+    delay: number | null = null,
+  ): Promise<void> {
+
+    try {
+
+      // spotify premium account (or elevated credentials) required for this function.
+      if (!player.isUserProductPremium() && (!player.attributes.sp_user_has_web_player_credentials)) {
+        throw new Error(ALERT_ERROR_SPOTIFY_PREMIUM_REQUIRED);
+      }
+
+      // resolve a device_id value, if one was not specified.
+      device_id = this.getDeviceId(player, device_id);
+
+      // create service data (with required parameters).
+      const serviceData: { [key: string]: any } = {
+        entity_id: player.id,
+      };
+
+      // update service data parameters (with optional parameters).
+      if (device_id != null)
+        serviceData['device_id'] = device_id;
+      if (delay != null)
+        serviceData['delay'] = delay;
+
+      // create service request.
+      const serviceRequest: ServiceCallRequest = {
+        domain: DOMAIN_SPOTIFYPLUS,
+        service: 'player_media_resume',
+        serviceData: serviceData
+      };
+
+      // call the service (no response).
+      await this.CallService(serviceRequest);
+
+    }
+    finally {
+    }
+  }
+
+
+  /**
+   * Seeks to the given absolute or relative position in the user's currently playing track for the specified Spotify Connect device.
+   * 
+   * @param player 
+   *    MediaPlayer instance that will process the request.
+   * @param device_id
+   *    The name or id of the device this command is targeting.  
+   *    If not supplied, the user's currently active device is the target.  
+   *    Example: `Office`, `0d1841b0976bae2a3a310dd74c0f3df354899bc8`
+   * @param position_ms
+   *    The absolute position in milliseconds to seek to; must be a positive number or zero if the `relativePositionMS` argument is specified.   
+   *    Passing in a position that is greater than the length of the track will cause the player to start playing the next song.   
+   *    Example = `25000` to start playing at the 25 second mark.  
+   * @param relative_position_ms
+   *    The relative position in milliseconds to seek to; can be a positive or negative number, or zero if the `positionMS` argument is specified.  
+   *    Example = `-10000` to seek behind by 10 seconds; `10000` to seek ahead by 10 seconds.  
+   * @param delay
+   *    Time delay (in seconds) to wait AFTER issuing the command to the player.  
+   *    This delay will give the spotify web api time to process the change before 
+   *    another command is issued.  
+   *    Default is 0.50; value range is 0 - 10.
+  */
+  public async PlayerMediaSeek(
+    player: MediaPlayer,
+    device_id: string | undefined | null = null,
+    position_ms: number | null = null,
+    relative_position_ms: number | null = null,
+    delay: number | null = null,
+  ): Promise<void> {
+
+    try {
+
+      // spotify premium account (or elevated credentials) required for this function.
+      if (!player.isUserProductPremium() && (!player.attributes.sp_user_has_web_player_credentials)) {
+        throw new Error(ALERT_ERROR_SPOTIFY_PREMIUM_REQUIRED);
+      }
+
+      // validations.
+      // ensure numbers (floats not allowed).
+      if (position_ms != null)
+        position_ms = Math.floor(position_ms);
+      if (relative_position_ms != null)
+        relative_position_ms = Math.floor(relative_position_ms);
+
+      // resolve a device_id value, if one was not specified.
+      device_id = this.getDeviceId(player, device_id);
+
+      // create service data (with required parameters).
+      const serviceData: { [key: string]: any } = {
+        entity_id: player.id,
+      };
+
+      // update service data parameters (with optional parameters).
+      if (device_id != null)
+        serviceData['device_id'] = device_id;
+      if (position_ms != null)
+        serviceData['position_ms'] = position_ms;
+      if (relative_position_ms != null)
+        serviceData['relative_position_ms'] = relative_position_ms;
+      if (delay != null)
+        serviceData['delay'] = delay;
+
+      // create service request.
+      const serviceRequest: ServiceCallRequest = {
+        domain: DOMAIN_SPOTIFYPLUS,
+        service: 'player_media_seek',
+        serviceData: serviceData
+      };
+
+      // call the service (no response).
+      await this.CallService(serviceRequest);
+
+    }
+    finally {
+    }
+  }
+
+
+  /**
    * Set shuffle mode for the specified Spotify Connect device.
    * 
    * @param player 
@@ -3284,6 +3478,122 @@ export class SpotifyPlusService {
       const serviceRequest: ServiceCallRequest = {
         domain: DOMAIN_SPOTIFYPLUS,
         service: 'player_set_shuffle_mode',
+        serviceData: serviceData
+      };
+
+      // call the service (no response).
+      await this.CallService(serviceRequest);
+
+    }
+    finally {
+    }
+  }
+
+
+  /**
+   * Skips to next track in the user's queue for the specified Spotify Connect device.
+   * 
+   * @param player 
+   *    MediaPlayer instance that will process the request.
+   * @param device_id
+   *    The name or id of the device this command is targeting.  
+   *    If not supplied, the user's currently active device is the target.  
+   *    Example: `Office`, `0d1841b0976bae2a3a310dd74c0f3df354899bc8`
+   * @param delay
+   *    Time delay (in seconds) to wait AFTER issuing the command to the player.  
+   *    This delay will give the spotify web api time to process the change before 
+   *    another command is issued.  
+   *    Default is 0.50; value range is 0 - 10.
+  */
+  public async PlayerMediaSkipNext(
+    player: MediaPlayer,
+    device_id: string | undefined | null = null,
+    delay: number | null = null,
+  ): Promise<void> {
+
+    try {
+
+      // spotify premium account (or elevated credentials) required for this function.
+      if (!player.isUserProductPremium() && (!player.attributes.sp_user_has_web_player_credentials)) {
+        throw new Error(ALERT_ERROR_SPOTIFY_PREMIUM_REQUIRED);
+      }
+
+      // resolve a device_id value, if one was not specified.
+      device_id = this.getDeviceId(player, device_id);
+
+      // create service data (with required parameters).
+      const serviceData: { [key: string]: any } = {
+        entity_id: player.id,
+      };
+
+      // update service data parameters (with optional parameters).
+      if (device_id != null)
+        serviceData['device_id'] = device_id;
+      if (delay != null)
+        serviceData['delay'] = delay;
+
+      // create service request.
+      const serviceRequest: ServiceCallRequest = {
+        domain: DOMAIN_SPOTIFYPLUS,
+        service: 'player_media_skip_next',
+        serviceData: serviceData
+      };
+
+      // call the service (no response).
+      await this.CallService(serviceRequest);
+
+    }
+    finally {
+    }
+  }
+
+
+  /**
+   * Skips to previous track in the user's queue for the specified Spotify Connect device.
+   * 
+   * @param player 
+   *    MediaPlayer instance that will process the request.
+   * @param device_id
+   *    The name or id of the device this command is targeting.  
+   *    If not supplied, the user's currently active device is the target.  
+   *    Example: `Office`, `0d1841b0976bae2a3a310dd74c0f3df354899bc8`
+   * @param delay
+   *    Time delay (in seconds) to wait AFTER issuing the command to the player.  
+   *    This delay will give the spotify web api time to process the change before 
+   *    another command is issued.  
+   *    Default is 0.50; value range is 0 - 10.
+  */
+  public async PlayerMediaSkipPrevious(
+    player: MediaPlayer,
+    device_id: string | undefined | null = null,
+    delay: number | null = null,
+  ): Promise<void> {
+
+    try {
+
+      // spotify premium account (or elevated credentials) required for this function.
+      if (!player.isUserProductPremium() && (!player.attributes.sp_user_has_web_player_credentials)) {
+        throw new Error(ALERT_ERROR_SPOTIFY_PREMIUM_REQUIRED);
+      }
+
+      // resolve a device_id value, if one was not specified.
+      device_id = this.getDeviceId(player, device_id);
+
+      // create service data (with required parameters).
+      const serviceData: { [key: string]: any } = {
+        entity_id: player.id,
+      };
+
+      // update service data parameters (with optional parameters).
+      if (device_id != null)
+        serviceData['device_id'] = device_id;
+      if (delay != null)
+        serviceData['delay'] = delay;
+
+      // create service request.
+      const serviceRequest: ServiceCallRequest = {
+        domain: DOMAIN_SPOTIFYPLUS,
+        service: 'player_media_skip_previous',
         serviceData: serviceData
       };
 
