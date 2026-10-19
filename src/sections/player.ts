@@ -144,17 +144,17 @@ export class Player extends AlertUpdatesBase {
       .player-section-container {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: minmax(0, 1fr) auto auto auto;
+        grid-template-rows: auto auto auto auto;
         grid-template-areas:
           'cover'
           'header'
           'body'
           'controls';
-        gap: 0.65rem;
+        gap: 0.8rem;
         justify-items: stretch;
         align-items: center;
         box-sizing: border-box;
-        padding: 1rem 1rem 0.8rem;
+        padding: 1.1rem 1rem 1rem;
         width: 100%;
         height: 100%;
         min-width: 0;
@@ -163,7 +163,9 @@ export class Player extends AlertUpdatesBase {
         background-repeat: no-repeat;
         background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));
         background-image: none !important;
-        background-color: #101c18;
+        background-color: #101b19;
+        color: #f0fdf4;
+        border-radius: 18px;
         text-align: center;
       }
 
@@ -176,11 +178,11 @@ export class Player extends AlertUpdatesBase {
         align-self: center;
         border-radius: 18px;
         overflow: hidden;
-        background: #164d3c;
+        background: #243c34;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #8ee0b3;
+        color: #86efac;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
       }
 
@@ -197,7 +199,7 @@ export class Player extends AlertUpdatesBase {
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
-        padding: 0.2rem 0;
+        padding: 0.25rem 0;
         background: transparent;
       }
 
@@ -230,7 +232,7 @@ export class Player extends AlertUpdatesBase {
         width: 100%;
         min-width: 0;
         max-width: 100%;
-        overflow-x: auto;
+        overflow-x: hidden;
         overflow-y: visible;
         padding: 0.25rem 0;
         box-sizing: border-box;
@@ -508,6 +510,20 @@ export class Player extends AlertUpdatesBase {
     if (playerVolumeSliderThickness)
       styleInfo['--crm-player-volume-slider-thickness'] = `${playerVolumeSliderThickness}`;
 
+    // Identidade visual ControlRoom: impede que as cores do tema do HA
+    // ou da configuracao antiga deixem os controles azuis.
+    styleInfo['--crm-player-controls-color'] = '#f0fdf4';
+    styleInfo['--crm-player-controls-icon-color'] = '#f0fdf4';
+    styleInfo['--crm-player-controls-icon-toggle-color'] = '#40d99a';
+    styleInfo['--crm-player-progress-slider-color'] = '#40d99a';
+    styleInfo['--crm-player-progress-label-color'] = '#a6b7af';
+    styleInfo['--crm-player-volume-slider-color'] = '#40d99a';
+    styleInfo['--crm-player-volume-label-color'] = '#a6b7af';
+    styleInfo['--crm-player-header-title1-color'] = '#f0fdf4';
+    styleInfo['--crm-player-header-title2-color'] = '#e8f5ee';
+    styleInfo['--crm-player-header-title3-color'] = '#a6b7af';
+    styleInfo['--crm-player-header-bg-color'] = 'transparent';
+    styleInfo['--crm-player-controls-bg-color'] = 'transparent';
     return styleMap(styleInfo);
 
   }

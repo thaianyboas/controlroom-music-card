@@ -2140,59 +2140,35 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
                        ></crm-media-browser-icons>`)()}  
         </div>
       </div>
-    `}firstUpdated(e){this.isCardInEditPreview||(this.isMediaListRefreshedOnSectionEntry=this.config.episodeFavBrowserItemsRefreshOnEntry||!1),super.firstUpdated(e)}updateMediaList(e){if(!super.updateMediaList(e))return!1;try{const t=new Array,i=new Promise((t,i)=>{const s=this.config.episodeFavBrowserItemsLimit||this.LIMIT_TOTAL_MAX,r=this.config.episodeFavBrowserItemsSortTitle||!1;this.spotifyPlusService.GetEpisodeFavorites(e,0,0,s,r).then(e=>{this.mediaList=function(e){const t=new Array;if(e)for(const i of e.items||[])t.push(i.episode);return t}(e),this.mediaListLastUpdatedOn=e.date_last_refreshed||ti(),super.updatedMediaListOk(),t(!0)}).catch(e=>{this.mediaList=void 0,this.mediaListLastUpdatedOn=0,super.updatedMediaListError("Get Episode Favorites failed: "+mi(e)),i(e)})});return t.push(i),this.progressShow(),Promise.allSettled(t).finally(()=>{this.progressHide()}),!0}catch(e){return this.progressHide(),super.updatedMediaListError("Episode favorites refresh failed: "+mi(e)),!0}}};hr=Ie([Be("crm-episode-fav-browser")],hr);class ur extends es{constructor(){super(...arguments),this.mediaDuration=0}render(){this.player=this.store.player,this.mediaDuration=this.player?.attributes.media_duration||0;return this.mediaDuration>0?(this.trackProgress(),B`
-        <div class="progress">
-          <span class="progress-time progress-pad-left">${mr(this.playingProgress)}</span>
-          <div class="bar" @click=${this.onSeekBarClick}>
-            <div class="progress-bar" style=${this.styleProgressBar(this.mediaDuration)}></div>
-          </div>
-          <span class="progress-time progress-pad-right"> -${mr(this.mediaDuration-this.playingProgress)}</span>
+    `}firstUpdated(e){this.isCardInEditPreview||(this.isMediaListRefreshedOnSectionEntry=this.config.episodeFavBrowserItemsRefreshOnEntry||!1),super.firstUpdated(e)}updateMediaList(e){if(!super.updateMediaList(e))return!1;try{const t=new Array,i=new Promise((t,i)=>{const s=this.config.episodeFavBrowserItemsLimit||this.LIMIT_TOTAL_MAX,r=this.config.episodeFavBrowserItemsSortTitle||!1;this.spotifyPlusService.GetEpisodeFavorites(e,0,0,s,r).then(e=>{this.mediaList=function(e){const t=new Array;if(e)for(const i of e.items||[])t.push(i.episode);return t}(e),this.mediaListLastUpdatedOn=e.date_last_refreshed||ti(),super.updatedMediaListOk(),t(!0)}).catch(e=>{this.mediaList=void 0,this.mediaListLastUpdatedOn=0,super.updatedMediaListError("Get Episode Favorites failed: "+mi(e)),i(e)})});return t.push(i),this.progressShow(),Promise.allSettled(t).finally(()=>{this.progressHide()}),!0}catch(e){return this.progressHide(),super.updatedMediaListError("Episode favorites refresh failed: "+mi(e)),!0}}};hr=Ie([Be("crm-episode-fav-browser")],hr);class ur extends es{constructor(){super(...arguments),this.playingProgress=0,this.mediaDuration=0}render(){if(this.player=this.store.player,this.mediaDuration=this.player?.attributes.media_duration||0,this.mediaDuration<=0)return this.stopTracking(),B``;this.trackProgress();const e=Math.max(0,Math.min(this.playingProgress||0,this.mediaDuration));return B`
+      <div class="progress">
+        <div
+          class="bar"
+          role="slider"
+          tabindex="0"
+          aria-label="Playback position"
+          aria-valuemin="0"
+          aria-valuemax=${Math.round(this.mediaDuration)}
+          aria-valuenow=${Math.round(e)}
+          @click=${this.onSeekBarClick}
+          @keydown=${this.onSeekBarKeyDown}
+        >
+          <div class="progress-bar" style=${this.styleProgressBar(this.mediaDuration)}></div>
         </div>
-      `):B``}disconnectedCallback(){this.tracker&&(clearInterval(this.tracker),this.tracker=void 0),super.disconnectedCallback()}async onSeekBarClick(e){try{const t=this.progressBar.offsetWidth,i=e.offsetX/t;let s=this.mediaDuration*i;return s>0&&(s*=1e3),this.progressShow(),await this.store.spotifyPlusService.PlayerMediaSeek(this.player,null,s,0),!0}catch(e){return this.alertErrorSet("Seek position failed: "+mi(e)),!0}finally{this.progressHide()}}alertErrorSet(e){const t=ci("#spcPlayer",this);t&&t.alertErrorSet(e)}styleProgressBar(e){return He({width:this.playingProgress/e*100+"%"})}trackProgress(){const e=this.player?.attributes.media_position||0,t=this.player?.isPlaying(),i=this.player?.attributes.media_position_updated_at||0;if(t){const t=e+Math.floor((Date.now()-new Date(i).getTime())/1e3);this.playingProgress=t}else this.playingProgress=e;this.tracker||(this.tracker=setInterval(()=>this.trackProgress(),1e3)),t||(clearInterval(this.tracker),this.tracker=void 0)}static get styles(){return a`
-      .progress {
-        width: 100%;
-        font-size: var(--crm-player-progress-label-font-size, x-small);
-        display: flex;
-        color: var(--crm-player-progress-label-color, var(--crm-player-controls-color, #ffffff));
-        padding-bottom: 0.2rem;
-      }
-
-      .progress-pad-left {
-        padding-left: var(--crm-player-progress-label-padding-lr, 0rem);
-      }
-
-      .progress-pad-right {
-        padding-right: var(--crm-player-progress-label-padding-lr, 0rem);
-      }
-
-      .bar {
-        display: flex;
-        flex-grow: 1;
-        align-items: center;
-        align-self: center;
-        margin-left: 5px;
-        margin-right: 5px;
-        height: 14px;
-        cursor: pointer;
-        background-clip: padding-box;
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 0.25rem;
-      }
-
-      .progress-bar {
-        align-self: center;
-        background-color: var(--crm-player-progress-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${o(Ae)})));
-        margin-left: 2px;
-        margin-right: 2px;
-        height: 50%;
-        transition: width 0.1s linear;
-        border-radius: 0.18rem;
-      }
-
-      .progress-time {
-        mix-blend-mode: normal;
-      }
-    `}}Ie([Ve()],ur.prototype,"playingProgress",void 0),Ie([qe(".bar")],ur.prototype,"progressBar",void 0);const mr=e=>{const t=new Date(1e3*e).toISOString().substring(11,19);return t.startsWith("00:")?t.substring(3):t};customElements.define("crm-player-progress",ur);class pr extends re{render(){this.config=this.store.config,this.player=this.store.player;const e=this.config.playerHeaderHideProgressBar||!1,t=yi(this.config.playerHeaderTitle,this.config,this.player);let i=yi(this.config.playerHeaderArtistTrack,this.config,this.player),s=yi(this.config.playerHeaderAlbum,this.config,this.player);i&&(i=i.replace(/^ - | - $/g,""));let r,o=!1,a=B``,n=B``;if(this.player.isPlaying()){const e=this.parentElement?.querySelector(".player-section-body-content");if(e){const t=e.tagName.toLowerCase();if("crm-player-body-track"==t){const t=e;r=t.isTrackFavorite,a=t.actionTrackFavoriteAdd,n=t.actionTrackFavoriteRemove,o=!0,t.mediaContentId=this.player.attributes.media_content_id}else if("crm-player-body-show"==t){const t=e;r=t.isEpisodeFavorite,a=t.actionEpisodeFavoriteAdd,n=t.actionEpisodeFavoriteRemove,o=!0,t.mediaContentId=this.player.attributes.media_content_id}else if("crm-player-body-audiobook"==t){const t=e;r=t.isAudiobookFavorite,a=t.actionAudiobookFavoriteAdd,n=t.actionAudiobookFavoriteRemove,o=!0,t.mediaContentId=this.player.attributes.media_content_id}}}return this.player.attributes.media_title||(i=yi(this.config.playerHeaderNoMediaPlayingText,this.config,this.player)||"No Media Playing",s=void 0),B` 
+        <div class="progress-times">
+          <span class="progress-time">${mr(e)}</span>
+          <span class="progress-time">${mr(this.mediaDuration)}</span>
+        </div>
+      </div>
+    `}disconnectedCallback(){this.stopTracking(),super.disconnectedCallback()}stopTracking(){void 0!==this.tracker&&(clearInterval(this.tracker),this.tracker=void 0)}async onSeekBarClick(e){const t=this.progressBar;if(!t)return;const i=t.getBoundingClientRect();if(i.width<=0)return;const s=Math.max(0,Math.min(1,(e.clientX-i.left)/i.width));await this.seekTo(this.mediaDuration*s)}async onSeekBarKeyDown(e){if("ArrowLeft"!==e.key&&"ArrowRight"!==e.key&&"Home"!==e.key&&"End"!==e.key)return;e.preventDefault();const t=Math.max(0,Math.min(this.playingProgress||0,this.mediaDuration)),i="Home"===e.key?0:"End"===e.key?this.mediaDuration:t+("ArrowRight"===e.key?5:-5);await this.seekTo(Math.max(0,Math.min(i,this.mediaDuration)))}async seekTo(e){try{this.progressShow(),await this.store.spotifyPlusService.PlayerMediaSeek(this.player,null,1e3*e,0)}catch(e){this.alertErrorSet("Seek position failed: "+mi(e))}finally{this.progressHide()}}alertErrorSet(e){const t=ci("#spcPlayer",this);t&&t.alertErrorSet(e)}styleProgressBar(e){const t=e>0?Math.max(0,Math.min(100,(this.playingProgress||0)/e*100)):0;return He({width:`${t}%`})}trackProgress(){const e=this.player?.attributes.media_position||0,t=this.player?.isPlaying(),i=this.player?.attributes.media_position_updated_at,s=i?new Date(i).getTime():NaN,r=t&&Number.isFinite(s)?Math.max(0,(Date.now()-s)/1e3):0,o=Math.max(0,Math.min(e+r,this.mediaDuration));this.playingProgress!==o&&(this.playingProgress=o),t&&void 0===this.tracker?this.tracker=setInterval(()=>this.trackProgress(),1e3):t||this.stopTracking()}static get styles(){return a`
+      :host { display: block; width: 100%; min-width: 0; }
+      .progress { width: 100%; display: flex; flex-direction: column; gap: 7px; box-sizing: border-box; padding: 7px 0 5px; }
+      .bar { display: block; width: 100%; height: 5px; background: rgba(255,255,255,0.18); border: 0; border-radius: 999px; overflow: hidden; cursor: pointer; box-sizing: border-box; touch-action: manipulation; }
+      .bar:focus-visible { outline: 2px solid #4adea4; outline-offset: 4px; }
+      .progress-bar { height: 100%; background: var(--crm-player-progress-slider-color, ${o(Ae)}); border-radius: inherit; transition: width 0.25s linear; }
+      .progress-times { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .progress-time { color: var(--crm-player-progress-label-color, rgba(255,255,255,0.65)); font-size: var(--crm-player-progress-label-font-size, 0.75rem); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    `}}Ie([Ve()],ur.prototype,"playingProgress",void 0),Ie([qe(".bar")],ur.prototype,"progressBar",void 0);const mr=e=>{const t=Math.max(0,Math.floor(Number.isFinite(e)?e:0)),i=Math.floor(t/3600),s=Math.floor(t%3600/60),r=t%60;return i>0?`${i}:${String(s).padStart(2,"0")}:${String(r).padStart(2,"0")}`:`${s}:${String(r).padStart(2,"0")}`};customElements.define("crm-player-progress",ur);class pr extends re{render(){this.config=this.store.config,this.player=this.store.player;const e=this.config.playerHeaderHideProgressBar||!1,t=yi(this.config.playerHeaderTitle,this.config,this.player);let i=yi(this.config.playerHeaderArtistTrack,this.config,this.player),s=yi(this.config.playerHeaderAlbum,this.config,this.player);i&&(i=i.replace(/^ - | - $/g,""));let r,o=!1,a=B``,n=B``;if(this.player.isPlaying()){const e=this.parentElement?.querySelector(".player-section-body-content");if(e){const t=e.tagName.toLowerCase();if("crm-player-body-track"==t){const t=e;r=t.isTrackFavorite,a=t.actionTrackFavoriteAdd,n=t.actionTrackFavoriteRemove,o=!0,t.mediaContentId=this.player.attributes.media_content_id}else if("crm-player-body-show"==t){const t=e;r=t.isEpisodeFavorite,a=t.actionEpisodeFavoriteAdd,n=t.actionEpisodeFavoriteRemove,o=!0,t.mediaContentId=this.player.attributes.media_content_id}else if("crm-player-body-audiobook"==t){const t=e;r=t.isAudiobookFavorite,a=t.actionAudiobookFavoriteAdd,n=t.actionAudiobookFavoriteRemove,o=!0,t.mediaContentId=this.player.attributes.media_content_id}}}return this.player.attributes.media_title||(i=yi(this.config.playerHeaderNoMediaPlayingText,this.config,this.player)||"No Media Playing",s=void 0),B` 
       <div class="player-header-container" style=${this.styleContainer()}>
         ${e?B``:B`<crm-player-progress .store=${this.store}></crm-player-progress>`}
         ${t?B`<div class="header-title">${t}</div>`:B``}
@@ -3161,7 +3137,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       .flex-1 {
         flex: 1;
       }
-    `}constructor(){super(),this.onKeyDown_EventListenerBound=this.onKeyDown.bind(this)}connectedCallback(){super.connectedCallback(),document.addEventListener("keydown",this.onKeyDown_EventListenerBound)}disconnectedCallback(){document.removeEventListener("keydown",this.onKeyDown_EventListenerBound),super.disconnectedCallback()}update(e){super.update(e);Array.from(e.keys()).includes("mediaContentId")&&setTimeout(()=>{this.toggleDisplayPlayerBodyQueue()},50)}toggleDisplayActionFavorites(){const e=this.parentElement?.querySelector(".player-section-body-content");e&&(e.style.display=this.isActionFavoritesVisible?"block":"none",e.style.opacity=this.isActionFavoritesVisible?"1":"0")}toggleDisplayPlayerBodyQueue(){const e=this.parentElement?.querySelector("#elmPlayerBodyQueue");e?(e.style.display=this.isQueueItemsVisible?"block":"none",e.style.opacity=this.isQueueItemsVisible?"1":"0",this.isQueueItemsVisible?(kr("toggleDisplayPlayerBodyQueue - calling for refresh of queue items"),e.refreshQueueItems()):kr("toggleDisplayPlayerBodyQueue - queue items not visible; isQueueItemsVisible = %s",JSON.stringify(this.isQueueItemsVisible))):kr("toggleDisplayPlayerBodyQueue - could not find queue items #elmPlayerBodyQueue selector!")}onKeyDown(e){"Escape"===e.key&&(this.isActionFavoritesVisible?this.onClickAction(Mr):this.isQueueItemsVisible&&this.onClickAction(xr))}async onClickAction(e){try{if(e==Mr)return this.isCardInEditPreview?(this.alertInfoSet("Action Favorites cannot be displayed while editing card configuration"),!0):(this.isActionFavoritesVisible=!this.isActionFavoritesVisible,kr.enabled&&kr("update - action favorites toggled - isActionFavoritesVisible = %s",JSON.stringify(this.isActionFavoritesVisible)),this.isQueueItemsVisible?(kr("update - queue items visible; imediately closing queue items, and delay opening action favorites"),this.isQueueItemsVisible=!1,this.toggleDisplayPlayerBodyQueue(),setTimeout(()=>{this.toggleDisplayActionFavorites()},250)):(kr("update - queue items not visible; immediately toggling action favorites"),this.toggleDisplayActionFavorites()),!0);if(e==Hr)this.store.card.SetSection(Yt.DEVICES);else if(e==xr)return this.isCardInEditPreview?(this.alertInfoSet("Queue items cannot be displayed while editing card configuration"),!0):(this.isQueueItemsVisible=!this.isQueueItemsVisible,kr.enabled&&kr("update - queue items toggled - isQueueItemsVisible = %s",JSON.stringify(this.isQueueItemsVisible)),this.isActionFavoritesVisible?(kr("update - action favorites visible; imeediately closing action favorites, and delay opening queue items"),this.isActionFavoritesVisible=!1,this.toggleDisplayActionFavorites(),setTimeout(()=>{this.toggleDisplayPlayerBodyQueue()},250)):(kr("update - action favorites not visible; immediately opening queue items"),this.toggleDisplayPlayerBodyQueue()),!0);if(this.progressShow(),e==Er)await this.spotifyPlusService.PlayerMediaPause(this.player,null);else if(e==$r)await this.spotifyPlusService.PlayerMediaResume(this.player,null);else if(e==Pr)await this.spotifyPlusService.PlayerMediaSkipNext(this.player,null);else if(e==_r){const e=this.player?.attributes.media_position||0,t=this.player?.isPlaying(),i=this.player?.attributes.media_position_updated_at||0;let s=e;t&&(s=e+(Date.now()-new Date(i).getTime())/1e3),s>8?await this.spotifyPlusService.PlayerMediaSeek(this.player,null,0,0):await this.spotifyPlusService.PlayerMediaSkipPrevious(this.player,null)}else if(e==Rr){let e=ps.OFF;this.player.attributes.repeat==ps.OFF?e=ps.ONE:this.player.attributes.repeat==ps.ONE?e=ps.ALL:this.player.attributes.repeat==ps.ALL&&(e=ps.OFF),await this.mediaControlService.repeat_set(this.player,e)}else e==Lr?await this.mediaControlService.shuffle_set(this.player,!this.player.attributes.shuffle):e==Or?await this.spotifyPlusService.turn_off(this.player):e==Fr&&await this.spotifyPlusService.turn_on(this.player);return this.progressHide(),!0}catch(e){return this.alertErrorSet("Control action failed: "+mi(e)),this.progressHide(),!0}}hideFeature(e){if(e==Er){if(this.player.supportsFeature(Er)){if(this.player.state==vs.PAUSED)return;return this.config.playerControlsHidePlayPause||D}}else if(e==$r){if(this.player.supportsFeature($r)){if(this.player.state==vs.PLAYING)return;return this.config.playerControlsHidePlayPause||D}}else if(e==Pr){if(this.player.supportsFeature(Pr))return this.config.playerControlsHideTrackNext||D}else if(e==_r){if(this.player.supportsFeature(_r))return this.config.playerControlsHideTrackPrev||D}else if(e==Rr){if(this.player.supportsFeature(Rr))return this.config.playerControlsHideRepeat||D}else if(e==Lr){if(this.player.supportsFeature(Lr))return this.config.playerControlsHideShuffle||D}else{if(e==Mr)return this.config.playerControlsHideFavorites||D;if(e==xr)return this.config.playerControlsHidePlayQueue||D;if(e==Fr){if(this.player.supportsFeature(Fr))return![vs.OFF,vs.STANDBY].includes(this.player.state)||(!!this.config.playerVolumeControlsHidePower||D)}else if(e==Or){if(this.player.supportsFeature(Or))return![vs.IDLE].includes(this.player.state)||(!!this.config.playerVolumeControlsHidePower||D)}else if(e==Hr&&this.config.playerMinimizeOnIdle&&this.config.sections?.includes(Yt.DEVICES))return D}return!0}alertInfoSet(e){const t=ci("#spcPlayer",this);t&&t.alertInfoSet(e)}alertErrorSet(e){const t=ci("#spcPlayer",this);t&&t.alertErrorSet(e)}getRepeatIcon(){return this.player.attributes.repeat==ps.ALL?"M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z":this.player.attributes.repeat==ps.ONE?"M13,15V9H12L10,10V11H11.5V15M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z":"M2,5.27L3.28,4L20,20.72L18.73,22L15.73,19H7V22L3,18L7,14V17H13.73L7,10.27V11H5V8.27L2,5.27M17,13H19V17.18L17,15.18V13M17,5V2L21,6L17,10V7H8.82L6.82,5H17Z"}getShuffleIcon(){return this.player.attributes.shuffle?"M14.83,13.41L13.42,14.82L16.55,17.95L14.5,20H20V14.5L17.96,16.54L14.83,13.41M14.5,4L16.54,6.04L4,18.59L5.41,20L17.96,7.46L20,9.5V4M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17Z":"M16,4.5V7H5V9H16V11.5L19.5,8M16,12.5V15H5V17H16V19.5L19.5,16"}styleContainer(e,t){const i={"margin-bottom":"0px"};return this.config.playerMinimizeOnIdle&&(e||t)&&(i.margin="0px",i.padding="2px"),He(i)}styleIcon(e=null){const t={},i=this.config.playerControlsIconMargin;return i&&(t.margin=`${i}`),e&&(t.color=`var(--crm-player-controls-icon-toggle-color, ${Ae})`),He(t)}}Ie([De({attribute:!1})],Br.prototype,"mediaContentId",void 0),Ie([Ve()],Br.prototype,"isActionFavoritesVisible",void 0),Ie([Ve()],Br.prototype,"isQueueItemsVisible",void 0),customElements.define("crm-player-controls",Br);const{TURN_OFF:Ur,TURN_ON:Dr,VOLUME_MUTE:Vr,VOLUME_SET:Nr,VOLUME_STEP:qr}=gs,zr=9e11,Wr=900000000001;class Gr extends es{constructor(){super(...arguments),this.slim=!1}render(){this.config=this.store.config,this.spotifyPlusService=this.store.spotifyPlusService;const e=this.config.playerVolumeControlsHideMute||!1,t=this.config.playerVolumeControlsHideLevels||!1,i=this.player.isMuted()?"M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z":"M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z",s=this.config.playerVolumeControlsShowPlusMinus&&!0,r=this.player.state==vs.OFF,o=this.player.attributes.is_volume_muted,a=this.player.getVolume(),n=Math.round(Math.abs((a-0)/100*100));return B`
+    `}constructor(){super(),this.onKeyDown_EventListenerBound=this.onKeyDown.bind(this)}connectedCallback(){super.connectedCallback(),document.addEventListener("keydown",this.onKeyDown_EventListenerBound)}disconnectedCallback(){document.removeEventListener("keydown",this.onKeyDown_EventListenerBound),super.disconnectedCallback()}update(e){super.update(e);Array.from(e.keys()).includes("mediaContentId")&&setTimeout(()=>{this.toggleDisplayPlayerBodyQueue()},50)}toggleDisplayActionFavorites(){const e=this.parentElement?.querySelector(".player-section-body-content");e&&(e.style.display=this.isActionFavoritesVisible?"block":"none",e.style.opacity=this.isActionFavoritesVisible?"1":"0")}toggleDisplayPlayerBodyQueue(){const e=this.parentElement?.querySelector("#elmPlayerBodyQueue");e?(e.style.display=this.isQueueItemsVisible?"block":"none",e.style.opacity=this.isQueueItemsVisible?"1":"0",this.isQueueItemsVisible?(kr("toggleDisplayPlayerBodyQueue - calling for refresh of queue items"),e.refreshQueueItems()):kr("toggleDisplayPlayerBodyQueue - queue items not visible; isQueueItemsVisible = %s",JSON.stringify(this.isQueueItemsVisible))):kr("toggleDisplayPlayerBodyQueue - could not find queue items #elmPlayerBodyQueue selector!")}onKeyDown(e){"Escape"===e.key&&(this.isActionFavoritesVisible?this.onClickAction(Mr):this.isQueueItemsVisible&&this.onClickAction(xr))}async onClickAction(e){try{if(e==Mr)return this.isCardInEditPreview?(this.alertInfoSet("Action Favorites cannot be displayed while editing card configuration"),!0):(this.isActionFavoritesVisible=!this.isActionFavoritesVisible,kr.enabled&&kr("update - action favorites toggled - isActionFavoritesVisible = %s",JSON.stringify(this.isActionFavoritesVisible)),this.isQueueItemsVisible?(kr("update - queue items visible; imediately closing queue items, and delay opening action favorites"),this.isQueueItemsVisible=!1,this.toggleDisplayPlayerBodyQueue(),setTimeout(()=>{this.toggleDisplayActionFavorites()},250)):(kr("update - queue items not visible; immediately toggling action favorites"),this.toggleDisplayActionFavorites()),!0);if(e==Hr)this.store.card.SetSection(Yt.DEVICES);else if(e==xr)return this.isCardInEditPreview?(this.alertInfoSet("Queue items cannot be displayed while editing card configuration"),!0):(this.isQueueItemsVisible=!this.isQueueItemsVisible,kr.enabled&&kr("update - queue items toggled - isQueueItemsVisible = %s",JSON.stringify(this.isQueueItemsVisible)),this.isActionFavoritesVisible?(kr("update - action favorites visible; imeediately closing action favorites, and delay opening queue items"),this.isActionFavoritesVisible=!1,this.toggleDisplayActionFavorites(),setTimeout(()=>{this.toggleDisplayPlayerBodyQueue()},250)):(kr("update - action favorites not visible; immediately opening queue items"),this.toggleDisplayPlayerBodyQueue()),!0);if(this.progressShow(),e==Er)await this.spotifyPlusService.PlayerMediaPause(this.player,null);else if(e==$r)await this.spotifyPlusService.PlayerMediaResume(this.player,null);else if(e==Pr)await this.spotifyPlusService.PlayerMediaSkipNext(this.player,null);else if(e==_r){const e=this.player?.attributes.media_position||0,t=this.player?.isPlaying(),i=this.player?.attributes.media_position_updated_at||0;let s=e;t&&(s=e+(Date.now()-new Date(i).getTime())/1e3),s>8?await this.spotifyPlusService.PlayerMediaSeek(this.player,null,0,0):await this.spotifyPlusService.PlayerMediaSkipPrevious(this.player,null)}else if(e==Rr){let e=ps.OFF;this.player.attributes.repeat==ps.OFF?e=ps.ONE:this.player.attributes.repeat==ps.ONE?e=ps.ALL:this.player.attributes.repeat==ps.ALL&&(e=ps.OFF),await this.mediaControlService.repeat_set(this.player,e)}else e==Lr?await this.mediaControlService.shuffle_set(this.player,!this.player.attributes.shuffle):e==Or?await this.spotifyPlusService.turn_off(this.player):e==Fr&&await this.spotifyPlusService.turn_on(this.player);return this.progressHide(),!0}catch(e){return this.alertErrorSet("Control action failed: "+mi(e)),this.progressHide(),!0}}hideFeature(e){if(e==Er){if(this.player.supportsFeature(Er)){if(this.player.state==vs.PAUSED)return;return this.config.playerControlsHidePlayPause||D}}else if(e==$r){if(this.player.supportsFeature($r)){if(this.player.state==vs.PLAYING)return;return this.config.playerControlsHidePlayPause||D}}else if(e==Pr){if(this.player.supportsFeature(Pr))return this.config.playerControlsHideTrackNext||D}else if(e==_r){if(this.player.supportsFeature(_r))return this.config.playerControlsHideTrackPrev||D}else if(e==Rr){if(this.player.supportsFeature(Rr))return this.config.playerControlsHideRepeat||D}else if(e==Lr){if(this.player.supportsFeature(Lr))return this.config.playerControlsHideShuffle||D}else{if(e==Mr)return this.config.playerControlsHideFavorites||D;if(e==xr)return this.config.playerControlsHidePlayQueue||D;if(e==Fr){if(this.player.supportsFeature(Fr))return![vs.OFF,vs.STANDBY].includes(this.player.state)||(!!this.config.playerVolumeControlsHidePower||D)}else if(e==Or){if(this.player.supportsFeature(Or))return![vs.IDLE].includes(this.player.state)||(!!this.config.playerVolumeControlsHidePower||D)}else if(e==Hr&&this.config.playerMinimizeOnIdle&&this.config.sections?.includes(Yt.DEVICES))return D}return!0}alertInfoSet(e){const t=ci("#spcPlayer",this);t&&t.alertInfoSet(e)}alertErrorSet(e){const t=ci("#spcPlayer",this);t&&t.alertErrorSet(e)}getRepeatIcon(){return this.player.attributes.repeat==ps.ALL?"M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z":this.player.attributes.repeat==ps.ONE?"M13,15V9H12L10,10V11H11.5V15M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z":"M2,5.27L3.28,4L20,20.72L18.73,22L15.73,19H7V22L3,18L7,14V17H13.73L7,10.27V11H5V8.27L2,5.27M17,13H19V17.18L17,15.18V13M17,5V2L21,6L17,10V7H8.82L6.82,5H17Z"}getShuffleIcon(){return this.player.attributes.shuffle?"M14.83,13.41L13.42,14.82L16.55,17.95L14.5,20H20V14.5L17.96,16.54L14.83,13.41M14.5,4L16.54,6.04L4,18.59L5.41,20L17.96,7.46L20,9.5V4M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17Z":"M16,4.5V7H5V9H16V11.5L19.5,8M16,12.5V15H5V17H16V19.5L19.5,16"}styleContainer(e,t){const i={"margin-bottom":"0px"};return this.config.playerMinimizeOnIdle&&(e||t)&&(i.margin="0px",i.padding="2px"),He(i)}styleIcon(e=null){const t={},i=this.config.playerControlsIconMargin;return i&&(t.margin=`${i}`),e&&(t.color=`var(--crm-player-controls-icon-toggle-color, ${Ae})`),He(t)}}Ie([De({attribute:!1})],Br.prototype,"mediaContentId",void 0),Ie([Ve()],Br.prototype,"isActionFavoritesVisible",void 0),Ie([Ve()],Br.prototype,"isQueueItemsVisible",void 0),customElements.define("crm-player-controls",Br);const{TURN_OFF:Ur,TURN_ON:Dr,VOLUME_MUTE:Vr,VOLUME_SET:Nr,VOLUME_STEP:qr}=gs,zr=9e11,Wr=900000000001;class Gr extends es{constructor(){super(...arguments),this.slim=!1}render(){this.config=this.store.config,this.spotifyPlusService=this.store.spotifyPlusService;const e=this.config.playerVolumeControlsHideMute||!1,t=this.config.playerVolumeControlsHideLevels||!1,i=this.player.isMuted()?"M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z":"M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z",s=this.config.playerVolumeControlsShowPlusMinus&&!0,r=this.player.state==vs.OFF,o=this.player.attributes.is_volume_muted,a=this.player.getVolume();return B`
       <div class="volume-container icons" slim=${this.slim||D}>
         ${e?B``:B`
           <ha-icon-button
@@ -3184,9 +3160,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           ></ha-control-slider>
           ${t?B``:B`
             <div class="volume-level">
-              <div class="volume-level-min">${0}%</div>
-              <div class="volume-level-pct" style="flex: ${n}%;">${a}%</div>
-              <div class="volume-level-max">${100}%</div>
+              <span class="volume-level-pct">${a}%</span>
             </div>
           `}
         </div>
@@ -3198,57 +3172,50 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       </div>
     `}async onVolumeValueChanged(e){try{this.progressShow();let t=Number.parseInt(e?.target?.value);const i=this.config.playerVolumeMaxValue||100;if(t>i){t=i;const s=e?.target;s&&(s.value=t+""),this.alertInfoSet("Selected volume level was greater than Max Volume limit set in card configuration; max limit value of "+i+" was applied.")}return await this.spotifyPlusService.volume_set(this.player,t),!0}catch(e){return this.alertErrorSet("Volume set failed: "+mi(e)),!0}finally{this.progressHide()}}async onMuteClick(){try{return this.progressShow(),await this.spotifyPlusService.volume_mute_toggle(this.player),!0}catch(e){return this.alertErrorSet("Volume mute failed: "+mi(e)),!0}finally{this.progressHide()}}styleVolumeSlider(){if(this.config.playerVolumeControlsHideSlider||!1)return"display: none"}async onClickAction(e){try{return this.progressShow(),e==Ur?await this.spotifyPlusService.turn_off(this.player):e==Dr?await this.spotifyPlusService.turn_on(this.player):e==zr?await this.spotifyPlusService.volume_down(this.player):e==Wr&&await this.spotifyPlusService.volume_up(this.player),!0}catch(e){return this.alertErrorSet("Volume action failed: "+mi(e)),!0}finally{this.progressHide()}}hideFeature(e){if(e==Dr){if(this.player.supportsFeature(Dr))return![vs.OFF,vs.UNKNOWN,vs.STANDBY].includes(this.player.state)||(!!this.config.playerVolumeControlsHidePower||D)}else if(e==Ur){if(this.player.supportsFeature(Ur))return!![vs.OFF,vs.UNKNOWN,vs.STANDBY].includes(this.player.state)||(!!this.config.playerVolumeControlsHidePower||D)}else if(e==Vr){if(this.player.supportsFeature(Vr))return D}else if(e==Nr){if(this.player.supportsFeature(Nr))return D}else if(e==qr&&this.player.supportsFeature(qr))return D;return!0}alertErrorSet(e){const t=ci("#spcPlayer",this);t&&t.alertErrorSet(e)}alertInfoSet(e){const t=ci("#spcPlayer",this);t&&t.alertInfoSet(e)}styleIcon(e=null){const t={},i=this.config.playerControlsIconMargin;return i&&(t.margin=`${i}`),e&&(t.color=`var(--crm-player-controls-icon-toggle-color, ${Ae})`),He(t)}static get styles(){return a`
       ha-control-slider {
-        --control-slider-color: var(--crm-player-volume-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${o(Ae)})));
-        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 1rem);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: var(--control-slider-border-radius);
+        display: block;
+        width: 100%;
+        --control-slider-color: var(--crm-player-volume-slider-color, #34d399);
+        --control-slider-thickness: 6px;
+        --control-slider-border-radius: 999px;
+        border: none;
         box-sizing: border-box;
       }
 
       ha-control-slider[disabled] {
         --control-slider-color: var(--disabled-text-color);
-        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 1rem);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: var(--control-slider-border-radius);
-        box-sizing: border-box;
+        --control-slider-thickness: 6px;
+        border: none;
       }
 
       .volume-container {
-        flex: 1;
-        /*border: 1px solid blue;  /*  FOR TESTING CONTROL LAYOUT CHANGES */
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        min-width: 0;
       }
 
       .volume-slider {
-        flex: 1;
-        padding-right: 0.0rem;
-        align-content: flex-end;
-        color: var(--crm-player-volume-label-color, var(--crm-player-controls-color, #ffffff));
+        flex: 1 1 auto;
+        min-width: 0;
+        color: var(--crm-player-volume-label-color, #d1fae5);
       }
 
       .volume-level {
-        font-size: var(--crm-player-volume-label-font-size, x-small);
         display: flex;
-      }
-
-      .volume-level-min {
-        flex: 0;
-        text-align: left;
-        margin-right: 4px;
+        justify-content: flex-end;
+        margin-top: 1px;
+        font-size: 11px;
+        line-height: 1.2;
       }
 
       .volume-level-pct {
-        text-align: right;
-        color: var(--crm-player-volume-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${o(Ae)})));
-      }
-
-      .volume-level-max {
-        flex: 100;
-        text-align: right;
-        margin-left: 4px;
+        color: var(--crm-player-volume-label-color, #a3b8af);
+        font-variant-numeric: tabular-nums;
       }
 
       *[slim] * {
-        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 10px);
+        --control-slider-thickness: 6px;
         --ha-icon-button-size: 30px;
         --mdc-icon-size: 20px;
       }
@@ -3264,7 +3231,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
       .icons {
         justify-content: center;
-        display: inline-flex;
+        display: flex;
         align-items: center;
         mix-blend-mode: normal;
         overflow: hidden;
@@ -3327,17 +3294,17 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       .player-section-container {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: minmax(0, 1fr) auto auto auto;
+        grid-template-rows: auto auto auto auto;
         grid-template-areas:
           'cover'
           'header'
           'body'
           'controls';
-        gap: 0.65rem;
+        gap: 0.8rem;
         justify-items: stretch;
         align-items: center;
         box-sizing: border-box;
-        padding: 1rem 1rem 0.8rem;
+        padding: 1.1rem 1rem 1rem;
         width: 100%;
         height: 100%;
         min-width: 0;
@@ -3346,7 +3313,9 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         background-repeat: no-repeat;
         background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));
         background-image: none !important;
-        background-color: #101c18;
+        background-color: #101b19;
+        color: #f0fdf4;
+        border-radius: 18px;
         text-align: center;
       }
 
@@ -3359,11 +3328,11 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         align-self: center;
         border-radius: 18px;
         overflow: hidden;
-        background: #164d3c;
+        background: #243c34;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #8ee0b3;
+        color: #86efac;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
       }
 
@@ -3380,7 +3349,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
-        padding: 0.2rem 0;
+        padding: 0.25rem 0;
         background: transparent;
       }
 
@@ -3413,7 +3382,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         width: 100%;
         min-width: 0;
         max-width: 100%;
-        overflow-x: auto;
+        overflow-x: hidden;
         overflow-y: visible;
         padding: 0.25rem 0;
         box-sizing: border-box;
@@ -3436,7 +3405,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         background-color: rgba(var(--rgb-card-background-color), 0.92);
       }
 
-    `}stylePlayerSection(){const e={},t=this.player.isPoweredOffOrUnknown(),i=this.player.isIdle();let s,r=!1;const o=this.config.customImageUrls?.default,a=this.config.customImageUrls?.playerBackground,n=this.config.customImageUrls?.playerIdleBackground,l=this.config.customImageUrls?.playerOffBackground;let d,c;this.store.player&&(d=this.store.player.attributes.media_content_id,c=this.store.player.attributes.entity_picture||this.store.player.attributes.entity_picture_local,c&&(c=this.store.hass.hassUrl(c))),this.config.playerBackgroundImageSize?e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`:"fill"==this.config.width&&(e["--crm-player-background-size-default"]="contain");const h=this.config.playerControlsMaxWidth;h&&(e["--crm-player-controls-max-width"]=`${h}`);const u=this.config.playerControlsIconJustifyContent;u&&(e["--crm-player-controls-icon-justify-content"]=`${u}`),t?(this.store.card.playerMediaContentId="configImagePlayerBgOff","none"==(l||"").toLowerCase()?e["background-image"]=void 0:l?(e["background-image"]=`url(${l})`,s=l):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${me}))`,e["--crm-player-background-size-default"]=`${pe}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):i?(this.store.card.playerMediaContentId="configImagePlayerBgIdle","none"==(n||"").toLowerCase()?e["background-image"]=void 0:n?(e["background-image"]=`url(${n})`,s=n):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${me}))`,e["--crm-player-background-size-default"]=`${pe}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):a?(this.store.card.playerMediaContentId="configImagePlayerBg","none"==(a||"").toLowerCase()?e["background-image"]=void 0:a&&(e["background-image"]=`url(${a})`,s=a)):c?(this.store.card.playerMediaContentId=d,s=c,e["background-image"]=`var(--crm-player-background-image, url(${c}))`):o?(this.store.card.playerMediaContentId="configImageDefault",s=o,e["background-image"]=`url(${o}`):(this.store.card.playerMediaContentId="BRAND_LOGO_IMAGE_BASE64",this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${me}))`,e["--crm-player-background-size-default"]=`${pe}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`));let m=this.config.playerControlsBackgroundColor;const p=this.config.playerControlsColor,g=this.config.playerControlsIconSize;let v=this.config.playerControlsIconColor;const f=this.config.playerControlsIconToggleColor;let y=this.config.playerHeaderBackgroundColor,A=this.config.playerHeaderTitle1Color;const b=this.config.playerHeaderTitle1FontSize;let w=this.config.playerHeaderTitle2Color;const S=this.config.playerHeaderTitle2FontSize;let C=this.config.playerHeaderTitle3Color;const I=this.config.playerHeaderTitle3FontSize,T=this.config.playerMinimizedTitleColor,k=this.config.playerMinimizedTitleFontSize,P=this.config.playerProgressSliderColor,E=this.config.playerProgressLabelColor,$=this.config.playerProgressLabelFontSize,_=this.config.playerProgressLabelPaddingLR,R=this.config.playerVolumeSliderColor,L=this.config.playerVolumeSliderThickness;let F=this.config.playerVolumeLabelColor;const O=this.config.playerVolumeLabelFontSize;return r&&(m=m||"transparent",v=v||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",y=y||"transparent",A=A||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",w=w||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",C=C||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",F=F||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)"),this.store.card.playerImage=s,m&&(e["--crm-player-controls-bg-color"]=`${m} `),p&&(e["--crm-player-controls-color"]=`${p}`),f&&(e["--crm-player-controls-icon-toggle-color"]=`${f}`),v&&(e["--crm-player-controls-icon-color"]=`${v}`),g&&(e["--crm-player-controls-icon-size"]=`${g}`,e["--crm-player-controls-icon-button-size"]=`var(--crm-player-controls-icon-size, ${g})`),y&&(e["--crm-player-header-bg-color"]=`${y}`),A&&(e["--crm-player-header-title1-color"]=`${A}`),b&&(e["--crm-player-header-title1-font-size"]=`${b}`),w&&(e["--crm-player-header-title2-color"]=`${w}`),S&&(e["--crm-player-header-title2-font-size"]=`${S}`),C&&(e["--crm-player-header-title3-color"]=`${C}`),I&&(e["--crm-player-header-title3-font-size"]=`${I}`),T&&(e["--crm-player-minimized-title-color"]=`${T}`),k&&(e["--crm-player-minimized-title-font-size"]=`${k}`),E&&(e["--crm-player-progress-label-color"]=`${E}`),$&&(e["--crm-player-progress-label-font-size"]=`${$}`),_&&(e["--crm-player-progress-label-padding-lr"]=`${_}`),P&&(e["--crm-player-progress-slider-color"]=`${P}`),F&&(e["--crm-player-volume-label-color"]=`${F}`),O&&(e["--crm-player-volume-label-font-size"]=`${O}`),R&&(e["--crm-player-volume-slider-color"]=`${R}`),L&&(e["--crm-player-volume-slider-thickness"]=`${L}`),He(e)}stylePlayerHeader(){const e={};return this.config.playerHeaderHide&&(e.display="none"),this.config.playerMinimizeOnIdle&&this.store.player.isPoweredOffOrIdle()&&"fill"!=this.config.height&&(e.display="none"),He(e)}stylePlayerControls(){const e={};return this.config.playerControlsHide&&(e.display="none"),this.config.playerMinimizeOnIdle&&this.store.player.isPoweredOffOrIdle()&&"fill"!=this.config.height&&(e["justify-items"]="flex-start",e["padding-left"]="0px"),He(e)}};Ie([De({attribute:!1})],Jr.prototype,"mediaContentId",void 0),Ie([Ve()],Jr.prototype,"config",void 0),Jr=Ie([Be("crm-player")],Jr);let jr=class extends Ws{constructor(){super(Yt.PLAYLIST_FAVORITES),this.filterCriteriaPlaceholder="filter by playlist name"}render(){let e;if(super.render(),!this.isActionsVisible){const t=(this.filterCriteria||"").toLocaleLowerCase();e=this.mediaList?.filter(e=>-1!==e.name.toLocaleLowerCase().indexOf(t)),this.filterItemCount=e?.length}const t=yi(this.config.playlistFavBrowserTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,e),i=yi(this.config.playlistFavBrowserSubTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,e);return this.shuffleOnPlay=this.config.playlistFavBrowserShuffleOnPlay||!1,this.favBrowserItemsPerRow||(this.favBrowserItemsPerRow=this.config.playlistFavBrowserItemsPerRow||4),B`
+    `}stylePlayerSection(){const e={},t=this.player.isPoweredOffOrUnknown(),i=this.player.isIdle();let s,r=!1;const o=this.config.customImageUrls?.default,a=this.config.customImageUrls?.playerBackground,n=this.config.customImageUrls?.playerIdleBackground,l=this.config.customImageUrls?.playerOffBackground;let d,c;this.store.player&&(d=this.store.player.attributes.media_content_id,c=this.store.player.attributes.entity_picture||this.store.player.attributes.entity_picture_local,c&&(c=this.store.hass.hassUrl(c))),this.config.playerBackgroundImageSize?e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`:"fill"==this.config.width&&(e["--crm-player-background-size-default"]="contain");const h=this.config.playerControlsMaxWidth;h&&(e["--crm-player-controls-max-width"]=`${h}`);const u=this.config.playerControlsIconJustifyContent;u&&(e["--crm-player-controls-icon-justify-content"]=`${u}`),t?(this.store.card.playerMediaContentId="configImagePlayerBgOff","none"==(l||"").toLowerCase()?e["background-image"]=void 0:l?(e["background-image"]=`url(${l})`,s=l):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${me}))`,e["--crm-player-background-size-default"]=`${pe}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):i?(this.store.card.playerMediaContentId="configImagePlayerBgIdle","none"==(n||"").toLowerCase()?e["background-image"]=void 0:n?(e["background-image"]=`url(${n})`,s=n):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${me}))`,e["--crm-player-background-size-default"]=`${pe}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):a?(this.store.card.playerMediaContentId="configImagePlayerBg","none"==(a||"").toLowerCase()?e["background-image"]=void 0:a&&(e["background-image"]=`url(${a})`,s=a)):c?(this.store.card.playerMediaContentId=d,s=c,e["background-image"]=`var(--crm-player-background-image, url(${c}))`):o?(this.store.card.playerMediaContentId="configImageDefault",s=o,e["background-image"]=`url(${o}`):(this.store.card.playerMediaContentId="BRAND_LOGO_IMAGE_BASE64",this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${me}))`,e["--crm-player-background-size-default"]=`${pe}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`));let m=this.config.playerControlsBackgroundColor;const p=this.config.playerControlsColor,g=this.config.playerControlsIconSize;let v=this.config.playerControlsIconColor;const f=this.config.playerControlsIconToggleColor;let y=this.config.playerHeaderBackgroundColor,A=this.config.playerHeaderTitle1Color;const b=this.config.playerHeaderTitle1FontSize;let w=this.config.playerHeaderTitle2Color;const S=this.config.playerHeaderTitle2FontSize;let C=this.config.playerHeaderTitle3Color;const I=this.config.playerHeaderTitle3FontSize,T=this.config.playerMinimizedTitleColor,k=this.config.playerMinimizedTitleFontSize,P=this.config.playerProgressSliderColor,E=this.config.playerProgressLabelColor,$=this.config.playerProgressLabelFontSize,_=this.config.playerProgressLabelPaddingLR,R=this.config.playerVolumeSliderColor,L=this.config.playerVolumeSliderThickness;let F=this.config.playerVolumeLabelColor;const O=this.config.playerVolumeLabelFontSize;return r&&(m=m||"transparent",v=v||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",y=y||"transparent",A=A||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",w=w||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",C=C||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",F=F||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)"),this.store.card.playerImage=s,m&&(e["--crm-player-controls-bg-color"]=`${m} `),p&&(e["--crm-player-controls-color"]=`${p}`),f&&(e["--crm-player-controls-icon-toggle-color"]=`${f}`),v&&(e["--crm-player-controls-icon-color"]=`${v}`),g&&(e["--crm-player-controls-icon-size"]=`${g}`,e["--crm-player-controls-icon-button-size"]=`var(--crm-player-controls-icon-size, ${g})`),y&&(e["--crm-player-header-bg-color"]=`${y}`),A&&(e["--crm-player-header-title1-color"]=`${A}`),b&&(e["--crm-player-header-title1-font-size"]=`${b}`),w&&(e["--crm-player-header-title2-color"]=`${w}`),S&&(e["--crm-player-header-title2-font-size"]=`${S}`),C&&(e["--crm-player-header-title3-color"]=`${C}`),I&&(e["--crm-player-header-title3-font-size"]=`${I}`),T&&(e["--crm-player-minimized-title-color"]=`${T}`),k&&(e["--crm-player-minimized-title-font-size"]=`${k}`),E&&(e["--crm-player-progress-label-color"]=`${E}`),$&&(e["--crm-player-progress-label-font-size"]=`${$}`),_&&(e["--crm-player-progress-label-padding-lr"]=`${_}`),P&&(e["--crm-player-progress-slider-color"]=`${P}`),F&&(e["--crm-player-volume-label-color"]=`${F}`),O&&(e["--crm-player-volume-label-font-size"]=`${O}`),R&&(e["--crm-player-volume-slider-color"]=`${R}`),L&&(e["--crm-player-volume-slider-thickness"]=`${L}`),e["--crm-player-controls-color"]="#f0fdf4",e["--crm-player-controls-icon-color"]="#f0fdf4",e["--crm-player-controls-icon-toggle-color"]="#40d99a",e["--crm-player-progress-slider-color"]="#40d99a",e["--crm-player-progress-label-color"]="#a6b7af",e["--crm-player-volume-slider-color"]="#40d99a",e["--crm-player-volume-label-color"]="#a6b7af",e["--crm-player-header-title1-color"]="#f0fdf4",e["--crm-player-header-title2-color"]="#e8f5ee",e["--crm-player-header-title3-color"]="#a6b7af",e["--crm-player-header-bg-color"]="transparent",e["--crm-player-controls-bg-color"]="transparent",He(e)}stylePlayerHeader(){const e={};return this.config.playerHeaderHide&&(e.display="none"),this.config.playerMinimizeOnIdle&&this.store.player.isPoweredOffOrIdle()&&"fill"!=this.config.height&&(e.display="none"),He(e)}stylePlayerControls(){const e={};return this.config.playerControlsHide&&(e.display="none"),this.config.playerMinimizeOnIdle&&this.store.player.isPoweredOffOrIdle()&&"fill"!=this.config.height&&(e["justify-items"]="flex-start",e["padding-left"]="0px"),He(e)}};Ie([De({attribute:!1})],Jr.prototype,"mediaContentId",void 0),Ie([Ve()],Jr.prototype,"config",void 0),Jr=Ie([Be("crm-player")],Jr);let jr=class extends Ws{constructor(){super(Yt.PLAYLIST_FAVORITES),this.filterCriteriaPlaceholder="filter by playlist name"}render(){let e;if(super.render(),!this.isActionsVisible){const t=(this.filterCriteria||"").toLocaleLowerCase();e=this.mediaList?.filter(e=>-1!==e.name.toLocaleLowerCase().indexOf(t)),this.filterItemCount=e?.length}const t=yi(this.config.playlistFavBrowserTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,e),i=yi(this.config.playlistFavBrowserSubTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,e);return this.shuffleOnPlay=this.config.playlistFavBrowserShuffleOnPlay||!1,this.favBrowserItemsPerRow||(this.favBrowserItemsPerRow=this.config.playlistFavBrowserItemsPerRow||4),B`
       <div class="media-browser-section" style=${this.styleMediaBrowser()}>
         ${t?B`<div class="media-browser-section-title">${t}</div>`:B``}
         ${i?B`<div class="media-browser-section-subtitle">${i}</div>`:B``}

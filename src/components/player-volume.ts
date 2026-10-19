@@ -68,7 +68,6 @@ class Volume extends AlertUpdatesBase {
     const volumeMin = 0;
     const volumeMax = 100;
     const volumeValue = this.player.getVolume();
-    const volumeValuePct = Math.round(Math.abs(100 * ((volumeValue - volumeMin) / (volumeMax - volumeMin))));
 
     // render control.
     return html`
@@ -94,9 +93,7 @@ class Volume extends AlertUpdatesBase {
           ></ha-control-slider>
           ${!hideLevels ? html`
             <div class="volume-level">
-              <div class="volume-level-min">${volumeMin}%</div>
-              <div class="volume-level-pct" style="flex: ${volumeValuePct}%;">${volumeValue}%</div>
-              <div class="volume-level-max">${volumeMax}%</div>
+              <span class="volume-level-pct">${volumeValue}%</span>
             </div>
           ` : html``}
         </div>
@@ -368,57 +365,50 @@ class Volume extends AlertUpdatesBase {
   static get styles() {
     return css`
       ha-control-slider {
-        --control-slider-color: var(--crm-player-volume-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
-        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 1rem);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: var(--control-slider-border-radius);
+        display: block;
+        width: 100%;
+        --control-slider-color: var(--crm-player-volume-slider-color, #34d399);
+        --control-slider-thickness: 6px;
+        --control-slider-border-radius: 999px;
+        border: none;
         box-sizing: border-box;
       }
 
       ha-control-slider[disabled] {
         --control-slider-color: var(--disabled-text-color);
-        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 1rem);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: var(--control-slider-border-radius);
-        box-sizing: border-box;
+        --control-slider-thickness: 6px;
+        border: none;
       }
 
       .volume-container {
-        flex: 1;
-        /*border: 1px solid blue;  /*  FOR TESTING CONTROL LAYOUT CHANGES */
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        min-width: 0;
       }
 
       .volume-slider {
-        flex: 1;
-        padding-right: 0.0rem;
-        align-content: flex-end;
-        color: var(--crm-player-volume-label-color, var(--crm-player-controls-color, #ffffff));
+        flex: 1 1 auto;
+        min-width: 0;
+        color: var(--crm-player-volume-label-color, #d1fae5);
       }
 
       .volume-level {
-        font-size: var(--crm-player-volume-label-font-size, x-small);
         display: flex;
-      }
-
-      .volume-level-min {
-        flex: 0;
-        text-align: left;
-        margin-right: 4px;
+        justify-content: flex-end;
+        margin-top: 1px;
+        font-size: 11px;
+        line-height: 1.2;
       }
 
       .volume-level-pct {
-        text-align: right;
-        color: var(--crm-player-volume-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
-      }
-
-      .volume-level-max {
-        flex: 100;
-        text-align: right;
-        margin-left: 4px;
+        color: var(--crm-player-volume-label-color, #a3b8af);
+        font-variant-numeric: tabular-nums;
       }
 
       *[slim] * {
-        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 10px);
+        --control-slider-thickness: 6px;
         --ha-icon-button-size: 30px;
         --mdc-icon-size: 20px;
       }
@@ -434,7 +424,7 @@ class Volume extends AlertUpdatesBase {
 
       .icons {
         justify-content: center;
-        display: inline-flex;
+        display: flex;
         align-items: center;
         mix-blend-mode: normal;
         overflow: hidden;

@@ -10,267 +10,136 @@ import { closestElement, getHomeAssistantErrorMessage } from '../utils/utils';
 import { Player } from '../sections/player';
 import { AlertUpdatesBase } from '../sections/alert-updates-base';
 
-
 class Progress extends AlertUpdatesBase {
-
-  // private state properties.
-  @state() private playingProgress!: number;
-
-  /** MediaPlayer instance created from the configuration entity id. */
+  @state() private playingProgress = 0;
   private player!: MediaPlayer;
-
-  /** Callback function that calculates the current progress (executed every 1 second). */
-  private tracker?: NodeJS.Timeout;
-
-  /** Current media duration value. */
+  private tracker?: ReturnType<typeof setInterval>;
   private mediaDuration = 0;
-
-  /** Progress bar HTMLElement control. */
   @query('.bar') private progressBar?: HTMLElement;
 
-
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult | void {
-
-    // set common references from application common storage area.
     this.player = this.store.player;
-
-    // get media duration, and check if it's progressing.
     this.mediaDuration = this.player?.attributes.media_duration || 0;
-    const hasProgress = this.mediaDuration > 0;
 
-    // show / hide the progress bar.
-    if (hasProgress) {
-
-      // start tracking progress.
-      this.trackProgress();
-
-      // render control.
-      return html`
-        <div class="progress">
-          <span class="progress-time progress-pad-left">${convertProgress(this.playingProgress)}</span>
-          <div class="bar" @click=${this.onSeekBarClick}>
-            <div class="progress-bar" style=${this.styleProgressBar(this.mediaDuration)}></div>
-          </div>
-          <span class="progress-time progress-pad-right"> -${convertProgress(this.mediaDuration - this.playingProgress)}</span>
-        </div>
-      `;
-    } else {
+    if (this.mediaDuration <= 0) {
+      this.stopTracking();
       return html``;
     }
+
+    this.trackProgress();
+    const progress = Math.max(0, Math.min(this.playingProgress || 0, this.mediaDuration));
+
+    return html`
+      <div class="progress">
+        <div
+          class="bar"
+          role="slider"
+          tabindex="0"
+          aria-label="Playback position"
+          aria-valuemin="0"
+          aria-valuemax=${Math.round(this.mediaDuration)}
+          aria-valuenow=${Math.round(progress)}
+          @click=${this.onSeekBarClick}
+          @keydown=${this.onSeekBarKeyDown}
+        >
+          <div class="progress-bar" style=${this.styleProgressBar(this.mediaDuration)}></div>
+        </div>
+        <div class="progress-times">
+          <span class="progress-time">${convertProgress(progress)}</span>
+          <span class="progress-time">${convertProgress(this.mediaDuration)}</span>
+        </div>
+      </div>
+    `;
   }
 
-
-  /**
-   * Invoked when the component is removed from the document's DOM.
-   *
-   * This callback is the main signal to the element that it may no longer be
-   * used. `disconnectedCallback()` should ensure that nothing is holding a
-   * reference to the element (such as event listeners added to nodes external
-   * to the element), so that it is free to be garbage collected.
-   *
-   * An element may be re-connected after being disconnected.
-   */
   public disconnectedCallback() {
-
-    // are we currently tracking progress?  if so, then stop tracking and
-    // indicate we are no longer tracking.
-    if (this.tracker) {
-      clearInterval(this.tracker);
-      this.tracker = undefined;
-    }
-
-    // invoke base class method.
+    this.stopTracking();
     super.disconnectedCallback();
   }
 
-
-  /**
-   * Handles the `click` event fired when the seek bar is clicked.
-   * 
-   * This will seek to the desired position of the playing track.
-   * 
-   * @param args Event arguments that contain the mouse pointer position.
-   */
-  private async onSeekBarClick(args: MouseEvent) {
-
-    try {
-
-      // calculate the desired position based on the mouse pointer position.
-      const progressWidth = this.progressBar!.offsetWidth;
-      const percent = args.offsetX / progressWidth;
-      let position = this.mediaDuration * percent;
-
-      // convert from seconds to milliseconds for spotifyplus service (ha service uses seconds).
-      if (position > 0) {
-        position = position * 1000;
-      }
-
-      // show progress indicator.
-      this.progressShow();
-
-      // call service to seek to track position.
-      await this.store.spotifyPlusService.PlayerMediaSeek(this.player, null, position, 0);
-      return true;
-
-    }
-    catch (error) {
-
-      // set alert error message.
-      this.alertErrorSet("Seek position failed: " + getHomeAssistantErrorMessage(error));
-      return true;
-
-    }
-    finally {
-
-      // hide progress indicator.
-      this.progressHide();
-
-    }
-
-  }
-
-
-  /**
-   * Sets the alert error message in the parent player.
-   * 
-   * @param message alert message text.
-   */
-  public override alertErrorSet(message: string): void {
-
-    // find the parent player reference, and update the message.
-    // we have to do it this way due to the shadowDOM between this element and the player element.
-    const spcPlayer = closestElement('#spcPlayer', this) as Player;
-    if (spcPlayer) {
-      spcPlayer.alertErrorSet(message);
-    }
-
-  }
-
-
-  /**
-   * Returns an element style for the progress bar portion of the control.
-   */
-  private styleProgressBar(mediaDuration: number) {
-    return styleMap({ width: `${(this.playingProgress / mediaDuration) * 100}%` });
-  }
-
-
-  /**
-   * Starts progress tracking; this method is repeatedly called at 1 second intervals
-   * to update the position of the track.
-   * 
-   * It is stopped when the control instance is unloaded from the DOM (via disconnectedCallback).
-   */
-  private trackProgress() {
-
-    // get current track positioning from media player attributes.
-    const position = this.player?.attributes.media_position || 0;
-    const playing = this.player?.isPlaying();
-    const updatedAt = this.player?.attributes.media_position_updated_at || 0;
-
-    // calculate progress.
-    if (playing) {
-      const progressValue = position + Math.floor((Date.now() - new Date(updatedAt).getTime()) / 1000);
-      //console.log("%ctrackProgress - position=%s, progress=%s",
-      //  "color:yellow",
-      //  JSON.stringify(position),
-      //  JSON.stringify(progressValue),
-      //);
-      //if ((progressValue < position) && (progressValue > 1)) {
-      //  progressValue = position;
-      //  console.log("%ctrackProgress - progress < position; setting progressValue = position!",
-      //    "color:red",
-      //  );
-      //}
-      this.playingProgress = progressValue;
-    } else {
-      this.playingProgress = position;
-    }
-
-    // start tracking progress at 1 second intervals.
-    if (!this.tracker) {
-      this.tracker = setInterval(() => this.trackProgress(), 1000);
-    }
-
-    // if we are not playing, then clear the interval.
-    if (!playing) {
+  private stopTracking() {
+    if (this.tracker !== undefined) {
       clearInterval(this.tracker);
       this.tracker = undefined;
     }
   }
 
+  private async onSeekBarClick(args: MouseEvent) {
+    const bar = this.progressBar;
+    if (!bar) return;
+    const rect = bar.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const percent = Math.max(0, Math.min(1, (args.clientX - rect.left) / rect.width));
+    await this.seekTo(this.mediaDuration * percent);
+  }
 
-  /**
-   * style definitions used by this component.
-   * */
+  private async onSeekBarKeyDown(args: KeyboardEvent) {
+    if (args.key !== 'ArrowLeft' && args.key !== 'ArrowRight' && args.key !== 'Home' && args.key !== 'End') return;
+    args.preventDefault();
+    const current = Math.max(0, Math.min(this.playingProgress || 0, this.mediaDuration));
+    const target = args.key === 'Home' ? 0 : args.key === 'End' ? this.mediaDuration : current + (args.key === 'ArrowRight' ? 5 : -5);
+    await this.seekTo(Math.max(0, Math.min(target, this.mediaDuration)));
+  }
+
+  private async seekTo(seconds: number) {
+    try {
+      this.progressShow();
+      // SpotifyPlus PlayerMediaSeek expects milliseconds here.
+      await this.store.spotifyPlusService.PlayerMediaSeek(this.player, null, seconds * 1000, 0);
+    } catch (error) {
+      this.alertErrorSet('Seek position failed: ' + getHomeAssistantErrorMessage(error));
+    } finally {
+      this.progressHide();
+    }
+  }
+
+  public override alertErrorSet(message: string): void {
+    const parent = closestElement('#spcPlayer', this) as Player;
+    if (parent) parent.alertErrorSet(message);
+  }
+
+  private styleProgressBar(duration: number) {
+    const percent = duration > 0 ? Math.max(0, Math.min(100, (this.playingProgress || 0) / duration * 100)) : 0;
+    return styleMap({ width: `${percent}%` });
+  }
+
+  private trackProgress() {
+    const position = this.player?.attributes.media_position || 0;
+    const playing = this.player?.isPlaying();
+    const updatedAt = this.player?.attributes.media_position_updated_at;
+    const updatedAtMs = updatedAt ? new Date(updatedAt).getTime() : NaN;
+    const elapsed = playing && Number.isFinite(updatedAtMs) ? Math.max(0, (Date.now() - updatedAtMs) / 1000) : 0;
+    const progress = Math.max(0, Math.min(position + elapsed, this.mediaDuration));
+    if (this.playingProgress !== progress) this.playingProgress = progress;
+
+    if (playing && this.tracker === undefined) {
+      this.tracker = setInterval(() => this.trackProgress(), 1000);
+    } else if (!playing) {
+      this.stopTracking();
+    }
+  }
+
   static get styles() {
     return css`
-      .progress {
-        width: 100%;
-        font-size: var(--crm-player-progress-label-font-size, x-small);
-        display: flex;
-        color: var(--crm-player-progress-label-color, var(--crm-player-controls-color, #ffffff));
-        padding-bottom: 0.2rem;
-      }
-
-      .progress-pad-left {
-        padding-left: var(--crm-player-progress-label-padding-lr, 0rem);
-      }
-
-      .progress-pad-right {
-        padding-right: var(--crm-player-progress-label-padding-lr, 0rem);
-      }
-
-      .bar {
-        display: flex;
-        flex-grow: 1;
-        align-items: center;
-        align-self: center;
-        margin-left: 5px;
-        margin-right: 5px;
-        height: 14px;
-        cursor: pointer;
-        background-clip: padding-box;
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 0.25rem;
-      }
-
-      .progress-bar {
-        align-self: center;
-        background-color: var(--crm-player-progress-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
-        margin-left: 2px;
-        margin-right: 2px;
-        height: 50%;
-        transition: width 0.1s linear;
-        border-radius: 0.18rem;
-      }
-
-      .progress-time {
-        mix-blend-mode: normal;
-      }
+      :host { display: block; width: 100%; min-width: 0; }
+      .progress { width: 100%; display: flex; flex-direction: column; gap: 7px; box-sizing: border-box; padding: 7px 0 5px; }
+      .bar { display: block; width: 100%; height: 5px; background: rgba(255,255,255,0.18); border: 0; border-radius: 999px; overflow: hidden; cursor: pointer; box-sizing: border-box; touch-action: manipulation; }
+      .bar:focus-visible { outline: 2px solid #4adea4; outline-offset: 4px; }
+      .progress-bar { height: 100%; background: var(--crm-player-progress-slider-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)}); border-radius: inherit; transition: width 0.25s linear; }
+      .progress-times { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .progress-time { color: var(--crm-player-progress-label-color, rgba(255,255,255,0.65)); font-size: var(--crm-player-progress-label-font-size, 0.75rem); font-variant-numeric: tabular-nums; line-height: 1.2; }
     `;
   }
 }
 
-
-/**
- * Converts a duration (in seconds) value to a current time value.
- * 
- * @param duration Duration to convert, specified in seconds.
- */
-const convertProgress = (duration: number) => {
-
-  // create a timestamp from the current duration value.
-  const date = new Date(duration * 1000).toISOString().substring(11, 19);
-
-  // return the minutes and seconds portion of the timestamp.
-  return date.startsWith('00:') ? date.substring(3) : date;
+const convertProgress = (duration: number): string => {
+  const total = Math.max(0, Math.floor(Number.isFinite(duration) ? duration : 0));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    : `${minutes}:${String(seconds).padStart(2, '0')}`;
 };
-
 
 customElements.define('crm-player-progress', Progress);
