@@ -54,7 +54,7 @@ class GeneralEditor extends BaseEditor {
         required: false,
         type: 'select',
         options: [
-          ['auto', `🌍 ${g('automaticLanguage')}`],
+          ['auto', `🌍 ${t('editor.automaticLanguage')}`],
           ['pt', '🇧🇷 Português (Brasil)'],
           ['de', '🇩🇪 Deutsch (Deutschland)'],
           ['en', '🇺🇸 English (United States)'],
