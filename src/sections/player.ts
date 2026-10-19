@@ -1,5 +1,5 @@
 // lovelace card imports.
-import { css, html, TemplateResult, unsafeCSS } from 'lit';
+import { css, html, TemplateResult } from 'lit';
 import { customElement, property, state } from "lit/decorators.js";
 import { styleMap, StyleInfo } from 'lit-html/directives/style-map.js';
 
@@ -16,8 +16,7 @@ import '../components/player-volume';
 // our imports.
 import {
   BRAND_LOGO_IMAGE_BASE64,
-  BRAND_LOGO_IMAGE_SIZE,
-  PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT
+  BRAND_LOGO_IMAGE_SIZE
 } from '../constants';
 import { CardConfig } from '../types/card-config';
 import { MediaPlayer } from '../model/media-player';
@@ -134,35 +133,55 @@ export class Player extends AlertUpdatesBase {
         color: var(--primary-color);
       }
 
+      /* ControlRoom Music: player vertical e responsivo. */
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+      }
+
       .player-section-container {
         display: grid;
-        grid-template-columns: 76px minmax(0, 1fr) auto;
-        grid-template-rows: auto auto;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto auto auto;
         grid-template-areas:
-          'cover header controls'
-          'cover body controls';
-        column-gap: 0.75rem;
+          'cover'
+          'header'
+          'body'
+          'controls';
+        gap: 0.65rem;
+        justify-items: stretch;
         align-items: center;
+        box-sizing: border-box;
+        padding: 1rem 1rem 0.8rem;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));  /* PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT */
+        background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));
         background-image: none !important;
         background-color: #101c18;
-        text-align: -webkit-center;
-        height: 100%;
-        width: 100%;
+        text-align: center;
       }
+
       .player-album-cover {
         grid-area: cover;
-        width: 76px;
-        height: 76px;
-        border-radius: 12px;
+        width: min(100%, 270px);
+        max-height: 100%;
+        aspect-ratio: 1 / 1;
+        justify-self: center;
+        align-self: center;
+        border-radius: 18px;
         overflow: hidden;
         background: #164d3c;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #8ee0b3;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
       }
 
       .player-album-cover img {
@@ -171,55 +190,62 @@ export class Player extends AlertUpdatesBase {
         object-fit: cover;
         display: block;
       }
+
       .player-section-header {
-        /* border: 1px solid red;      /* FOR TESTING CONTROL LAYOUT CHANGES */
         grid-area: header;
-        padding: 0.25rem 0.5rem 0rem 0.5rem;
+        display: block;
+        width: 100%;
+        min-width: 0;
         box-sizing: border-box;
-        background: linear-gradient(180deg, var(--crm-player-header-bg-color, ${unsafeCSS(PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)}) 30%, transparent 100%);
-        background-repeat: no-repeat;
+        padding: 0.2rem 0;
+        background: transparent;
       }
 
       .player-section-body {
-        /* border: 1px solid orange;   /* FOR TESTING CONTROL LAYOUT CHANGES */
         grid-area: body;
-        height: 100%;
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        height: auto;
         overflow: hidden;
-        padding: 0rem 0.5rem 0rem 0.5rem;
+        padding: 0;
         box-sizing: border-box;
         background: transparent;
       }
 
-      .player-section-body-content {
-        /* border: 1px solid yellow;   /* FOR TESTING CONTROL LAYOUT CHANGES */
-        height: inherit;
-        background: transparent;
-        overflow: hidden;
-        display: none;              /* don't display initially */
-        /* for fade-in, fade-out support */
-        transition: opacity 0.25s, display 0.25s;
-        transition-behavior: allow-discrete;    /* Note: be sure to write this after the shorthand */
-      }
-
+      .player-section-body-content,
       .player-section-body-queue {
-        /* border: 1px solid yellow;   /* FOR TESTING CONTROL LAYOUT CHANGES */
-        height: inherit;
+        height: auto;
+        min-height: 0;
         background: transparent;
         overflow: hidden;
-        display: none;              /* don't display initially */
-        /* for fade-in, fade-out support */
+        display: none;
         transition: opacity 0.25s, display 0.25s;
-        transition-behavior: allow-discrete;    /* Note: be sure to write this after the shorthand */
+        transition-behavior: allow-discrete;
       }
 
       .player-section-controls {
-        /* border: 1px solid blue;     /* FOR TESTING CONTROL LAYOUT CHANGES */
         grid-area: controls;
-        overflow-y: auto;
-        padding: 0rem 0.5rem 0.25rem 0.5rem;
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+        padding: 0.25rem 0;
         box-sizing: border-box;
-        background: linear-gradient(0deg, var(--crm-player-controls-bg-color, ${unsafeCSS(PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)}) 30%, transparent 100%);
-        background-repeat: no-repeat;
+        background: transparent;
+      }
+
+      @media (max-width: 420px) {
+        .player-section-container {
+          padding: 0.75rem 0.6rem;
+          gap: 0.4rem;
+        }
+        .player-album-cover {
+          width: min(100%, 220px);
+          border-radius: 14px;
+        }
       }
 
       /* have to set a background color for alerts due to parent background transparency. */

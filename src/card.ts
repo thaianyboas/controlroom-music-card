@@ -185,9 +185,6 @@ export class Card extends AlertUpdatesBase {
     // just in case hass property has not been set yet.
     if (!this.hass)
       return html``;
-    const language = this.hass.locale?.language;
-    const musicTitle = translate('music.title', this.config?.language ?? 'auto', language);
-    console.log('ControlRoom Music:', musicTitle);
 
     // note that this cannot be called from `setConfig` method, as the `hass` property
     // has not been set set.
@@ -355,9 +352,9 @@ export class Card extends AlertUpdatesBase {
       .crm-card-content-section {
         margin: var(--crm-card-content-margin, ${unsafeCSS(CARD_CONTENT_MARGIN_DEFAULT)});
         color: #e5f5ee;
-        flex-grow: 1;
-        flex-shrink: 0;
-        height: 1vh;
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
         overflow: hidden;
       }
 
