@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 // ensure that you have "compilerOptions"."lib": [ ... , "WebWorker" ] specified
 // in your tsconfig.json!  If not, the Vibrant module will not initialize correctly
 // and you will tear your hair out trying to figure out why it doesn't work!!!
-import Vibrant from 'node-vibrant/dist/vibrant';
+import Vibrant from './vibrant-browser';
 import { Palette } from '@vibrant/color';
 
 // our imports - card sections and editor.
