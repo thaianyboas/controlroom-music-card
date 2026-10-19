@@ -216,8 +216,14 @@ export class MediaBrowserBase extends LitElement {
       styleInfo['--crm-media-browser-items-color'] = `${mediaBrowserItemsColor}`;
     if (mediaBrowserItemsListColor)
       styleInfo['--crm-media-browser-items-list-color'] = `${mediaBrowserItemsListColor}`;
-    if (mediaBrowserItemsSvgIconColor)
+    // ControlRoom: keep the device icons green even when an old card setting
+    // or the Home Assistant theme specifies blue. Other browser sections
+    // continue to honor the user's configured icon color.
+    if (this.section == Section.DEVICES) {
+      styleInfo['--crm-media-browser-items-svgicon-color'] = '#40d99a';
+    } else if (mediaBrowserItemsSvgIconColor) {
       styleInfo['--crm-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
+    }
     if (mediaBrowserItemsTitleFontSize)
       styleInfo['--crm-media-browser-items-title-font-size'] = `${mediaBrowserItemsTitleFontSize}`;
     if (mediaBrowserItemsSubTitleFontSize)
@@ -587,7 +593,12 @@ export class MediaBrowserBase extends LitElement {
         // we will also indicate which device is active.
         const device = (item as ISpotifyConnectDevice);
         mbi_info.title = device.Name;
-        mbi_info.subtitle = (device.DeviceInfo.BrandDisplayName || "unknown") + ", " + (device.DeviceInfo.ModelDisplayName || "unknown");
+        const brand = device.DeviceInfo?.BrandDisplayName?.trim();
+        const model = device.DeviceInfo?.ModelDisplayName?.trim();
+        const knownParts = [brand, model].filter(
+          (value): value is string => Boolean(value && value.toLowerCase() !== 'unknown')
+        );
+        mbi_info.subtitle = knownParts.length ? knownParts.join(', ') : 'Spotify Connect';
         // set is_active flag based on the device id selected;
         // if no device_id, then use the device name.
         if ((device.Id || "") != "") {

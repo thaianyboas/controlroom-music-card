@@ -64,7 +64,12 @@ export class Player extends AlertUpdatesBase {
                   alt="Album cover"
                 />
               `
-            : html`<ha-icon icon="mdi:music"></ha-icon>`
+            : html`
+              <img
+                src="/local/Bild%20f%C3%BCr%20Spotify.jpg"
+                alt="ControlRoom Music"
+              />
+            `
           }
         </div>
         <crm-player-header style=${this.stylePlayerHeader()}
