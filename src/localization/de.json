@@ -1,0 +1,52 @@
+
+{
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "unknown": "Unbekannt",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "close": "Schließen",
+    "back": "Zurück"
+  },
+  "music": {
+    "title": "Musik",
+    "nowPlaying": "Aktuelle Wiedergabe",
+    "play": "Wiedergabe starten",
+    "pause": "Pause",
+    "next": "Nächster Titel",
+    "previous": "Vorheriger Titel",
+    "shuffle": "Zufallswiedergabe",
+    "repeat": "Wiederholen",
+    "volume": "Lautstärke",
+    "noMusic": "Keine Musik wird abgespielt",
+    "ready": "Bereit für Musik 🎵"
+  },
+  "navigation": {
+    "player": "Player",
+    "playlists": "Wiedergabelisten",
+    "albums": "Alben",
+    "artists": "Künstler",
+    "devices": "Geräte",
+    "search": "Suche",
+    "favorites": "Favoriten",
+    "settings": "Einstellungen"
+  },
+  "devices": {
+    "title": "Wiedergabegeräte",
+    "select": "Gerät auswählen",
+    "noDevices": "Keine Geräte verfügbar",
+    "connected": "Verbunden",
+    "disconnected": "Nicht verbunden"
+  },
+  "search": {
+    "placeholder": "Musik, Künstler oder Alben suchen...",
+    "noResults": "Keine Ergebnisse gefunden"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "automatic": "Automatisch (Home Assistant)",
+    "appearance": "Darstellung"
+  }
+}

@@ -10,6 +10,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 import { when } from 'lit/directives/when.js';
 import { HomeAssistant } from './types/home-assistant-frontend/home-assistant';
+import { translate } from './localization/i18n';
 import { v4 as uuidv4 } from 'uuid';
 
 // ** IMPORTANT - Vibrant notes:
@@ -96,7 +97,7 @@ const EDIT_BOTTOM_TOOLBAR_HEIGHT = '59px';
 // https://gist.github.com/thomasloven/1de8c62d691e754f95b023105fe4b74b
 
 
-@customElement("spotifyplus-card")
+@customElement("controlroom-music-card")
 export class Card extends AlertUpdatesBase {
 
   /** 
@@ -184,6 +185,9 @@ export class Card extends AlertUpdatesBase {
     // just in case hass property has not been set yet.
     if (!this.hass)
       return html``;
+    const language = this.hass.locale?.language;
+    const musicTitle = translate('music.title', this.config?.language ?? 'auto', language);
+    console.log('ControlRoom Music:', musicTitle);
 
     // note that this cannot be called from `setConfig` method, as the `hass` property
     // has not been set set.
@@ -243,7 +247,7 @@ export class Card extends AlertUpdatesBase {
               ])
               : html`
                   <div class="spc-initial-config">
-                    Welcome to the SpotifyPlus media player card.<br/>
+                    ${translate('music.title', this.config?.language ?? 'auto', this.hass.locale?.language)}<br/>
                     Start by editing the card configuration media player "entity" value.<br/>
                     <div class="spc-not-configured">
                       ${this.store.player.attributes.sp_config_state}
@@ -287,7 +291,7 @@ export class Card extends AlertUpdatesBase {
         margin: 0;
       }
 
-      spotifyplus-card {
+      controlroom-music-card {
         display: block;
         height: 100% !important;
         width: 100% !important;
@@ -301,6 +305,12 @@ export class Card extends AlertUpdatesBase {
       }
 
       .spc-card {
+      /* ControlRoom Music - Design System */
+        --crm-background: #101b19;
+        --crm-background-secondary: #091310;
+        --crm-accent: #34d399;
+        --crm-text: #f0fdf4;
+        --crm-border-radius: 20px;
         --spc-card-header-height: ${HEADER_HEIGHT}rem;
         --spc-card-footer-height: ${FOOTER_HEIGHT}rem;
         --spc-card-edit-tab-height: 0px;
@@ -313,7 +323,11 @@ export class Card extends AlertUpdatesBase {
         height: calc(100vh - var(--spc-card-footer-height) - var(--spc-card-edit-tab-height) - var(--spc-card-edit-bottom-toolbar-height));
         min-width: 20rem;
         width: calc(100vw - var(--mdc-drawer-width));
-        color: var(--secondary-text-color);
+        color: var(--crm-text);
+        background: linear-gradient(145deg, var(--crm-background) 0%, var(--crm-background-secondary) 100%);
+        border: 1px solid rgba(52, 211, 153, 0.16);
+        border-radius: var(--crm-border-radius);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
       }
 
       .spc-card-header {
@@ -326,11 +340,13 @@ export class Card extends AlertUpdatesBase {
         width: 100%;
         font-weight: bold;
         font-size: 1.2rem;
-        color: var(--secondary-text-color);
+        color: var(--crm-accent);
+        letter-spacing: 0.3px;
       }
 
       .spc-card-content-section {
         margin: var(--spc-card-content-margin, ${unsafeCSS(CARD_CONTENT_MARGIN_DEFAULT)});
+        color: #e5f5ee;
         flex-grow: 1;
         flex-shrink: 0;
         height: 1vh;
@@ -1175,12 +1191,26 @@ export class Card extends AlertUpdatesBase {
   */
   private styleCard() {
 
-    // build style info object.
-    const styleInfo: StyleInfo = <StyleInfo>{};
+  // build style info object.
+  const styleInfo: StyleInfo = <StyleInfo>{};
 
-    // load basic layout settings.
-    let editTabHeight = '0px';
-    let editBottomToolbarHeight = '0px';
+  // ControlRoom Music - Design
+  if (this.config?.crmBackground) {
+    styleInfo['--crm-background'] = this.config.crmBackground;
+  }
+  if (this.config?.crmAccent) {
+  styleInfo['--crm-accent'] = this.config.crmAccent;
+  }
+  if (this.config?.crmText) {
+  styleInfo['--crm-text'] = this.config.crmText;
+  }
+  if (this.config?.crmBorderRadius) {
+  styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;
+  }
+
+  // load basic layout settings.
+  let editTabHeight = '0px';
+  let editBottomToolbarHeight = '0px';
     const cardWaitProgressSliderColor = this.config.cardWaitProgressSliderColor;
     const cardContentMargin = this.config.cardContentMargin;
 

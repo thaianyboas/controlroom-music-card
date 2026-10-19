@@ -1,0 +1,52 @@
+
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "unknown": "Unknown",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back"
+  },
+  "music": {
+    "title": "Music",
+    "nowPlaying": "Now Playing",
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next Track",
+    "previous": "Previous Track",
+    "shuffle": "Shuffle",
+    "repeat": "Repeat",
+    "volume": "Volume",
+    "noMusic": "No music playing",
+    "ready": "Ready for music 🎵"
+  },
+  "navigation": {
+    "player": "Player",
+    "playlists": "Playlists",
+    "albums": "Albums",
+    "artists": "Artists",
+    "devices": "Devices",
+    "search": "Search",
+    "favorites": "Favorites",
+    "settings": "Settings"
+  },
+  "devices": {
+    "title": "Playback Devices",
+    "select": "Select Device",
+    "noDevices": "No devices available",
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "search": {
+    "placeholder": "Search songs, artists or albums...",
+    "noResults": "No results found"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "automatic": "Automatic (Home Assistant)",
+    "appearance": "Appearance"
+  }
+}

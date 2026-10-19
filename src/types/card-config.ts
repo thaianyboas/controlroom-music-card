@@ -11,6 +11,19 @@ import { SearchMediaTypes } from './search-media-types';
  * Card configuration settings.
  */
 export interface CardConfig extends LovelaceCardConfig {
+    // ControlRoom Music - Design
+    crmBackground?: string;
+    crmAccent?: string;
+    crmText?: string;
+    crmBorderRadius?: string;
+  
+    /**
+   * ControlRoom Music Card language.
+   * auto = Home Assistant user language.
+   * de = German, pt = Portuguese, en = English.
+   * Default: auto.
+   */
+  language?: 'auto' | 'de' | 'pt' | 'en';
 
   /** 
    * Contains the unique ID of the card - do not edit this value!

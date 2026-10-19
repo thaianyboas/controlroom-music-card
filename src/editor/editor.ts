@@ -15,6 +15,7 @@ import {
 } from '../utils/utils';
 import './editor-form';
 import './general-editor';
+import './design-editor';
 import './player-editor';
 import './album-fav-browser-editor';
 import './artist-fav-browser-editor';
@@ -69,7 +70,7 @@ class CardEditor extends BaseEditor {
 
     return html`
       <ha-control-button-group>
-        ${[ConfigArea.GENERAL, ConfigArea.PLAYER, ConfigArea.DEVICE_BROWSER, ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER].map(
+        ${[ConfigArea.GENERAL, ConfigArea.DESIGN, ConfigArea.PLAYER, ConfigArea.DEVICE_BROWSER, ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER].map(
       (configArea) => html`
             <ha-control-button
               selected=${this.configArea === configArea || nothing}
@@ -180,6 +181,10 @@ class CardEditor extends BaseEditor {
       [
         ConfigArea.GENERAL,
         () => html`<spc-general-editor .config=${this.config} .hass=${this.hass}></spc-general-editor>`,
+      ],
+      [
+        ConfigArea.DESIGN,
+        () => html`<crm-design-editor .config=${this.config} .hass=${this.hass}></crm-design-editor>`,
       ],
       [
         ConfigArea.PLAYER,

@@ -165,6 +165,7 @@ export function getSectionForConfigArea(configArea: ConfigArea) {
 
   // get section value for supplied ConfigArea value.
   let section = Section.UNDEFINED;
+
   if (configArea == ConfigArea.ALBUM_FAVORITES) {
     section = Section.ALBUM_FAVORITES;
   } else if (configArea == ConfigArea.ARTIST_FAVORITES) {
@@ -178,6 +179,8 @@ export function getSectionForConfigArea(configArea: ConfigArea) {
   } else if (configArea == ConfigArea.EPISODE_FAVORITES) {
     section = Section.EPISODE_FAVORITES;
   } else if (configArea == ConfigArea.GENERAL) {
+    section = Section.PLAYER;
+  } else if (configArea == ConfigArea.DESIGN) {
     section = Section.PLAYER;
   } else if (configArea == ConfigArea.PLAYER) {
     section = Section.PLAYER;

@@ -10,7 +10,7 @@ import '@home-assistant/webawesome/dist/webawesome.js';
 
 // Display card version details in console, as well as a link to help docs.
 console.groupCollapsed(
-  `%cSPOTIFYPLUS-CARD ${CARD_VERSION} IS INSTALLED`,
+  `%cCONTROLROOM-MUSIC-CARD ${CARD_VERSION} IS INSTALLED`,
   "color: green; font-weight: bold"
 );
 console.log(
@@ -32,8 +32,8 @@ console.groupEnd();
 // by adding it to the "window.customCards" array with attributes that
 // describe the card and what it provides ("type" and "name" are required).
 window.customCards.push({
-  type: 'spotifyplus-card',
-  name: 'SpotifyPlus Card',
+  type: 'controlroom-music-card',
+  name: 'ControlRoom Music Card',
   description: 'Home Assistant UI card that supports features unique to the SpotifyPlus custom integration',
   //documentationURL: 'https://github.com/thlucas1/spotifyplus_card/wiki/Configuration-Options',
   preview: true,
