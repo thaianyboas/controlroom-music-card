@@ -1,6 +1,7 @@
 {
   "name": "ControlRoom Music Card",
   "filename": "controlroom-music-card.js",
+  "content_in_root": false,
   "hide_default_branch": false,
   "homeassistant": "2024.8.0",
   "render_readme": true
