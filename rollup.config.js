@@ -1,4 +1,4 @@
-import typescript from 'rollup-plugin-typescript2';
+import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
@@ -17,13 +17,16 @@ const serveopts = {
 };
 
 const plugins = [
-  nodeResolve({}),
+  nodeResolve({
+  extensions: ['.mjs', '.js', '.json', '.node', '.ts', '.tsx'],
+}),
   commonjs(),
   //typescript(),
   typescript({
-    sourceMap: false,    // Generate sourcemaps
-    inlineSources: false // Include source code in sourcemaps
-  }),
+  noEmit: false,
+  sourceMap: false,
+  inlineSources: false
+}),
   //terser() // Optional: Minify the output
   json(),
   babel({
