@@ -73,13 +73,13 @@ class PlayerHeaderSettingsEditor extends BaseEditor {
       <div class="schema-title">
         Player Header Status area settings
       </div>
-      <spc-editor-form
+      <crm-editor-form
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 
@@ -100,4 +100,4 @@ class PlayerHeaderSettingsEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-player-header-editor', PlayerHeaderSettingsEditor);
+customElements.define('crm-player-header-editor', PlayerHeaderSettingsEditor);

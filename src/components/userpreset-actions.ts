@@ -244,4 +244,4 @@ class UserPresetActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-userpreset-actions', UserPresetActions);
+customElements.define('crm-userpreset-actions', UserPresetActions);

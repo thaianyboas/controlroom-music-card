@@ -474,8 +474,8 @@ export function getObjectDifferences(obj1: any, obj2: any): any {
  * examples:
  * - find element by it's `id=` value:
  *   const container = this.closestElement('#spcPlayer', this);
- * - find element by it's html tag name (e.g. `<spc-player>`):
- *   const container = this.closestElement('spc-player', this);
+ * - find element by it's html tag name (e.g. `<crm-player>`):
+ *   const container = this.closestElement('crm-player', this);
  */
 export function closestElement(selector: string, base: Element) {
 

@@ -85,13 +85,13 @@ class PlayerControlsSettingsEditor extends BaseEditor {
       <div class="schema-title">
         Player Media Control area settings
       </div>
-      <spc-editor-form
+      <crm-editor-form
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 
@@ -112,4 +112,4 @@ class PlayerControlsSettingsEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-player-controls-editor', PlayerControlsSettingsEditor);
+customElements.define('crm-player-controls-editor', PlayerControlsSettingsEditor);

@@ -69,21 +69,21 @@ class PlayerHeader extends LitElement {
         // if currently playing track info changed then gather various favorite details
         // and update the player mediaContentId value so overlay content is updated on next render.
         // retrieve favorite details based on the player body type (audiobook chapter, show episode, track).
-        if (tagName == ("spc-player-body-track")) {
+        if (tagName == ("crm-player-body-track")) {
           const elmPlayerBodyTrack = elmBody as PlayerBodyTrack
           isFavorite = elmPlayerBodyTrack.isTrackFavorite;
           actionFavoriteAdd = elmPlayerBodyTrack.actionTrackFavoriteAdd;
           actionFavoriteRemove = elmPlayerBodyTrack.actionTrackFavoriteRemove;
           isFavoriteReady = true;
           elmPlayerBodyTrack.mediaContentId = this.player.attributes.media_content_id;
-        } else if (tagName == ("spc-player-body-show")) {
+        } else if (tagName == ("crm-player-body-show")) {
           const elmPlayerBodyShow = elmBody as PlayerBodyShow
           isFavorite = elmPlayerBodyShow.isEpisodeFavorite;
           actionFavoriteAdd = elmPlayerBodyShow.actionEpisodeFavoriteAdd;
           actionFavoriteRemove = elmPlayerBodyShow.actionEpisodeFavoriteRemove;
           isFavoriteReady = true;
           elmPlayerBodyShow.mediaContentId = this.player.attributes.media_content_id;
-        } else if (tagName == ("spc-player-body-audiobook")) {
+        } else if (tagName == ("crm-player-body-audiobook")) {
           const elmPlayerBodyAudiobook = elmBody as PlayerBodyAudiobook
           isFavorite = elmPlayerBodyAudiobook.isAudiobookFavorite;
           actionFavoriteAdd = elmPlayerBodyAudiobook.actionAudiobookFavoriteAdd;
@@ -103,7 +103,7 @@ class PlayerHeader extends LitElement {
     // render html.
     return html` 
       <div class="player-header-container" style=${this.styleContainer()}>
-        ${!hideProgress ? html`<spc-player-progress .store=${this.store}></spc-player-progress>` : html``}
+        ${!hideProgress ? html`<crm-player-progress .store=${this.store}></crm-player-progress>` : html``}
         ${title ? html`<div class="header-title">${title}</div>` : html``}
         ${artistTrack ? html`
           <div class="header-artist-track">${artistTrack}
@@ -136,7 +136,7 @@ static get styles() {
     css`
 
       .player-header-container {
-        max-width: var(--spc-player-controls-max-width, 40rem);
+        max-width: var(--crm-player-controls-max-width, 40rem);
         text-align: center;
         background-position: center;
         background-repeat: no-repeat;
@@ -148,11 +148,11 @@ static get styles() {
       .header-title {
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: var(--spc-player-header-title1-font-size, 1.0rem);
-        line-height: var(--spc-player-header-title1-font-size, 1.0rem);
+        font-size: var(--crm-player-header-title1-font-size, 1.0rem);
+        line-height: var(--crm-player-header-title1-font-size, 1.0rem);
         font-weight: 500;
-        text-shadow: 0 0 2px var(--spc-player-palette-vibrant);
-        color: var(--spc-player-header-title1-color, #ffffff);
+        text-shadow: 0 0 2px var(--crm-player-palette-vibrant);
+        color: var(--crm-player-header-title1-color, #ffffff);
         white-space: nowrap;
         mix-blend-mode: normal;
         min-height: 0.5rem;
@@ -162,11 +162,11 @@ static get styles() {
       .header-artist-track {
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: var(--spc-player-header-title2-font-size, 1.15rem);
-        line-height: var(--spc-player-header-title2-font-size, 1.15rem);
+        font-size: var(--crm-player-header-title2-font-size, 1.15rem);
+        line-height: var(--crm-player-header-title2-font-size, 1.15rem);
         font-weight: 400;
-        text-shadow: 0 0 2px var(--spc-player-palette-vibrant);
-        color: var(--spc-player-header-title2-color, #ffffff);
+        text-shadow: 0 0 2px var(--crm-player-palette-vibrant);
+        color: var(--crm-player-header-title2-color, #ffffff);
         mix-blend-mode: normal;
         padding: 0.1rem;
         /* the following is used to correctly align the favorite indicator to the right of the track. */
@@ -179,11 +179,11 @@ static get styles() {
       .header-artist-album {
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: var(--spc-player-header-title3-font-size, 1.0rem);
-        line-height: var(--spc-player-header-title3-font-size, 1.0rem);
+        font-size: var(--crm-player-header-title3-font-size, 1.0rem);
+        line-height: var(--crm-player-header-title3-font-size, 1.0rem);
         font-weight: 400;
-        text-shadow: 0 0 2px var(--spc-player-palette-vibrant);
-        color: var(--spc-player-header-title3-color, #ffffff);
+        text-shadow: 0 0 2px var(--crm-player-palette-vibrant);
+        color: var(--crm-player-header-title3-color, #ffffff);
         mix-blend-mode: normal;
         padding: 0.1rem;
       }
@@ -192,15 +192,15 @@ static get styles() {
       //@media (prefers-color-scheme: dark) {
 
       //  .header-title {
-      //    color: var(--spc-player-header-title1-color, #ffffff);
+      //    color: var(--crm-player-header-title1-color, #ffffff);
       //  }
 
       //  .header-artist-track {
-      //    color: var(--spc-player-header-title2-color, #ffffff);
+      //    color: var(--crm-player-header-title2-color, #ffffff);
       //  }
 
       //  .header-artist-album {
-      //    color: var(--spc-player-header-title3-color, #ffffff);
+      //    color: var(--crm-player-header-title3-color, #ffffff);
       //  }
       //}
     `
@@ -208,4 +208,4 @@ static get styles() {
   }
 }
 
-customElements.define('spc-player-header', PlayerHeader);
+customElements.define('crm-player-header', PlayerHeader);

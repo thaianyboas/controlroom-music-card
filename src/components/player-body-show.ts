@@ -569,4 +569,4 @@ export class PlayerBodyShow extends PlayerBodyBase {
 
 }
 
-customElements.define('spc-player-body-show', PlayerBodyShow);
+customElements.define('crm-player-body-show', PlayerBodyShow);

@@ -25,7 +25,7 @@ import {
 } from '../constants';
 
 
-@customElement("spc-userpreset-browser")
+@customElement("crm-userpreset-browser")
 export class UserPresetBrowser extends FavBrowserBase {
 
   /** Array of items to display in the media list. */
@@ -88,30 +88,30 @@ export class UserPresetBrowser extends FavBrowserBase {
             if (!this.isActionsVisible) {
               if (this.favBrowserItemsPerRow === 1) {
                 return (
-                  html`<spc-media-browser-list 
+                  html`<crm-media-browser-list 
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-list>`
+                       ></crm-media-browser-list>`
                 )
               } else {
                 return (
-                  html`<spc-media-browser-icons 
+                  html`<crm-media-browser-icons 
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-icons>`
+                       ></crm-media-browser-icons>`
                 )
               }
             // if actions are visbile, then render the actions display.
             } else {
-              return html`<spc-userpreset-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-userpreset-actions>`;
+              return html`<crm-userpreset-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-userpreset-actions>`;
             }
           })()}  
         </div>

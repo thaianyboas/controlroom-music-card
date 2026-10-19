@@ -212,18 +212,18 @@ class Progress extends AlertUpdatesBase {
     return css`
       .progress {
         width: 100%;
-        font-size: var(--spc-player-progress-label-font-size, x-small);
+        font-size: var(--crm-player-progress-label-font-size, x-small);
         display: flex;
-        color: var(--spc-player-progress-label-color, var(--spc-player-controls-color, #ffffff));
+        color: var(--crm-player-progress-label-color, var(--crm-player-controls-color, #ffffff));
         padding-bottom: 0.2rem;
       }
 
       .progress-pad-left {
-        padding-left: var(--spc-player-progress-label-padding-lr, 0rem);
+        padding-left: var(--crm-player-progress-label-padding-lr, 0rem);
       }
 
       .progress-pad-right {
-        padding-right: var(--spc-player-progress-label-padding-lr, 0rem);
+        padding-right: var(--crm-player-progress-label-padding-lr, 0rem);
       }
 
       .bar {
@@ -242,7 +242,7 @@ class Progress extends AlertUpdatesBase {
 
       .progress-bar {
         align-self: center;
-        background-color: var(--spc-player-progress-slider-color, var(--spc-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
+        background-color: var(--crm-player-progress-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
         margin-left: 2px;
         margin-right: 2px;
         height: 50%;
@@ -273,4 +273,4 @@ const convertProgress = (duration: number) => {
 };
 
 
-customElements.define('spc-player-progress', Progress);
+customElements.define('crm-player-progress', Progress);

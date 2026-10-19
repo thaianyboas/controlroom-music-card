@@ -247,10 +247,10 @@ class DeviceActions extends FavActionsBase {
     const styleInfo: StyleInfo = <StyleInfo>{};
     if (thumbnail?.includes("svg+xml")) {
       styleInfo['mask-image'] = `url(${thumbnail})`;
-      styleInfo['background-color'] = `var(--spc-media-browser-items-svgicon-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})`;
+      styleInfo['background-color'] = `var(--crm-media-browser-items-svgicon-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})`;
     } else {
       styleInfo['background-image'] = `url(${thumbnail})`;
-      styleInfo['background-color'] = `var(--spc-media-browser-items-svgicon-color, transparent)`;
+      styleInfo['background-color'] = `var(--crm-media-browser-items-svgicon-color, transparent)`;
     }
     return styleMap(styleInfo);
 
@@ -455,4 +455,4 @@ class DeviceActions extends FavActionsBase {
 }
 
 
-customElements.define('spc-device-actions', DeviceActions);
+customElements.define('crm-device-actions', DeviceActions);

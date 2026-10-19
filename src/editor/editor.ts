@@ -106,7 +106,7 @@ class CardEditor extends BaseEditor {
         )}
       </ha-control-button-group>
 
-      <div class="spc-card-editor">
+      <div class="crm-card-editor">
         ${this.subEditor()}
       </div>
     `;
@@ -130,7 +130,7 @@ class CardEditor extends BaseEditor {
   static get styles() {
     return css`
 
-      .spc-card-editor {
+      .crm-card-editor {
         /* control the look and feel of the HA-FORM element. */
         --ha-form-style-integer-margin-bottom: 0.5rem;
         --ha-form-style-multiselect-margin-bottom: 0.5rem;
@@ -156,31 +156,31 @@ class CardEditor extends BaseEditor {
     return choose(this.configArea, [
       [
         ConfigArea.ALBUM_FAVORITES,
-        () => html`<spc-album-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-album-fav-browser-editor>`,
+        () => html`<crm-album-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-album-fav-browser-editor>`,
       ],
       [
         ConfigArea.ARTIST_FAVORITES,
-        () => html`<spc-artist-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-artist-fav-browser-editor>`,
+        () => html`<crm-artist-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-artist-fav-browser-editor>`,
       ],
       [
         ConfigArea.AUDIOBOOK_FAVORITES,
-        () => html`<spc-audiobook-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-audiobook-fav-browser-editor>`,
+        () => html`<crm-audiobook-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-audiobook-fav-browser-editor>`,
       ],
       [
         ConfigArea.CATEGORY_BROWSER,
-        () => html`<spc-category-browser-editor .config=${this.config} .hass=${this.hass}></spc-category-browser-editor>`,
+        () => html`<crm-category-browser-editor .config=${this.config} .hass=${this.hass}></crm-category-browser-editor>`,
       ],
       [
         ConfigArea.DEVICE_BROWSER,
-        () => html`<spc-device-browser-editor .config=${this.config} .hass=${this.hass}></spc-device-browser-editor>`,
+        () => html`<crm-device-browser-editor .config=${this.config} .hass=${this.hass}></crm-device-browser-editor>`,
       ],
       [
         ConfigArea.EPISODE_FAVORITES,
-        () => html`<spc-episode-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-episode-fav-browser-editor>`,
+        () => html`<crm-episode-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-episode-fav-browser-editor>`,
       ],
       [
         ConfigArea.GENERAL,
-        () => html`<spc-general-editor .config=${this.config} .hass=${this.hass}></spc-general-editor>`,
+        () => html`<crm-general-editor .config=${this.config} .hass=${this.hass}></crm-general-editor>`,
       ],
       [
         ConfigArea.DESIGN,
@@ -188,31 +188,31 @@ class CardEditor extends BaseEditor {
       ],
       [
         ConfigArea.PLAYER,
-        () => html`<spc-player-editor .config=${this.config} .hass=${this.hass}></spc-player-editor>`,
+        () => html`<crm-player-editor .config=${this.config} .hass=${this.hass}></crm-player-editor>`,
       ],
       [
         ConfigArea.PLAYLIST_FAVORITES,
-        () => html`<spc-playlist-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-playlist-fav-browser-editor>`,
+        () => html`<crm-playlist-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-playlist-fav-browser-editor>`,
       ],
       [
         ConfigArea.RECENT_BROWSER,
-        () => html`<spc-recent-browser-editor .config=${this.config} .hass=${this.hass}></spc-recent-browser-editor>`,
+        () => html`<crm-recent-browser-editor .config=${this.config} .hass=${this.hass}></crm-recent-browser-editor>`,
       ],
       [
         ConfigArea.SEARCH_MEDIA_BROWSER,
-        () => html`<spc-search-media-browser-editor .config=${this.config} .hass=${this.hass}></spc-search-media-browser-editor>`,
+        () => html`<crm-search-media-browser-editor .config=${this.config} .hass=${this.hass}></crm-search-media-browser-editor>`,
       ],
       [
         ConfigArea.SHOW_FAVORITES,
-        () => html`<spc-show-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-show-fav-browser-editor>`,
+        () => html`<crm-show-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-show-fav-browser-editor>`,
       ],
       [
         ConfigArea.TRACK_FAVORITES,
-        () => html`<spc-track-fav-browser-editor .config=${this.config} .hass=${this.hass}></spc-track-fav-browser-editor>`,
+        () => html`<crm-track-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-track-fav-browser-editor>`,
       ],
       [
         ConfigArea.USERPRESET_BROWSER,
-        () => html`<spc-userpreset-browser-editor .config=${this.config} .hass=${this.hass}></spc-userpreset-browser-editor>`,
+        () => html`<crm-userpreset-browser-editor .config=${this.config} .hass=${this.hass}></crm-userpreset-browser-editor>`,
       ],
     ]);
   }
@@ -354,4 +354,4 @@ class CardEditor extends BaseEditor {
 }
 
 
-customElements.define('spc-editor', CardEditor);
+customElements.define('crm-editor', CardEditor);

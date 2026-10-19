@@ -880,4 +880,4 @@ class TrackActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-track-actions', TrackActions);
+customElements.define('crm-track-actions', TrackActions);

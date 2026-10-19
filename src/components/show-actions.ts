@@ -448,4 +448,4 @@ class ShowActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-show-actions', ShowActions);
+customElements.define('crm-show-actions', ShowActions);

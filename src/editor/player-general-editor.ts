@@ -43,13 +43,13 @@ class PlayerGeneralSettingsEditor extends BaseEditor {
       <div class="schema-title">
         Player General area settings
       </div>
-      <spc-editor-form
+      <crm-editor-form
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 
@@ -70,4 +70,4 @@ class PlayerGeneralSettingsEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-player-general-editor', PlayerGeneralSettingsEditor);
+customElements.define('crm-player-general-editor', PlayerGeneralSettingsEditor);

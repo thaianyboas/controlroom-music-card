@@ -213,15 +213,15 @@ export class MediaBrowserBase extends LitElement {
     const styleInfo: StyleInfo = <StyleInfo>{};
     styleInfo['--items-per-row'] = `${this.itemsPerRow}`;
     if (mediaBrowserItemsColor)
-      styleInfo['--spc-media-browser-items-color'] = `${mediaBrowserItemsColor}`;
+      styleInfo['--crm-media-browser-items-color'] = `${mediaBrowserItemsColor}`;
     if (mediaBrowserItemsListColor)
-      styleInfo['--spc-media-browser-items-list-color'] = `${mediaBrowserItemsListColor}`;
+      styleInfo['--crm-media-browser-items-list-color'] = `${mediaBrowserItemsListColor}`;
     if (mediaBrowserItemsSvgIconColor)
-      styleInfo['--spc-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
+      styleInfo['--crm-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
     if (mediaBrowserItemsTitleFontSize)
-      styleInfo['--spc-media-browser-items-title-font-size'] = `${mediaBrowserItemsTitleFontSize}`;
+      styleInfo['--crm-media-browser-items-title-font-size'] = `${mediaBrowserItemsTitleFontSize}`;
     if (mediaBrowserItemsSubTitleFontSize)
-      styleInfo['--spc-media-browser-items-subtitle-font-size'] = `${mediaBrowserItemsSubTitleFontSize}`;
+      styleInfo['--crm-media-browser-items-subtitle-font-size'] = `${mediaBrowserItemsSubTitleFontSize}`;
     return styleMap(styleInfo);
   }
 
@@ -498,7 +498,7 @@ export class MediaBrowserBase extends LitElement {
         .button:nth-of-type(${index + 1}) .thumbnail {
           mask-image: url(${thumbnail});
           mask-size: ${bgSize};
-          background-color: var(--spc-media-browser-items-svgicon-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)});
+          background-color: var(--crm-media-browser-items-svgicon-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)});
         }
       </style>
     `;
@@ -508,7 +508,7 @@ export class MediaBrowserBase extends LitElement {
         .button:nth-of-type(${index + 1}) .thumbnail {
           background-image: url(${thumbnail});
           background-size: ${bgSize};
-          background-color: var(--spc-media-browser-items-svgicon-color, transparent);
+          background-color: var(--crm-media-browser-items-svgicon-color, transparent);
         }
       </style>
     `;

@@ -355,7 +355,7 @@ class Volume extends AlertUpdatesBase {
     // if button is toggled, then use the icon toggle color; 
     // otherwise, default to regular icon color.
     if (isToggled) {
-      styleInfo['color'] = `var(--spc-player-controls-icon-toggle-color, ${PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT})`;
+      styleInfo['color'] = `var(--crm-player-controls-icon-toggle-color, ${PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT})`;
     }
 
     return styleMap(styleInfo);
@@ -368,8 +368,8 @@ class Volume extends AlertUpdatesBase {
   static get styles() {
     return css`
       ha-control-slider {
-        --control-slider-color: var(--spc-player-volume-slider-color, var(--spc-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
-        --control-slider-thickness: var(--spc-player-volume-slider-thickness, 1rem);
+        --control-slider-color: var(--crm-player-volume-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
+        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 1rem);
         border: 1px solid rgba(255, 255, 255, 0.10);
         border-radius: var(--control-slider-border-radius);
         box-sizing: border-box;
@@ -377,7 +377,7 @@ class Volume extends AlertUpdatesBase {
 
       ha-control-slider[disabled] {
         --control-slider-color: var(--disabled-text-color);
-        --control-slider-thickness: var(--spc-player-volume-slider-thickness, 1rem);
+        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 1rem);
         border: 1px solid rgba(255, 255, 255, 0.10);
         border-radius: var(--control-slider-border-radius);
         box-sizing: border-box;
@@ -392,11 +392,11 @@ class Volume extends AlertUpdatesBase {
         flex: 1;
         padding-right: 0.0rem;
         align-content: flex-end;
-        color: var(--spc-player-volume-label-color, var(--spc-player-controls-color, #ffffff));
+        color: var(--crm-player-volume-label-color, var(--crm-player-controls-color, #ffffff));
       }
 
       .volume-level {
-        font-size: var(--spc-player-volume-label-font-size, x-small);
+        font-size: var(--crm-player-volume-label-font-size, x-small);
         display: flex;
       }
 
@@ -408,7 +408,7 @@ class Volume extends AlertUpdatesBase {
 
       .volume-level-pct {
         text-align: right;
-        color: var(--spc-player-volume-slider-color, var(--spc-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
+        color: var(--crm-player-volume-slider-color, var(--crm-player-controls-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})));
       }
 
       .volume-level-max {
@@ -418,7 +418,7 @@ class Volume extends AlertUpdatesBase {
       }
 
       *[slim] * {
-        --control-slider-thickness: var(--spc-player-volume-slider-thickness, 10px);
+        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 10px);
         --ha-icon-button-size: 30px;
         --mdc-icon-size: 20px;
       }
@@ -438,10 +438,10 @@ class Volume extends AlertUpdatesBase {
         align-items: center;
         mix-blend-mode: normal;
         overflow: hidden;
-        color: var(--spc-player-controls-icon-color, #ffffff);
+        color: var(--crm-player-controls-icon-color, #ffffff);
         width: 100%;
-        --ha-icon-button-size: var(--spc-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
+        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
       }
 
       *[hide] {
@@ -452,4 +452,4 @@ class Volume extends AlertUpdatesBase {
 }
 
 
-customElements.define('spc-player-volume', Volume);
+customElements.define('crm-player-volume', Volume);

@@ -122,7 +122,7 @@ class PlayerControls extends AlertUpdatesBase {
       </div>
       <div class="player-volume-container" style=${this.styleContainer(idle, isOff)}>
           <div class="iconsVolume" hide=${stopped}>
-              <spc-player-volume hide=${stopped} .store=${this.store} .player=${this.player}></spc-player-volume>
+              <crm-player-volume hide=${stopped} .store=${this.store} .player=${this.player}></crm-player-volume>
           </div>
       </div>
     `;
@@ -135,7 +135,7 @@ class PlayerControls extends AlertUpdatesBase {
   static get styles() {
     return css`
       .player-controls-container {
-        max-width: var(--spc-player-controls-max-width, 40rem);
+        max-width: var(--crm-player-controls-max-width, 40rem);
         text-align: center;
         overflow: hidden auto;
         box-sizing: border-box;
@@ -143,7 +143,7 @@ class PlayerControls extends AlertUpdatesBase {
       }
 
       .player-volume-container {
-        max-width: var(--spc-player-controls-max-width, 40rem);
+        max-width: var(--crm-player-controls-max-width, 40rem);
         text-align: center;
         overflow: hidden auto;
         box-sizing: border-box;
@@ -153,11 +153,11 @@ class PlayerControls extends AlertUpdatesBase {
       .icons {
         display: inline-flex;
         align-items: center;
-        justify-content: var(--spc-player-controls-icon-justify-content, center);
+        justify-content: var(--crm-player-controls-icon-justify-content, center);
         overflow: hidden;
-        color: var(--spc-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: var(--spc-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+        color: var(--crm-player-controls-icon-color, #ffffff);
+        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
+        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
         mix-blend-mode: normal;
         width: 100%;
       }
@@ -165,11 +165,11 @@ class PlayerControls extends AlertUpdatesBase {
       .iconsPower {
         display: inline-flex;
         align-items: center;
-        justify-content: var(--spc-player-controls-icon-justify-content, center);
+        justify-content: var(--crm-player-controls-icon-justify-content, center);
         overflow: hidden;
-        color: var(--spc-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: var(--spc-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+        color: var(--crm-player-controls-icon-color, #ffffff);
+        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
+        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
         mix-blend-mode: normal;
         width: 100%;
       }
@@ -178,9 +178,9 @@ class PlayerControls extends AlertUpdatesBase {
         display: inline;
         align-items: center;
         overflow: hidden;
-        color: var(--spc-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: var(--spc-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+        color: var(--crm-player-controls-icon-color, #ffffff);
+        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
+        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
         mix-blend-mode: normal;
       }
 
@@ -704,7 +704,7 @@ class PlayerControls extends AlertUpdatesBase {
     // if button is toggled, then use the icon toggle color;
     // otherwise, default to regular icon color.
     if (isToggled) {
-      styleInfo['color'] = `var(--spc-player-controls-icon-toggle-color, ${PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT})`;
+      styleInfo['color'] = `var(--crm-player-controls-icon-toggle-color, ${PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT})`;
     }
 
     return styleMap(styleInfo);
@@ -712,4 +712,4 @@ class PlayerControls extends AlertUpdatesBase {
 
 }
 
-customElements.define('spc-player-controls', PlayerControls);
+customElements.define('crm-player-controls', PlayerControls);

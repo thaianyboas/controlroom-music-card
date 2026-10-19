@@ -73,13 +73,13 @@ class UserPresetSettingsEditor extends BaseEditor {
       <div class="schema-title">
         Settings that control the User Preset Browser section look and feel
       </div>
-      <spc-editor-form class="spc-editor-form"
+      <crm-editor-form class="crm-editor-form"
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.USERPRESETS}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
       <div class="schema-title">
         User Preset items must be defined manually in the configuration code editor.
         Please refer to the <a href="https://github.com/thlucas1/spotifyplus_card/wiki/Configuration-Options#userpresets-user-preset-content-items" target="_blank">
@@ -92,7 +92,7 @@ class UserPresetSettingsEditor extends BaseEditor {
   /**
    * Style definitions used by this TemplateResult.
    * 
-   * Use the "spc-editor-form" class to apply styling to the elements that are dynamically defined by 
+   * Use the "crm-editor-form" class to apply styling to the elements that are dynamically defined by 
    * the HA-FORM element.  This gives you the ability to generate a more compact look and feel to the
    * element, which can save quite a bit of screen real-estate in the process!
    * See the static "styles()" function in the "editor.ts" module for more details.
@@ -108,7 +108,7 @@ class UserPresetSettingsEditor extends BaseEditor {
       }
 
       /* control the look and feel of the HA-FORM element. */
-      .spc-editor-form {
+      .crm-editor-form {
       }
 
       `;
@@ -116,4 +116,4 @@ class UserPresetSettingsEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-userpreset-browser-editor', UserPresetSettingsEditor);
+customElements.define('crm-userpreset-browser-editor', UserPresetSettingsEditor);

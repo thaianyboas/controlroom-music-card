@@ -123,13 +123,13 @@ class GeneralEditor extends BaseEditor {
       <div class="schema-title">
         Settings that control overall look of card - version ${CARD_VERSION}
       </div>
-      <spc-editor-form class="spc-editor-form"
+      <crm-editor-form class="crm-editor-form"
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 
@@ -137,7 +137,7 @@ class GeneralEditor extends BaseEditor {
   /**
    * Style definitions used by this TemplateResult.
    * 
-   * Use the "spc-editor-form" class to apply styling to the elements that are dynamically defined by 
+   * Use the "crm-editor-form" class to apply styling to the elements that are dynamically defined by 
    * the HA-FORM element.  This gives you the ability to generate a more compact look and feel to the
    * element, which can save quite a bit of screen real-estate in the process!
    * See the static "styles()" function in the "editor.ts" module for more details.
@@ -153,7 +153,7 @@ class GeneralEditor extends BaseEditor {
       }
 
       /* control the look and feel of the HA-FORM element. */
-      .spc-editor-form {
+      .crm-editor-form {
       }
 
       `;
@@ -161,4 +161,4 @@ class GeneralEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-general-editor', GeneralEditor);
+customElements.define('crm-general-editor', GeneralEditor);

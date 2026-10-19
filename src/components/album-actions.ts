@@ -730,4 +730,4 @@ class AlbumActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-album-actions', AlbumActions);
+customElements.define('crm-album-actions', AlbumActions);

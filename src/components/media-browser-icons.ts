@@ -129,8 +129,8 @@ export class MediaBrowserIcons extends MediaBrowserBase {
         }
 
         .title {
-          color: var(--spc-media-browser-items-color, #ffffff);
-          font-size: var(--spc-media-browser-items-title-font-size, 0.8rem);
+          color: var(--crm-media-browser-items-color, #ffffff);
+          font-size: var(--crm-media-browser-items-title-font-size, 0.8rem);
           font-weight: normal;
           line-height: 160%;
           padding: 0.75rem 0.5rem 0rem;
@@ -144,11 +144,11 @@ export class MediaBrowserIcons extends MediaBrowserBase {
         }
 
         .title-active {
-          color: var(--spc-media-browser-items-color, #ffffff);
+          color: var(--crm-media-browser-items-color, #ffffff);
         }
 
         .subtitle {
-          font-size: var(--spc-media-browser-items-subtitle-font-size, 0.8rem);
+          font-size: var(--crm-media-browser-items-subtitle-font-size, 0.8rem);
           line-height: 120%;
           width: 100%;
           padding-bottom: 0.25rem;
@@ -209,4 +209,4 @@ export class MediaBrowserIcons extends MediaBrowserBase {
   }
 }
 
-customElements.define('spc-media-browser-icons', MediaBrowserIcons);
+customElements.define('crm-media-browser-icons', MediaBrowserIcons);

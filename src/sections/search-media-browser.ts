@@ -53,7 +53,7 @@ const SEARCH_TYPES_BASIC = [SearchMediaTypes.ALBUMS, SearchMediaTypes.ARTISTS, S
 SearchMediaTypes.PLAYLISTS, SearchMediaTypes.SHOWS, SearchMediaTypes.TRACKS]
 
 
-@customElement("spc-search-media-browser")
+@customElement("crm-search-media-browser")
 export class SearchBrowser extends FavBrowserBase {
 
   // private state properties.
@@ -269,43 +269,43 @@ export class SearchBrowser extends FavBrowserBase {
             if (!this.isActionsVisible) {
               if (this.favBrowserItemsPerRow === 1) {
                 return (
-                  html`<spc-media-browser-list class="media-browser-list"
+                  html`<crm-media-browser-list class="media-browser-list"
                         .items=${this.mediaList}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         .searchMediaType=${this.searchMediaType}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                      ></spc-media-browser-list>`
+                      ></crm-media-browser-list>`
                 )
               } else {
                 return (
-                  html`<spc-media-browser-icons class="media-browser-list"
+                  html`<crm-media-browser-icons class="media-browser-list"
                         .items=${this.mediaList}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         .searchMediaType=${this.searchMediaType}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                      ></spc-media-browser-icons>`
+                      ></crm-media-browser-icons>`
                 )
               }
               // if actions are visbile, then render the actions display.
             } else if ([SearchMediaTypes.ALBUMS, SearchMediaTypes.ARTIST_ALBUMS, SearchMediaTypes.ARTIST_ALBUMS_APPEARSON, SearchMediaTypes.ARTIST_ALBUMS_COMPILATION,
                         SearchMediaTypes.ARTIST_ALBUMS_SINGLE].indexOf(this.searchMediaType as any) > -1) {
-              return (html`<spc-album-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-album-actions>`);
+              return (html`<crm-album-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-album-actions>`);
             } else if ([SearchMediaTypes.ARTISTS, SearchMediaTypes.ARTIST_RELATED_ARTISTS].indexOf(this.searchMediaType as any) > -1) {
-              return (html`<spc-artist-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-artist-actions>`);
+              return (html`<crm-artist-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-artist-actions>`);
             } else if (this.searchMediaType == SearchMediaTypes.AUDIOBOOKS) {
-              return (html`<spc-audiobook-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-audiobook-actions>`);
+              return (html`<crm-audiobook-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-audiobook-actions>`);
             } else if ([SearchMediaTypes.EPISODES, SearchMediaTypes.AUDIOBOOK_EPISODES, SearchMediaTypes.SHOW_EPISODES].indexOf(this.searchMediaType as any) > -1) {
-              return (html`<spc-episode-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-episode-actions>`);
+              return (html`<crm-episode-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-episode-actions>`);
             } else if ([SearchMediaTypes.PLAYLISTS].indexOf(this.searchMediaType as any) > -1) {
-              return (html`<spc-playlist-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-playlist-actions>`);
+              return (html`<crm-playlist-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-playlist-actions>`);
             } else if (this.searchMediaType == SearchMediaTypes.SHOWS) {
-              return (html`<spc-show-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-show-actions>`);
+              return (html`<crm-show-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-show-actions>`);
             } else if ([SearchMediaTypes.TRACKS, SearchMediaTypes.ALBUM_TRACKS, SearchMediaTypes.ARTIST_TOP_TRACKS].indexOf(this.searchMediaType as any) > -1) {
-              return (html`<spc-track-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-track-actions>`);
+              return (html`<crm-track-actions class="search-media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-track-actions>`);
             } else {
               return (html``);
             }
@@ -749,7 +749,7 @@ export class SearchBrowser extends FavBrowserBase {
               }
 
               // add parent album info to ITrackSimplified objects so that we can just use
-              // the <spc-track-actions> control (it requires an ITrack object).  we do this
+              // the <crm-track-actions> control (it requires an ITrack object).  we do this
               // because ITrackSimplified objects do not contain an `album` object.
               result.items.forEach(item => {
                 const track = item as ITrack;

@@ -328,4 +328,4 @@ export class PlayerBodyQueue extends PlayerBodyBase {
 
 }
 
-customElements.define('spc-player-body-queue', PlayerBodyQueue);
+customElements.define('crm-player-body-queue', PlayerBodyQueue);

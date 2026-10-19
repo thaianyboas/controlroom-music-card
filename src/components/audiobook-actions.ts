@@ -465,4 +465,4 @@ class AudiobookActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-audiobook-actions', AudiobookActions);
+customElements.define('crm-audiobook-actions', AudiobookActions);

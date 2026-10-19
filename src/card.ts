@@ -220,49 +220,49 @@ export class Card extends AlertUpdatesBase {
 
     // render html for the card.
     return html`
-      <ha-card class="spc-card" style=${this.styleCard()}>
-        <div class="spc-loader" ?hidden=${!this.showLoader}>
+      <ha-card class="crm-card" style=${this.styleCard()}>
+        <div class="crm-loader" ?hidden=${!this.showLoader}>
           <ha-spinner size="large"></ha-spinner>
         </div>
-        ${title ? html`<div class="spc-card-header" style=${this.styleCardHeader()}>${title}</div>` : ""}
+        ${title ? html`<div class="crm-card-header" style=${this.styleCardHeader()}>${title}</div>` : ""}
         ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ""}
         ${this.alertInfo ? html`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>` : ""}
-        <div class="spc-card-content-section" style=${this.styleCardContent()}>
+        <div class="crm-card-content-section" style=${this.styleCardContent()}>
           ${this.store.player.id != ""
               ? choose(this.section, [
-                [Section.ALBUM_FAVORITES, () => html`<spc-album-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmAlbumFavBrowserForm"></spc-album-fav-browser>`],
-                [Section.ARTIST_FAVORITES, () => html`<spc-artist-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmArtistFavBrowserForm"></spc-artist-fav-browser>`],
-                [Section.AUDIOBOOK_FAVORITES, () => html`<spc-audiobook-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmAudiobookFavBrowserForm"></spc-audiobook-fav-browser>`],
-                [Section.CATEGORYS, () => html`<spc-category-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmCategoryBrowserForm"></spc-category-browser>`],
-                [Section.DEVICES, () => html`<spc-device-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmDeviceBrowserForm"></spc-device-browser>`],
-                [Section.EPISODE_FAVORITES, () => html`<spc-episode-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmEpisodeFavBrowserForm"></spc-episode-fav-browser>`],
-                [Section.PLAYER, () => html`<spc-player id="spcPlayer" .store=${this.store}></spc-player>`],
-                [Section.PLAYLIST_FAVORITES, () => html`<spc-playlist-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmPlaylistFavBrowserForm"></spc-playlist-fav-browser>`],
-                [Section.RECENTS, () => html`<spc-recent-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmRecentBrowserForm"></spc-recents-browser>`],
-                [Section.SEARCH_MEDIA, () => html`<spc-search-media-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmSearchMediaBrowserForm"></spc-search-media-browser>`],
-                [Section.SHOW_FAVORITES, () => html`<spc-show-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmShowFavBrowserForm"></spc-show-fav-browser>`],
-                [Section.TRACK_FAVORITES, () => html`<spc-track-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmTrackFavBrowserForm"></spc-track-fav-browser>`],
-                [Section.USERPRESETS, () => html`<spc-userpreset-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmUserPresetBrowserForm"></spc-userpresets-browser>`],
-                [Section.UNDEFINED, () => html`<div class="spc-not-configured">SpotifyPlus card configuration error.<br/>Please configure section(s) to display.</div>`],
+                [Section.ALBUM_FAVORITES, () => html`<crm-album-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmAlbumFavBrowserForm"></crm-album-fav-browser>`],
+                [Section.ARTIST_FAVORITES, () => html`<crm-artist-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmArtistFavBrowserForm"></crm-artist-fav-browser>`],
+                [Section.AUDIOBOOK_FAVORITES, () => html`<crm-audiobook-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmAudiobookFavBrowserForm"></crm-audiobook-fav-browser>`],
+                [Section.CATEGORYS, () => html`<crm-category-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmCategoryBrowserForm"></crm-category-browser>`],
+                [Section.DEVICES, () => html`<crm-device-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmDeviceBrowserForm"></crm-device-browser>`],
+                [Section.EPISODE_FAVORITES, () => html`<crm-episode-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmEpisodeFavBrowserForm"></crm-episode-fav-browser>`],
+                [Section.PLAYER, () => html`<crm-player id="spcPlayer" .store=${this.store}></crm-player>`],
+                [Section.PLAYLIST_FAVORITES, () => html`<crm-playlist-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmPlaylistFavBrowserForm"></crm-playlist-fav-browser>`],
+                [Section.RECENTS, () => html`<crm-recent-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmRecentBrowserForm"></crm-recents-browser>`],
+                [Section.SEARCH_MEDIA, () => html`<crm-search-media-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmSearchMediaBrowserForm"></crm-search-media-browser>`],
+                [Section.SHOW_FAVORITES, () => html`<crm-show-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmShowFavBrowserForm"></crm-show-fav-browser>`],
+                [Section.TRACK_FAVORITES, () => html`<crm-track-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmTrackFavBrowserForm"></crm-track-fav-browser>`],
+                [Section.USERPRESETS, () => html`<crm-userpreset-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmUserPresetBrowserForm"></crm-userpresets-browser>`],
+                [Section.UNDEFINED, () => html`<div class="crm-not-configured">SpotifyPlus card configuration error.<br/>Please configure section(s) to display.</div>`],
               ])
               : html`
-                  <div class="spc-initial-config">
+                  <div class="crm-initial-config">
                     ${translate('music.title', this.config?.language ?? 'auto', this.hass.locale?.language)}<br/>
                     Start by editing the card configuration media player "entity" value.<br/>
-                    <div class="spc-not-configured">
+                    <div class="crm-not-configured">
                       ${this.store.player.attributes.sp_config_state}
                     </div>
                   </div>`
           }
         </div>
         ${when(showFooter, () =>
-          html`<div class="spc-card-footer-container" style=${this.styleCardFooter()}>
-            <spc-footer 
-              class="spc-card-footer"
+          html`<div class="crm-card-footer-container" style=${this.styleCardFooter()}>
+            <crm-footer 
+              class="crm-card-footer"
               .config=${this.config}
               .section=${this.section}
               @show-section=${this.onFooterShowSection}
-            ></spc-footer>
+            ></crm-footer>
           </div>`
         )}
       </ha-card>
@@ -304,23 +304,23 @@ export class Card extends AlertUpdatesBase {
         width: 40rem;
       }
 
-      .spc-card {
+      .crm-card {
       /* ControlRoom Music - Design System */
         --crm-background: #101b19;
         --crm-background-secondary: #091310;
         --crm-accent: #34d399;
         --crm-text: #f0fdf4;
         --crm-border-radius: 20px;
-        --spc-card-header-height: ${HEADER_HEIGHT}rem;
-        --spc-card-footer-height: ${FOOTER_HEIGHT}rem;
-        --spc-card-edit-tab-height: 0px;
-        --spc-card-edit-bottom-toolbar-height: 0px;
+        --crm-card-header-height: ${HEADER_HEIGHT}rem;
+        --crm-card-footer-height: ${FOOTER_HEIGHT}rem;
+        --crm-card-edit-tab-height: 0px;
+        --crm-card-edit-bottom-toolbar-height: 0px;
         box-sizing: border-box;
         padding: 0rem;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        height: calc(100vh - var(--spc-card-footer-height) - var(--spc-card-edit-tab-height) - var(--spc-card-edit-bottom-toolbar-height));
+        height: calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height));
         min-width: 20rem;
         width: calc(100vw - var(--mdc-drawer-width));
         color: var(--crm-text);
@@ -330,7 +330,7 @@ export class Card extends AlertUpdatesBase {
         box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
       }
 
-      .spc-card-header {
+      .crm-card-header {
         box-sizing: border-box;
         padding: 0.2rem;
         display: flex;
@@ -344,8 +344,8 @@ export class Card extends AlertUpdatesBase {
         letter-spacing: 0.3px;
       }
 
-      .spc-card-content-section {
-        margin: var(--spc-card-content-margin, ${unsafeCSS(CARD_CONTENT_MARGIN_DEFAULT)});
+      .crm-card-content-section {
+        margin: var(--crm-card-content-margin, ${unsafeCSS(CARD_CONTENT_MARGIN_DEFAULT)});
         color: #e5f5ee;
         flex-grow: 1;
         flex-shrink: 0;
@@ -353,16 +353,16 @@ export class Card extends AlertUpdatesBase {
         overflow: hidden;
       }
 
-      .spc-card-footer-container {
+      .crm-card-footer-container {
         width: 100%;
         display: flex;
         align-items: center;
         background-repeat: no-repeat;
-        background-color: var(--spc-footer-background-color, var(--spc-player-footer-bg-color, var(--card-background-color, transparent)));
-        background-image: var(--spc-footer-background-image, linear-gradient(rgba(0, 0, 0, 0.6), rgb(0, 0, 0)));
+        background-color: var(--crm-footer-background-color, var(--crm-player-footer-bg-color, var(--card-background-color, transparent)));
+        background-image: var(--crm-footer-background-image, linear-gradient(rgba(0, 0, 0, 0.6), rgb(0, 0, 0)));
       }
 
-      .spc-card-footer {
+      .crm-card-footer {
         margin: 0.2rem;
         display: flex;
         align-self: flex-start;
@@ -370,29 +370,29 @@ export class Card extends AlertUpdatesBase {
         justify-content: space-around;
         flex-wrap: wrap;
         width: 100%;
-        --ha-icon-button-size: var(--spc-footer-icon-button-size, 2.5rem);
-        --mdc-icon-size: var(--spc-footer-icon-size, 1.75rem);
+        --ha-icon-button-size: var(--crm-footer-icon-button-size, 2.5rem);
+        --mdc-icon-size: var(--crm-footer-icon-size, 1.75rem);
         --mdc-ripple-top: 0px;
         --mdc-ripple-left: 0px;
         --mdc-ripple-fg-size: 10px;
       }
 
-      .spc-loader {
+      .crm-loader {
         position: absolute;
         z-index: 1000;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        --ha-spinner-indicator-color: var(--spc-card-wait-progress-slider-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)}));
+        --ha-spinner-indicator-color: var(--crm-card-wait-progress-slider-color, var(--dark-primary-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)}));
       }
 
-      .spc-not-configured {
+      .crm-not-configured {
         text-align: center;
         margin: 1rem;
         color: #fa2643;
       }
 
-      .spc-initial-config {
+      .crm-initial-config {
         text-align: center;
         margin-top: 1rem;
       }
@@ -1046,7 +1046,7 @@ export class Card extends AlertUpdatesBase {
     Store.hasCardEditLoadedMediaList = {};
 
     // get the card configuration editor, and return for display.
-    return document.createElement('spc-editor');
+    return document.createElement('crm-editor');
   }
 
 
@@ -1216,9 +1216,9 @@ export class Card extends AlertUpdatesBase {
 
     // set css variables that affect multiple sections of the card.
     if (cardWaitProgressSliderColor)
-      styleInfo['--spc-card-wait-progress-slider-color'] = `${cardWaitProgressSliderColor}`;
+      styleInfo['--crm-card-wait-progress-slider-color'] = `${cardWaitProgressSliderColor}`;
     if (cardContentMargin)
-      styleInfo['--spc-card-content-margin'] = `${cardContentMargin}`;
+      styleInfo['--crm-card-content-margin'] = `${cardContentMargin}`;
 
     // if config entity not set, then display the brand logo neatly in the card.
     if ((this.playerId || "") == "") {
@@ -1233,8 +1233,8 @@ export class Card extends AlertUpdatesBase {
     if (this.isCardInEditPreview) {
 
       // card is in edit preview.
-      styleInfo['--spc-card-edit-tab-height'] = `${editTabHeight}`;
-      styleInfo['--spc-card-edit-bottom-toolbar-height'] = `${editBottomToolbarHeight}`;
+      styleInfo['--crm-card-edit-tab-height'] = `${editTabHeight}`;
+      styleInfo['--crm-card-edit-bottom-toolbar-height'] = `${editBottomToolbarHeight}`;
       styleInfo['height'] = `${CARD_EDIT_PREVIEW_HEIGHT}`;
       styleInfo['width'] = `${CARD_EDIT_PREVIEW_WIDTH}`;
 
@@ -1254,8 +1254,8 @@ export class Card extends AlertUpdatesBase {
     if (isCardInPickerPreview(this)) {
 
       // card is in pick preview.
-      styleInfo['--spc-card-edit-tab-height'] = `${editTabHeight}`;
-      styleInfo['--spc-card-edit-bottom-toolbar-height'] = `${editBottomToolbarHeight}`;
+      styleInfo['--crm-card-edit-tab-height'] = `${editTabHeight}`;
+      styleInfo['--crm-card-edit-bottom-toolbar-height'] = `${editBottomToolbarHeight}`;
       styleInfo['height'] = `${CARD_PICK_PREVIEW_HEIGHT}`;
       styleInfo['width'] = `${CARD_PICK_PREVIEW_WIDTH}`;
       styleInfo['min-height'] = '22rem';
@@ -1291,7 +1291,7 @@ export class Card extends AlertUpdatesBase {
     // - if number value specified, then use as height (in rem units).
     // - if no value specified, then use default.
     if (this.config.height == 'fill') {
-      styleInfo['height'] = 'calc(100vh - var(--spc-card-footer-height) - var(--spc-card-edit-tab-height) - var(--spc-card-edit-bottom-toolbar-height))';
+      styleInfo['height'] = 'calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height))';
     } else if (isNumber(String(this.config.height))) {
       styleInfo['height'] = String(this.config.height) + 'rem';
     } else {
@@ -1313,14 +1313,14 @@ export class Card extends AlertUpdatesBase {
     //  editBottomToolbarHeight,
     //);
 
-    styleInfo['--spc-card-edit-tab-height'] = `${editTabHeight}`;
-    styleInfo['--spc-card-edit-bottom-toolbar-height'] = `${editBottomToolbarHeight}`;
-    styleInfo['--spc-player-palette-vibrant'] = `${this.vibrantColorVibrant}`;
-    styleInfo['--spc-player-palette-muted'] = `${this.vibrantColorMuted}`;
-    styleInfo['--spc-player-palette-darkvibrant'] = `${this.vibrantColorDarkVibrant}`;
-    styleInfo['--spc-player-palette-darkmuted'] = `${this.vibrantColorDarkMuted}`;
-    styleInfo['--spc-player-palette-lightvibrant'] = `${this.vibrantColorLightVibrant}`;
-    styleInfo['--spc-player-palette-lightmuted'] = `${this.vibrantColorLightMuted}`;
+    styleInfo['--crm-card-edit-tab-height'] = `${editTabHeight}`;
+    styleInfo['--crm-card-edit-bottom-toolbar-height'] = `${editBottomToolbarHeight}`;
+    styleInfo['--crm-player-palette-vibrant'] = `${this.vibrantColorVibrant}`;
+    styleInfo['--crm-player-palette-muted'] = `${this.vibrantColorMuted}`;
+    styleInfo['--crm-player-palette-darkvibrant'] = `${this.vibrantColorDarkVibrant}`;
+    styleInfo['--crm-player-palette-darkmuted'] = `${this.vibrantColorDarkMuted}`;
+    styleInfo['--crm-player-palette-lightvibrant'] = `${this.vibrantColorLightVibrant}`;
+    styleInfo['--crm-player-palette-lightmuted'] = `${this.vibrantColorLightMuted}`;
 
     return styleMap(styleInfo);
   }
@@ -1338,8 +1338,8 @@ export class Card extends AlertUpdatesBase {
     // if so, then return a vibrant background style;
     // otherwise, return an empty style to let it default to the card background.
     if ((this.section == Section.PLAYER) && (this.footerBackgroundColor)) {
-      styleInfo['--spc-player-footer-bg-color'] = `${this.footerBackgroundColor || 'transparent'}`;
-      styleInfo['background-color'] = `var(--spc-player-footer-bg-color)`;
+      styleInfo['--crm-player-footer-bg-color'] = `${this.footerBackgroundColor || 'transparent'}`;
+      styleInfo['background-color'] = `var(--crm-player-footer-bg-color)`;
       styleInfo['background-image'] = `linear-gradient(rgba(0, 0, 0, 1.6), rgba(0, 0, 0, 0.6))`;
     }
 
@@ -1402,23 +1402,23 @@ export class Card extends AlertUpdatesBase {
 
     // set css variables that affect the card footer.
     if (footerIconColor)
-      styleInfo['--spc-footer-icon-color'] = `${footerIconColor}`;
+      styleInfo['--crm-footer-icon-color'] = `${footerIconColor}`;
     if (footerIconColorSelected)
-      styleInfo['--spc-footer-icon-color-selected'] = `${footerIconColorSelected}`;
+      styleInfo['--crm-footer-icon-color-selected'] = `${footerIconColorSelected}`;
     if (footerIconSize) {
-      styleInfo['--spc-footer-icon-size'] = `${footerIconSize}`;
-      styleInfo['--spc-footer-icon-button-size'] = `var(--spc-footer-icon-size, ${footerIconSize})`;
+      styleInfo['--crm-footer-icon-size'] = `${footerIconSize}`;
+      styleInfo['--crm-footer-icon-button-size'] = `var(--crm-footer-icon-size, ${footerIconSize})`;
     }
     if (footerBackgroundImage)
-      styleInfo['--spc-footer-background-image'] = `${footerBackgroundImage}`;
+      styleInfo['--crm-footer-background-image'] = `${footerBackgroundImage}`;
     if (footerBackgroundColor) {
-      styleInfo['--spc-footer-background-color'] = `${footerBackgroundColor}`;
+      styleInfo['--crm-footer-background-color'] = `${footerBackgroundColor}`;
     } else {
       // is player selected, and a footer background color set?
       // if so, then return vibrant background style;
       // otherwise, let background color default to the card background color.
       if ((this.section == Section.PLAYER) && (this.vibrantColorVibrant)) {
-        styleInfo['--spc-player-footer-bg-color'] = `${this.footerBackgroundColor || 'transparent'}`;
+        styleInfo['--crm-player-footer-bg-color'] = `${this.footerBackgroundColor || 'transparent'}`;
       } else {
         styleInfo['background'] = `unset`;
       }

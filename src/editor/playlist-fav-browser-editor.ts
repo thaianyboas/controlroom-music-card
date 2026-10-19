@@ -94,14 +94,14 @@ class PlaylistFavBrowserEditor extends BaseEditor {
       <div class="schema-title">
         Settings that control the Playlist Favorites section look and feel
       </div>
-      <spc-editor-form class="spc-editor-form"
+      <crm-editor-form class="crm-editor-form"
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.PLAYLIST_FAVORITES}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
         @value-changed=${this.onValueChanged}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 
@@ -109,7 +109,7 @@ class PlaylistFavBrowserEditor extends BaseEditor {
   /**
    * Style definitions used by this TemplateResult.
    * 
-   * Use the "spc-editor-form" class to apply styling to the elements that are dynamically defined by 
+   * Use the "crm-editor-form" class to apply styling to the elements that are dynamically defined by 
    * the HA-FORM element.  This gives you the ability to generate a more compact look and feel to the
    * element, which can save quite a bit of screen real-estate in the process!
    * See the static "styles()" function in the "editor.ts" module for more details.
@@ -125,7 +125,7 @@ class PlaylistFavBrowserEditor extends BaseEditor {
       }
 
       /* control the look and feel of the HA-FORM element. */
-      .spc-editor-form {
+      .crm-editor-form {
       }
 
       `;
@@ -147,4 +147,4 @@ class PlaylistFavBrowserEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-playlist-fav-browser-editor', PlaylistFavBrowserEditor);
+customElements.define('crm-playlist-fav-browser-editor', PlaylistFavBrowserEditor);

@@ -591,4 +591,4 @@ class EpisodeActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-episode-actions', EpisodeActions);
+customElements.define('crm-episode-actions', EpisodeActions);

@@ -913,4 +913,4 @@ export class PlayerBodyTrack extends PlayerBodyBase {
 
 }
 
-customElements.define('spc-player-body-track', PlayerBodyTrack);
+customElements.define('crm-player-body-track', PlayerBodyTrack);

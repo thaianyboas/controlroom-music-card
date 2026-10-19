@@ -58,10 +58,10 @@ export class PlayerBodyIdle extends PlayerBodyBase {
         }
 
         .thumbnail {
-          min-height: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
-          min-width: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
-          max-height: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
-          max-width: var(--spc-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+          min-height: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+          min-width: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+          max-height: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+          max-width: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
           background-repeat: no-repeat;
           background-position: center center;
           background-size: 70%;
@@ -70,11 +70,11 @@ export class PlayerBodyIdle extends PlayerBodyBase {
         .title {
           overflow: hidden;
           text-overflow: ellipsis;
-          font-size: var(--spc-player-minimized-title-font-size, 1.0rem);
-          line-height: var(--spc-player-minimized-title-font-size, 1.3rem);
+          font-size: var(--crm-player-minimized-title-font-size, 1.0rem);
+          line-height: var(--crm-player-minimized-title-font-size, 1.3rem);
           font-weight: 500;
           text-shadow: 0 0 2px;
-          color: var(--spc-player-minimized-title-color, #ffffff);
+          color: var(--crm-player-minimized-title-color, #ffffff);
           white-space: nowrap;
           mix-blend-mode: normal;
           min-height: 0.5rem;
@@ -96,10 +96,10 @@ export class PlayerBodyIdle extends PlayerBodyBase {
     const styleInfo: StyleInfo = <StyleInfo>{};
     if (thumbnail?.includes("svg+xml")) {
       styleInfo['mask-image'] = `url(${thumbnail})`;
-      styleInfo['background-color'] = `var(--spc-media-browser-items-svgicon-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})`;
+      styleInfo['background-color'] = `var(--crm-media-browser-items-svgicon-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)})`;
     } else {
       styleInfo['background-image'] = `url(${thumbnail})`;
-      styleInfo['background-color'] = `var(--spc-media-browser-items-svgicon-color, transparent)`;
+      styleInfo['background-color'] = `var(--crm-media-browser-items-svgicon-color, transparent)`;
     }
     return styleMap(styleInfo);
 
@@ -107,4 +107,4 @@ export class PlayerBodyIdle extends PlayerBodyBase {
 
 }
 
-customElements.define('spc-player-body-idle', PlayerBodyIdle);
+customElements.define('crm-player-body-idle', PlayerBodyIdle);

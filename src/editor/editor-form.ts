@@ -221,4 +221,4 @@ export function formatLabel({ help, label, name }: { name: string; help: string;
 }
 
 
-customElements.define('spc-editor-form', Form);
+customElements.define('crm-editor-form', Form);

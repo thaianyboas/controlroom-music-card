@@ -576,4 +576,4 @@ class ArtistActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-artist-actions', ArtistActions);
+customElements.define('crm-artist-actions', ArtistActions);

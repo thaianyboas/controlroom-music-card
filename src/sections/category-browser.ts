@@ -25,7 +25,7 @@ import {
 } from '../constants';
 
 
-@customElement("spc-category-browser")
+@customElement("crm-category-browser")
 export class CategoryBrowser extends FavBrowserBase {
 
   // private state properties.
@@ -115,55 +115,55 @@ export class CategoryBrowser extends FavBrowserBase {
           ${(() => {
             if (this.isActionsVisible) {
               // if actions are visbile, then render the actions display.
-              return html`<spc-playlist-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-playlist-actions>`;
+              return html`<crm-playlist-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-playlist-actions>`;
             } else if (this.isCategoryVisible) {
               // if category is visible, then render the playlists for the category.
               if (this.favBrowserItemsPerRow === 1) {
                 return (
-                  html`<spc-media-browser-list 
+                  html`<crm-media-browser-list 
                         class="media-browser-list"
                         .items=${filteredItemsCategory}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-list>`
+                       ></crm-media-browser-list>`
                 )
               } else {
                 return (
-                  html`<spc-media-browser-icons 
+                  html`<crm-media-browser-icons 
                         class="media-browser-list"
                         .items=${filteredItemsCategory}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-icons>`
+                       ></crm-media-browser-icons>`
                 )
               }
             } else {
               // if category is not visbile, then render the category list.
               if (this.favBrowserItemsPerRow === 1) {
                 return (
-                  html`<spc-media-browser-list 
+                  html`<crm-media-browser-list 
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-list>`
+                       ></crm-media-browser-list>`
                 )
               } else {
                 return (
-                  html`<spc-media-browser-icons 
+                  html`<crm-media-browser-icons 
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-icons>`
+                       ></crm-media-browser-icons>`
                 )
               }
             }

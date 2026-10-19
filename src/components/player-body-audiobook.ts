@@ -585,4 +585,4 @@ export class PlayerBodyAudiobook extends PlayerBodyBase {
 
 }
 
-customElements.define('spc-player-body-audiobook', PlayerBodyAudiobook);
+customElements.define('crm-player-body-audiobook', PlayerBodyAudiobook);

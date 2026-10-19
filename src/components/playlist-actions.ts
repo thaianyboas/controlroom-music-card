@@ -514,4 +514,4 @@ class PlaylistActions extends FavActionsBase {
 
 }
 
-customElements.define('spc-playlist-actions', PlaylistActions);
+customElements.define('crm-playlist-actions', PlaylistActions);

@@ -243,15 +243,15 @@ export class FavBrowserBase extends AlertUpdatesBase {
     // build style info object.
     const styleInfo: StyleInfo = <StyleInfo>{};
     if (mediaBrowserSectionTitleColor)
-      styleInfo['--spc-media-browser-section-title-color'] = `${mediaBrowserSectionTitleColor}`;
+      styleInfo['--crm-media-browser-section-title-color'] = `${mediaBrowserSectionTitleColor}`;
     if (mediaBrowserSectionTitleFontSize)
-      styleInfo['--spc-media-browser-section-title-font-size'] = `${mediaBrowserSectionTitleFontSize}`;
+      styleInfo['--crm-media-browser-section-title-font-size'] = `${mediaBrowserSectionTitleFontSize}`;
     if (mediaBrowserSectionSubTitleColor)
-      styleInfo['--spc-media-browser-section-subtitle-color'] = `${mediaBrowserSectionSubTitleColor}`;
+      styleInfo['--crm-media-browser-section-subtitle-color'] = `${mediaBrowserSectionSubTitleColor}`;
     if (mediaBrowserSectionSubTitleFontSize)
-      styleInfo['--spc-media-browser-section-subtitle-font-size'] = `${mediaBrowserSectionSubTitleFontSize}`;
+      styleInfo['--crm-media-browser-section-subtitle-font-size'] = `${mediaBrowserSectionSubTitleFontSize}`;
     if (mediaBrowserItemsSvgIconColor)
-      styleInfo['--spc-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
+      styleInfo['--crm-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
     return styleMap(styleInfo);
 
   }
@@ -794,15 +794,15 @@ export class FavBrowserBase extends AlertUpdatesBase {
     // at this point, elmMediaList should one of the following elements since they both
     // utilize the "media-browser-list" class.  Which one is controlled by user configuration
     // settings "xItemsPerRow" parameter (1=list format, 2+=icons format):
-    // - "<spc-media-browser-icons>" element
-    // - "<spc-media-browser-list>" element 
+    // - "<crm-media-browser-icons>" element
+    // - "<crm-media-browser-list>" element 
 
     // if shadowRoot has not updated yet then we can't do anything.
     if (!elmMediaList.shadowRoot) {
       return;
     }
 
-    // if <spc-media-browser-icons> has not completely updated yet then we can't do anything.
+    // if <crm-media-browser-icons> has not completely updated yet then we can't do anything.
     if (!elmMediaList?.updateComplete) {
       return;
     }

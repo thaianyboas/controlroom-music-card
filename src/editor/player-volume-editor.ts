@@ -87,13 +87,13 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
       <div class="schema-title">
         Player Volume Control area settings
       </div>
-      <spc-editor-form
+      <crm-editor-form
         .schema=${CONFIG_SETTINGS_SCHEMA}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 
@@ -114,4 +114,4 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
 
 }
 
-customElements.define('spc-player-volume-editor', PlayerVolumeSettingsEditor);
+customElements.define('crm-player-volume-editor', PlayerVolumeSettingsEditor);

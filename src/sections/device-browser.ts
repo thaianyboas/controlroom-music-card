@@ -22,7 +22,7 @@ import {
 } from '../constants';
 
 
-@customElement("spc-device-browser")
+@customElement("crm-device-browser")
 export class DeviceBrowser extends FavBrowserBase {
 
   /** Array of items to display in the media list. */
@@ -88,30 +88,30 @@ export class DeviceBrowser extends FavBrowserBase {
             if (!this.isActionsVisible) {
               if ((this.config.deviceBrowserItemsPerRow || 1) === 1) {
                 return (
-                  html`<spc-media-browser-list
+                  html`<crm-media-browser-list
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-list>`
+                       ></crm-media-browser-list>`
                 )
               } else {
                 return (
-                  html`<spc-media-browser-icons
+                  html`<crm-media-browser-icons
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
                         .store=${this.store}
                         @item-selected=${this.onItemSelected}
                         @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></spc-media-browser-icons>`
+                       ></crm-media-browser-icons>`
                 )
               }
             // if actions are visbile, then render the actions display.
             } else {
-              return html`<spc-device-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></spc-device-actions>`;
+              return html`<crm-device-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-device-actions>`;
             }
           })()}  
         </div>

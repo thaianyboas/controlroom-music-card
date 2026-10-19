@@ -13,7 +13,7 @@ export const DOMAIN_MEDIA_PLAYER = 'media_player';
 export const DEBUG_APP_NAME = 'spotifyplus-card';
 
 /** prefix used for event dispatching to make them unique throughtout the system. */
-const dispatchPrefix = 'spc-dispatch-event-';
+const dispatchPrefix = 'crm-dispatch-event-';
 
 /** uniquely identifies the configuration updated event. */
 export const CONFIG_UPDATED = dispatchPrefix + 'config-updated';

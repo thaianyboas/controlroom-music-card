@@ -43,13 +43,13 @@ class DesignEditor extends BaseEditor {
         🎨 ControlRoom Music — Design
       </div>
 
-      <spc-editor-form
+      <crm-editor-form
         .schema=${DESIGN_SETTINGS_SCHEMA}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
         .hass=${this.hass}
-      ></spc-editor-form>
+      ></crm-editor-form>
     `;
   }
 

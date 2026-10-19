@@ -24,7 +24,7 @@ import { Section } from '../types/section';
 import { customEvent } from '../utils/utils';
 
 
-@customElement("spc-footer")
+@customElement("crm-footer")
 export class Footer extends LitElement {
 
   @property({ attribute: false }) config!: CardConfig;
@@ -139,11 +139,11 @@ export class Footer extends LitElement {
   static get styles() {
     return css`
       :host > * {
-        color: var(--spc-footer-icon-color, inherit);
+        color: var(--crm-footer-icon-color, inherit);
       }
 
       :host > *[selected] {
-        color: var(--spc-footer-icon-color-selected, var(--dark-primary-color));
+        color: var(--crm-footer-icon-color-selected, var(--dark-primary-color));
       }
 
       :host > *[hide] {

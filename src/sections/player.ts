@@ -24,7 +24,7 @@ import { MediaPlayer } from '../model/media-player';
 import { AlertUpdatesBase } from './alert-updates-base';
 
 
-@customElement("spc-player")
+@customElement("crm-player")
 export class Player extends AlertUpdatesBase {
 
   // public state properties.
@@ -54,10 +54,10 @@ export class Player extends AlertUpdatesBase {
     // render html.
     return html`
       <div class="player-section-container" style=${this.stylePlayerSection()}>
-        <spc-player-header style=${this.stylePlayerHeader()}
+        <crm-player-header style=${this.stylePlayerHeader()}
           class="player-section-header"
           .store=${this.store}
-        ></spc-player-header>
+        ></crm-player-header>
         <div class="player-section-body">
           <div class="player-alert-bgcolor">
             ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ""}
@@ -65,15 +65,15 @@ export class Player extends AlertUpdatesBase {
           </div>
           ${(() => {
             if (isOffIdle && this.config.playerMinimizeOnIdle && this.config.height != "fill") {
-              return (html`<spc-player-body-idle class="player-section-body-content" style="display:block" .store=${this.store}></spc-player-body-idle>`);
+              return (html`<crm-player-body-idle class="player-section-body-content" style="display:block" .store=${this.store}></crm-player-body-idle>`);
             } else if ((this.config.playerControlsHideFavorites || false) == true) {
               return (html``); // if favorites disabled then we don't need to display favorites body.
             } else if (this.player.attributes.sp_item_type == 'track') {
-              return (html`<spc-player-body-track class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></spc-player-body-track>`);
+              return (html`<crm-player-body-track class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></crm-player-body-track>`);
             } else if (this.player.attributes.sp_item_type == 'podcast') {
-              return (html`<spc-player-body-show class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></spc-player-body-show>`);
+              return (html`<crm-player-body-show class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></crm-player-body-show>`);
             } else if (this.player.attributes.sp_item_type == 'audiobook') {
-              return (html`<spc-player-body-audiobook class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></spc-player-body-audiobook>`);
+              return (html`<crm-player-body-audiobook class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></crm-player-body-audiobook>`);
             } else {
               return (html`<div class="player-section-body-content"></div>`);
             }
@@ -84,21 +84,21 @@ export class Player extends AlertUpdatesBase {
             } else  if ((this.config.playerControlsHidePlayQueue || false) == true) {
               return (html``); // if play queue disabled then we don't need to display queue body.
             } else if (this.player.attributes.sp_item_type == 'track') {
-              return (html`<spc-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></spc-player-body-queue>`);
+              return (html`<crm-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></crm-player-body-queue>`);
             } else if (this.player.attributes.sp_item_type == 'podcast') {
-              return (html`<spc-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></spc-player-body-queue>`);
+              return (html`<crm-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></crm-player-body-queue>`);
             } else if (this.player.attributes.sp_item_type == 'audiobook') {
-              return (html`<spc-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></spc-player-body-queue>`);
+              return (html`<crm-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></crm-player-body-queue>`);
             } else {
               return (html`<div class="player-section-body-queue"></div>`);
             }
           })()}
         </div>
-        <spc-player-controls style=${this.stylePlayerControls()}
+        <crm-player-controls style=${this.stylePlayerControls()}
           class="player-section-controls"
           .store=${this.store}
           .mediaContentId=${this.mediaContentId}
-        ></spc-player-controls>
+        ></crm-player-controls>
       </div>
     `;
   }
@@ -131,7 +131,7 @@ export class Player extends AlertUpdatesBase {
         align-items: center;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: var(--spc-player-background-size, var(--spc-player-background-size-default, 100% 100%));  /* PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT */
+        background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));  /* PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT */
         text-align: -webkit-center;
         height: 100%;
         width: 100%;
@@ -142,7 +142,7 @@ export class Player extends AlertUpdatesBase {
         grid-area: header;
         padding: 0.25rem 0.5rem 0rem 0.5rem;
         box-sizing: border-box;
-        background: linear-gradient(180deg, var(--spc-player-header-bg-color, ${unsafeCSS(PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)}) 30%, transparent 100%);
+        background: linear-gradient(180deg, var(--crm-player-header-bg-color, ${unsafeCSS(PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)}) 30%, transparent 100%);
         background-repeat: no-repeat;
       }
 
@@ -184,7 +184,7 @@ export class Player extends AlertUpdatesBase {
         overflow-y: auto;
         padding: 0rem 0.5rem 0.25rem 0.5rem;
         box-sizing: border-box;
-        background: linear-gradient(0deg, var(--spc-player-controls-bg-color, ${unsafeCSS(PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)}) 30%, transparent 100%);
+        background: linear-gradient(0deg, var(--crm-player-controls-bg-color, ${unsafeCSS(PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)}) 30%, transparent 100%);
         background-repeat: no-repeat;
       }
 
@@ -244,19 +244,19 @@ export class Player extends AlertUpdatesBase {
     // is specific background size specified in config? if so, then use it.
     // otherwise, do not stretch the background image if in fill mode.
     if (this.config.playerBackgroundImageSize) {
-      styleInfo['--spc-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
+      styleInfo['--crm-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
     } else if (this.config.width == 'fill') {
-      styleInfo['--spc-player-background-size-default'] = 'contain';
+      styleInfo['--crm-player-background-size-default'] = 'contain';
     }
 
     // set various player control icon specifications.
     const playerControlsMaxWidth = this.config.playerControlsMaxWidth;
     if (playerControlsMaxWidth) {
-      styleInfo['--spc-player-controls-max-width'] = `${playerControlsMaxWidth}`;
+      styleInfo['--crm-player-controls-max-width'] = `${playerControlsMaxWidth}`;
     }
     const playerControlsIconJustifyContent = this.config.playerControlsIconJustifyContent;
     if (playerControlsIconJustifyContent) {
-      styleInfo['--spc-player-controls-icon-justify-content'] = `${playerControlsIconJustifyContent}`;
+      styleInfo['--crm-player-controls-icon-justify-content'] = `${playerControlsIconJustifyContent}`;
     }
 
     // set player background image to display.
@@ -273,17 +273,17 @@ export class Player extends AlertUpdatesBase {
         backgroundImageUrl = configImagePlayerBgOff;
       } else if (this.config.playerMinimizeOnIdle) {
         // player is minimized, so use theme file image if defined (do not display brand logo).
-        styleInfo['background-image'] = `var(--spc-player-background-image-off)`;
+        styleInfo['background-image'] = `var(--crm-player-background-image-off)`;
       } else {
         // player is not minimized, so use theme file image if defined; otherwise, use brand logo.
-        styleInfo['background-image'] = `var(--spc-player-background-image-off, url(${BRAND_LOGO_IMAGE_BASE64}))`;
-        styleInfo['--spc-player-background-size-default'] = `${BRAND_LOGO_IMAGE_SIZE}`;
+        styleInfo['background-image'] = `var(--crm-player-background-image-off, url(${BRAND_LOGO_IMAGE_BASE64}))`;
+        styleInfo['--crm-player-background-size-default'] = `${BRAND_LOGO_IMAGE_SIZE}`;
         isBackgroundImageBrandLogo = true;
       }
 
       // set image size.
       if (this.config.playerBackgroundImageSize) {
-        styleInfo['--spc-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
+        styleInfo['--crm-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
       }
 
     } else if (isIdle) {
@@ -299,17 +299,17 @@ export class Player extends AlertUpdatesBase {
         backgroundImageUrl = configImagePlayerBgIdle;
       } else if (this.config.playerMinimizeOnIdle) {
         // player is minimized, so use theme file image if defined (do not display brand logo).
-        styleInfo['background-image'] = `var(--spc-player-background-image-off)`;
+        styleInfo['background-image'] = `var(--crm-player-background-image-off)`;
       } else {
         // player is not minimized, so use theme file image if defined; otherwise, use brand logo.
-        styleInfo['background-image'] = `var(--spc-player-background-image-off, url(${BRAND_LOGO_IMAGE_BASE64}))`;
-        styleInfo['--spc-player-background-size-default'] = `${BRAND_LOGO_IMAGE_SIZE}`;
+        styleInfo['background-image'] = `var(--crm-player-background-image-off, url(${BRAND_LOGO_IMAGE_BASE64}))`;
+        styleInfo['--crm-player-background-size-default'] = `${BRAND_LOGO_IMAGE_SIZE}`;
         isBackgroundImageBrandLogo = true;
       }
 
       // set image size.
       if (this.config.playerBackgroundImageSize) {
-        styleInfo['--spc-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
+        styleInfo['--crm-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
       }
 
     } else if (configImagePlayerBg) {
@@ -331,7 +331,7 @@ export class Player extends AlertUpdatesBase {
       // note that theming variable will override this value if specified.
       this.store.card.playerMediaContentId = playerMediaContentId;
       backgroundImageUrl = playerImage;
-      styleInfo['background-image'] = `var(--spc-player-background-image, url(${playerImage}))`;
+      styleInfo['background-image'] = `var(--crm-player-background-image, url(${playerImage}))`;
 
     } else if (configImageDefault) {
 
@@ -346,17 +346,17 @@ export class Player extends AlertUpdatesBase {
       this.store.card.playerMediaContentId = "BRAND_LOGO_IMAGE_BASE64"
       if (this.config.playerMinimizeOnIdle) {
         // player is minimized, so use theme file image if defined (do not display brand logo).
-        styleInfo['background-image'] = `var(--spc-player-background-image-off)`;
+        styleInfo['background-image'] = `var(--crm-player-background-image-off)`;
       } else {
         // player is not minimized, so use theme file image if defined; otherwise, use brand logo.
-        styleInfo['background-image'] = `var(--spc-player-background-image-off, url(${BRAND_LOGO_IMAGE_BASE64}))`;
-        styleInfo['--spc-player-background-size-default'] = `${BRAND_LOGO_IMAGE_SIZE}`;
+        styleInfo['background-image'] = `var(--crm-player-background-image-off, url(${BRAND_LOGO_IMAGE_BASE64}))`;
+        styleInfo['--crm-player-background-size-default'] = `${BRAND_LOGO_IMAGE_SIZE}`;
         isBackgroundImageBrandLogo = true;
       }
 
       // set image size.
       if (this.config.playerBackgroundImageSize) {
-        styleInfo['--spc-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
+        styleInfo['--crm-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
       }
 
     }
@@ -402,51 +402,51 @@ export class Player extends AlertUpdatesBase {
     // build style info object.
     this.store.card.playerImage = backgroundImageUrl;
     if (playerControlsBackgroundColor)
-      styleInfo['--spc-player-controls-bg-color'] = `${playerControlsBackgroundColor} `;
+      styleInfo['--crm-player-controls-bg-color'] = `${playerControlsBackgroundColor} `;
     if (playerControlsColor)
-      styleInfo['--spc-player-controls-color'] = `${playerControlsColor}`;
+      styleInfo['--crm-player-controls-color'] = `${playerControlsColor}`;
     if (playerControlsIconToggleColor)
-      styleInfo['--spc-player-controls-icon-toggle-color'] = `${playerControlsIconToggleColor}`;
+      styleInfo['--crm-player-controls-icon-toggle-color'] = `${playerControlsIconToggleColor}`;
     if (playerControlsIconColor)
-      styleInfo['--spc-player-controls-icon-color'] = `${playerControlsIconColor}`;
+      styleInfo['--crm-player-controls-icon-color'] = `${playerControlsIconColor}`;
     if (playerControlsIconSize) {
-      styleInfo['--spc-player-controls-icon-size'] = `${playerControlsIconSize}`;
-      styleInfo['--spc-player-controls-icon-button-size'] = `var(--spc-player-controls-icon-size, ${playerControlsIconSize})`;
+      styleInfo['--crm-player-controls-icon-size'] = `${playerControlsIconSize}`;
+      styleInfo['--crm-player-controls-icon-button-size'] = `var(--crm-player-controls-icon-size, ${playerControlsIconSize})`;
     }
     if (playerHeaderBackgroundColor)
-      styleInfo['--spc-player-header-bg-color'] = `${playerHeaderBackgroundColor}`;
+      styleInfo['--crm-player-header-bg-color'] = `${playerHeaderBackgroundColor}`;
     if (playerHeaderTitle1Color)
-      styleInfo['--spc-player-header-title1-color'] = `${playerHeaderTitle1Color}`;
+      styleInfo['--crm-player-header-title1-color'] = `${playerHeaderTitle1Color}`;
     if (playerHeaderTitle1FontSize)
-      styleInfo['--spc-player-header-title1-font-size'] = `${playerHeaderTitle1FontSize}`;
+      styleInfo['--crm-player-header-title1-font-size'] = `${playerHeaderTitle1FontSize}`;
     if (playerHeaderTitle2Color)
-      styleInfo['--spc-player-header-title2-color'] = `${playerHeaderTitle2Color}`;
+      styleInfo['--crm-player-header-title2-color'] = `${playerHeaderTitle2Color}`;
     if (playerHeaderTitle2FontSize)
-      styleInfo['--spc-player-header-title2-font-size'] = `${playerHeaderTitle2FontSize}`;
+      styleInfo['--crm-player-header-title2-font-size'] = `${playerHeaderTitle2FontSize}`;
     if (playerHeaderTitle3Color)
-      styleInfo['--spc-player-header-title3-color'] = `${playerHeaderTitle3Color}`;
+      styleInfo['--crm-player-header-title3-color'] = `${playerHeaderTitle3Color}`;
     if (playerHeaderTitle3FontSize)
-      styleInfo['--spc-player-header-title3-font-size'] = `${playerHeaderTitle3FontSize}`;
+      styleInfo['--crm-player-header-title3-font-size'] = `${playerHeaderTitle3FontSize}`;
     if (playerMinimizedTitleColor)
-      styleInfo['--spc-player-minimized-title-color'] = `${playerMinimizedTitleColor}`;
+      styleInfo['--crm-player-minimized-title-color'] = `${playerMinimizedTitleColor}`;
     if (playerMinimizedTitleFontSize)
-      styleInfo['--spc-player-minimized-title-font-size'] = `${playerMinimizedTitleFontSize}`;
+      styleInfo['--crm-player-minimized-title-font-size'] = `${playerMinimizedTitleFontSize}`;
     if (playerProgressLabelColor)
-      styleInfo['--spc-player-progress-label-color'] = `${playerProgressLabelColor}`;
+      styleInfo['--crm-player-progress-label-color'] = `${playerProgressLabelColor}`;
     if (playerProgressLabelFontSize)
-      styleInfo['--spc-player-progress-label-font-size'] = `${playerProgressLabelFontSize}`;
+      styleInfo['--crm-player-progress-label-font-size'] = `${playerProgressLabelFontSize}`;
     if (playerProgressLabelPaddingLR)
-      styleInfo['--spc-player-progress-label-padding-lr'] = `${playerProgressLabelPaddingLR}`;
+      styleInfo['--crm-player-progress-label-padding-lr'] = `${playerProgressLabelPaddingLR}`;
     if (playerProgressSliderColor)
-      styleInfo['--spc-player-progress-slider-color'] = `${playerProgressSliderColor}`;
+      styleInfo['--crm-player-progress-slider-color'] = `${playerProgressSliderColor}`;
     if (playerVolumeLabelColor)
-      styleInfo['--spc-player-volume-label-color'] = `${playerVolumeLabelColor}`;
+      styleInfo['--crm-player-volume-label-color'] = `${playerVolumeLabelColor}`;
     if (playerVolumeLabelFontSize)
-      styleInfo['--spc-player-volume-label-font-size'] = `${playerVolumeLabelFontSize}`;
+      styleInfo['--crm-player-volume-label-font-size'] = `${playerVolumeLabelFontSize}`;
     if (playerVolumeSliderColor)
-      styleInfo['--spc-player-volume-slider-color'] = `${playerVolumeSliderColor}`;
+      styleInfo['--crm-player-volume-slider-color'] = `${playerVolumeSliderColor}`;
     if (playerVolumeSliderThickness)
-      styleInfo['--spc-player-volume-slider-thickness'] = `${playerVolumeSliderThickness}`;
+      styleInfo['--crm-player-volume-slider-thickness'] = `${playerVolumeSliderThickness}`;
 
     return styleMap(styleInfo);
 

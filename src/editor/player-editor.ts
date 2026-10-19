@@ -66,19 +66,19 @@ class PlayerSettingsEditor extends BaseEditor {
     return choose(this.configArea, [
       [
         GENERAL,
-        () => html`<spc-player-general-editor .config=${this.config} .hass=${this.hass}></spc-player-general-editor>`,
+        () => html`<crm-player-general-editor .config=${this.config} .hass=${this.hass}></crm-player-general-editor>`,
       ],
       [
         HEADER,
-        () => html`<spc-player-header-editor .config=${this.config} .hass=${this.hass}></spc-player-header-editor>`,
+        () => html`<crm-player-header-editor .config=${this.config} .hass=${this.hass}></crm-player-header-editor>`,
       ],
       [
         CONTROLS,
-        () => html`<spc-player-controls-editor .config=${this.config} .hass=${this.hass}></spc-player-controls-editor>`,
+        () => html`<crm-player-controls-editor .config=${this.config} .hass=${this.hass}></crm-player-controls-editor>`,
       ],
       [
         VOLUME,
-        () => html`<spc-player-volume-editor .config=${this.config} .hass=${this.hass}></spc-player-volume-editor>`,
+        () => html`<crm-player-volume-editor .config=${this.config} .hass=${this.hass}></crm-player-volume-editor>`,
       ],
     ]);
   }
@@ -117,4 +117,4 @@ class PlayerSettingsEditor extends BaseEditor {
   }
 }
 
-customElements.define('spc-player-editor', PlayerSettingsEditor);
+customElements.define('crm-player-editor', PlayerSettingsEditor);
