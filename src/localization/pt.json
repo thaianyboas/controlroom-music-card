@@ -19,7 +19,10 @@
     "repeat": "Repetir",
     "volume": "Volume",
     "noMusic": "Nenhuma música em reprodução",
-    "ready": "Pronto para ouvir música 🎵"
+    "ready": "Pronto para ouvir música 🎵",
+    "configureEntity": "Comece selecionando a entidade do reprodutor SpotifyPlus nas configurações do cartão.",
+    "configurationError": "Erro na configuração do ControlRoom Music Card.",
+    "configureSections": "Selecione as seções que deseja exibir."
   },
   "navigation": {
     "player": "Reprodutor",

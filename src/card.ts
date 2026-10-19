@@ -243,12 +243,20 @@ export class Card extends AlertUpdatesBase {
                 [Section.SHOW_FAVORITES, () => html`<crm-show-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmShowFavBrowserForm"></crm-show-fav-browser>`],
                 [Section.TRACK_FAVORITES, () => html`<crm-track-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmTrackFavBrowserForm"></crm-track-fav-browser>`],
                 [Section.USERPRESETS, () => html`<crm-userpreset-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmUserPresetBrowserForm"></crm-userpresets-browser>`],
-                [Section.UNDEFINED, () => html`<div class="crm-not-configured">SpotifyPlus card configuration error.<br/>Please configure section(s) to display.</div>`],
+                [Section.UNDEFINED, () => html`
+                  <div class="crm-not-configured">
+                    ${translate('music.configurationError', this.config?.language ?? 'auto', this.hass.locale?.language)}
+                    <br/>
+                    ${translate('music.configureSections', this.config?.language ?? 'auto', this.hass.locale?.language)}
+                  </div>
+                `],
               ])
               : html`
                   <div class="crm-initial-config">
-                    ${translate('music.title', this.config?.language ?? 'auto', this.hass.locale?.language)}<br/>
-                    Start by editing the card configuration media player "entity" value.<br/>
+                    ${translate('music.title', this.config?.language ?? 'auto', this.hass.locale?.language)}
+                    <br/>
+                    ${translate('music.configureEntity', this.config?.language ?? 'auto', this.hass.locale?.language)}
+                    <br/>
                     <div class="crm-not-configured">
                       ${this.store.player.attributes.sp_config_state}
                     </div>

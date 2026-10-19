@@ -19,7 +19,10 @@
     "repeat": "Repeat",
     "volume": "Volume",
     "noMusic": "No music playing",
-    "ready": "Ready for music 🎵"
+    "ready": "Ready for music 🎵",
+    "configureEntity": "Start by selecting the SpotifyPlus media player entity in the card settings.",
+    "configurationError": "ControlRoom Music Card configuration error.",
+    "configureSections": "Select the sections you want to display."
   },
   "navigation": {
     "player": "Player",

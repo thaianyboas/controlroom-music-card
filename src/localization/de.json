@@ -19,7 +19,10 @@
     "repeat": "Wiederholen",
     "volume": "Lautstärke",
     "noMusic": "Keine Musik wird abgespielt",
-    "ready": "Bereit für Musik 🎵"
+    "ready": "Bereit für Musik 🎵",
+    "configureEntity": "Wähle zunächst die SpotifyPlus-Mediaplayer-Entität in den Karteneinstellungen aus.",
+    "configurationError": "Konfigurationsfehler der ControlRoom Music-Karte.",
+    "configureSections": "Wähle die Bereiche aus, die angezeigt werden sollen."
   },
   "navigation": {
     "player": "Player",
