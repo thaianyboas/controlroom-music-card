@@ -1,130 +1,137 @@
-// lovelace card imports.
+
 import { css, html, TemplateResult } from 'lit';
 
-// our imports.
 import {
   CARD_VERSION,
   DOMAIN_MEDIA_PLAYER,
   DOMAIN_SPOTIFYPLUS,
 } from '../constants';
+
 import { BaseEditor } from './base-editor';
+import { translate } from '../localization/i18n';
 import { Section } from '../types/section';
-
-
-const CONFIG_SETTINGS_SCHEMA = [
-  {
-    name: 'sections',
-    label: 'Card sections to enable',
-    help: 'unchecked items will not be shown',
-    required: false,
-    type: 'multi_select',
-    options: {
-      /* the following must match defined names in `secion.ts` */
-      player: 'Player',                           /* Section.PLAYER */
-      albumfavorites: 'Album Favorites',          /* Section.ALBUM_FAVORITES */
-      artistfavorites: 'Artist Favorites',        /* Section.ARTIST_FAVORITES */
-      audiobookfavorites: 'Audiobook Favorites',  /* Section.AUDIOBOOK_FAVORITES */
-      categorys: 'Categorys',                     /* Section.CATEGORYS */
-      devices: 'Devices',                         /* Section.DEVICES */
-      episodefavorites: 'Episode Favorites',      /* Section.EPISODE_FAVORITES */
-      playlistfavorites: 'Playlist Favorites',    /* Section.PLAYLIST_FAVORITES */
-      recents: 'Recently Played',                 /* Section.RECENTS */
-      searchmedia: 'Search Media',                /* Section.SEARCH_MEDIA */
-      showfavorites: 'Show Favorites',            /* Section.SHOW_FAVORITES */
-      trackfavorites: 'Track Favorites',          /* Section.TRACK_FAVORITES */
-      userpresets: 'User Presets',                /* Section.USERPRESETS */
-    },
-  },
-  {
-    name: 'entity',
-    label: 'SpotifyPlus media player entity to retrieve data from',
-    help: 'required',
-    required: true,
-    selector: {
-      entity: {
-        multiple: false,
-        filter: {
-          domain: DOMAIN_MEDIA_PLAYER,
-          integration: DOMAIN_SPOTIFYPLUS
-        }
-      }
-    },
-  },
-  {
-    name: 'title',
-    label: 'Card title text',
-    help: 'displayed at the top of the card above the section',
-    required: false,
-    type: 'string',
-  },
-  {
-    name: 'width',
-    label: 'Width of the card',
-    help: 'in rem units; or "fill" for 100% width',
-    required: false,
-    type: 'string',
-    default: 35.15,
-  },
-  {
-    name: 'height',
-    label: 'Height of the card',
-    help: 'in rem units; or "fill" for 100% height',
-    required: false,
-    type: 'string',
-    default: 35.15,
-  },
-  {
-    name: 'sectionDefault',
-    label: 'Default card section to display',
-    required: false,
-    type: 'select',
-    options: [
-      /* the following must match defined names in `secion.ts` */
-      ['player', 'Player'],                           /* Section.PLAYER */
-      ['albumfavorites', 'Album Favorites'],          /* Section.ALBUM_FAVORITES */
-      ['artistfavorites', 'Artist Favorites'],        /* Section.ARTIST_FAVORITES */
-      ['audiobookfavorites', 'Audiobook Favorites'],  /* Section.AUDIOBOOK_FAVORITES */
-      ['categorys', 'Categorys'],                     /* Section.CATEGORYS */
-      ['devices', 'Devices'],                         /* Section.DEVICES */
-      ['episodefavorites', 'Episode Favorites'],      /* Section.EPISODE_FAVORITES */
-      ['playlistfavorites', 'Playlist Favorites'],    /* Section.PLAYLIST_FAVORITES */
-      ['recents', 'Recently Played'],                 /* Section.RECENTS */
-      ['searchmedia', 'Search Media'],                /* Section.SEARCH_MEDIA */
-      ['showfavorites', 'Show Favorites'],            /* Section.SHOW_FAVORITES */
-      ['trackfavorites', 'Track Favorites'],          /* Section.TRACK_FAVORITES */
-      ['userpresets', 'User Presets'],                /* Section.USERPRESETS */
-    ],
-  },
-  {
-    name: 'touchSupportDisabled',
-    label: "Disable touch event support",
-    help: 'force mouse events',
-    required: false,
-    selector: { boolean: {} },
-  },
-];
-
 
 class GeneralEditor extends BaseEditor {
 
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult {
-
-    // ensure store is created.
     super.createStore();
 
-    // render html.
+    const t = (key: string): string =>
+      translate(
+        key,
+        this.config.language ?? 'auto',
+        this.hass.language
+      );
+
+    const g = (key: string): string =>
+      t(`editor.generalSettings.${key}`);
+
+    const sectionOptions = {
+      player: t('editor.player'),
+      albumfavorites: g('albumFavorites'),
+      artistfavorites: g('artistFavorites'),
+      audiobookfavorites: g('audiobookFavorites'),
+      categorys: t('editor.categorys'),
+      devices: t('editor.devices'),
+      episodefavorites: g('episodeFavorites'),
+      playlistfavorites: g('playlistFavorites'),
+      recents: t('editor.recents'),
+      searchmedia: g('searchMedia'),
+      showfavorites: g('showFavorites'),
+      trackfavorites: g('trackFavorites'),
+      userpresets: g('userPresets'),
+    };
+
+    const defaultSectionOptions = Object.entries(
+      sectionOptions
+    ).map(([value, label]) => [value, label]);
+
+    const schema = [
+      {
+        name: 'language',
+        label: `🌍 ${g('language')}`,
+        help: g('languageHelp'),
+        required: false,
+        type: 'select',
+        options: [
+          ['auto', `🌍 ${g('automaticLanguage')}`],
+          ['pt', '🇧🇷 Português (Brasil)'],
+          ['de', '🇩🇪 Deutsch (Deutschland)'],
+          ['en', '🇺🇸 English (United States)'],
+        ],
+      },
+      {
+        name: 'sections',
+        label: g('sections'),
+        help: g('sectionsHelp'),
+        required: false,
+        type: 'multi_select',
+        options: sectionOptions,
+      },
+      {
+        name: 'entity',
+        label: g('entity'),
+        help: g('entityHelp'),
+        required: true,
+        selector: {
+          entity: {
+            multiple: false,
+            filter: {
+              domain: DOMAIN_MEDIA_PLAYER,
+              integration: DOMAIN_SPOTIFYPLUS,
+            },
+          },
+        },
+      },
+      {
+        name: 'title',
+        label: g('title'),
+        help: g('titleHelp'),
+        required: false,
+        type: 'string',
+      },
+      {
+        name: 'width',
+        label: g('width'),
+        help: g('widthHelp'),
+        required: false,
+        type: 'string',
+        default: 35.15,
+      },
+      {
+        name: 'height',
+        label: g('height'),
+        help: g('heightHelp'),
+        required: false,
+        type: 'string',
+        default: 35.15,
+      },
+      {
+        name: 'sectionDefault',
+        label: g('sectionDefault'),
+        required: false,
+        type: 'select',
+        options: defaultSectionOptions,
+      },
+      {
+        name: 'touchSupportDisabled',
+        label: g('touchSupportDisabled'),
+        help: g('touchSupportDisabledHelp'),
+        required: false,
+        selector: {
+          boolean: {},
+        },
+      },
+    ];
+
     return html`
       <div class="schema-title">
-        Settings that control overall look of card - version ${CARD_VERSION}
+        ${g('description')} ${CARD_VERSION}
       </div>
-      <crm-editor-form class="crm-editor-form"
-        .schema=${CONFIG_SETTINGS_SCHEMA}
+
+      <crm-editor-form
+        class="crm-editor-form"
+        .schema=${schema}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
@@ -133,18 +140,8 @@ class GeneralEditor extends BaseEditor {
     `;
   }
 
-
-  /**
-   * Style definitions used by this TemplateResult.
-   * 
-   * Use the "crm-editor-form" class to apply styling to the elements that are dynamically defined by 
-   * the HA-FORM element.  This gives you the ability to generate a more compact look and feel to the
-   * element, which can save quite a bit of screen real-estate in the process!
-   * See the static "styles()" function in the "editor.ts" module for more details.
-   */
   static get styles() {
     return css`
-
       .schema-title {
         margin: 0.4rem 0;
         text-align: left;
@@ -152,13 +149,10 @@ class GeneralEditor extends BaseEditor {
         color: var(--secondary-text-color);
       }
 
-      /* control the look and feel of the HA-FORM element. */
       .crm-editor-form {
       }
-
-      `;
+    `;
   }
-
 }
 
 customElements.define('crm-general-editor', GeneralEditor);

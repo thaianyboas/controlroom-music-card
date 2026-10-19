@@ -1,94 +1,91 @@
-// lovelace card imports.
+
 import { css, html, TemplateResult } from 'lit';
 
-// our imports.
 import { PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT } from '../constants';
 import { BaseEditor } from './base-editor';
 import { Section } from '../types/section';
-
-
-const CONFIG_SETTINGS_SCHEMA = [
-  {
-    name: 'playerControlsBackgroundColor',
-    label: 'Color value (e.g. "#hhrrggbb") for controls area background gradient',
-    help: "'transparent' to disable",
-    required: false,
-    type: 'string',
-    default: PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT,
-  },
-  {
-    name: 'playerVolumeMaxValue',
-    label: 'Maximum volume value allowed via card UI',
-    help: 'range 10 - 100',
-    required: true,
-    type: 'integer',
-    default: 100,
-    valueMin: 10,
-    valueMax: 100,
-  },
-  {
-    name: 'playerVolumeStepValue',
-    label: 'Amount used to adjust volume when step buttons are used',
-    help: 'range 1 - 30',
-    required: true,
-    type: 'integer',
-    default: 10,
-    valueMin: 1,
-    valueMax: 30,
-  },
-  {
-    name: 'playerVolumeControlsHideMute',
-    label: 'Hide mute button in the volume controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerVolumeControlsHidePower',
-    label: 'Hide power button in the volume controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerVolumeControlsHideSlider',
-    label: 'Hide volume slider and levels in the volume controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerVolumeControlsShowPlusMinus',
-    label: 'Show plus / minus buttons in the volume controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerVolumeControlsHideLevels',
-    label: "Hide volume level numbers / %'s in the volume controls area",
-    required: false,
-    selector: { boolean: {} },
-  },
-];
-
+import { translate } from '../localization/i18n';
 
 class PlayerVolumeSettingsEditor extends BaseEditor {
 
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult {
-
-    // ensure store is created.
     super.createStore();
 
-    // render html.
+    const t = (key: string): string =>
+      translate(
+        `editor.playerVolumeSettings.${key}`,
+        this.config.language ?? 'auto',
+        this.hass.language
+      );
+
+    const configSettingsSchema = [
+      {
+        name: 'playerControlsBackgroundColor',
+        label: t('backgroundColor'),
+        help: t('backgroundColorHelp'),
+        required: false,
+        type: 'string',
+        default: PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT,
+      },
+      {
+        name: 'playerVolumeMaxValue',
+        label: t('maxVolume'),
+        help: t('maxVolumeHelp'),
+        required: true,
+        type: 'integer',
+        default: 100,
+        valueMin: 10,
+        valueMax: 100,
+      },
+      {
+        name: 'playerVolumeStepValue',
+        label: t('volumeStep'),
+        help: t('volumeStepHelp'),
+        required: true,
+        type: 'integer',
+        default: 10,
+        valueMin: 1,
+        valueMax: 30,
+      },
+      {
+        name: 'playerVolumeControlsHideMute',
+        label: t('hideMute'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerVolumeControlsHidePower',
+        label: t('hidePower'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerVolumeControlsHideSlider',
+        label: t('hideSlider'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerVolumeControlsShowPlusMinus',
+        label: t('showPlusMinus'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerVolumeControlsHideLevels',
+        label: t('hideLevels'),
+        required: false,
+        selector: { boolean: {} },
+      },
+    ];
+
     return html`
       <div class="schema-title">
-        Player Volume Control area settings
+        ${t('description')}
       </div>
+
       <crm-editor-form
-        .schema=${CONFIG_SETTINGS_SCHEMA}
+        .schema=${configSettingsSchema}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
@@ -97,10 +94,6 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
     `;
   }
 
-
-  /**
-   * Style definitions used by this TemplateResult.
-   */
   static get styles() {
     return css`
       .schema-title {
@@ -109,9 +102,11 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
         font-size: 1rem;
         color: var(--secondary-text-color);
       }
-      `;
+    `;
   }
-
 }
 
-customElements.define('crm-player-volume-editor', PlayerVolumeSettingsEditor);
+customElements.define(
+  'crm-player-volume-editor',
+  PlayerVolumeSettingsEditor
+);

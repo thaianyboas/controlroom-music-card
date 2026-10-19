@@ -30,6 +30,7 @@ import './show-fav-browser-editor';
 import './track-fav-browser-editor';
 import './userpreset-browser-editor';
 import { BaseEditor } from './base-editor';
+import { translate } from '../localization/i18n';
 import { ConfigArea } from '../types/config-area';
 import { Section } from '../types/section';
 import { Store } from '../model/store';
@@ -76,7 +77,11 @@ class CardEditor extends BaseEditor {
               selected=${this.configArea === configArea || nothing}
               @click=${() => this.onConfigSectionClick(configArea)}
             >
-              ${configArea}
+              ${translate(
+              `editor.${String(configArea).toLowerCase().replace(/[^a-z]/g, '')}`,
+              this.config.language ?? 'auto',
+              this.hass.language
+            )}
             </ha-control-button>
           `,
         )}
@@ -88,7 +93,11 @@ class CardEditor extends BaseEditor {
               selected=${this.configArea === configArea || nothing}
               @click=${() => this.onConfigSectionClick(configArea)}
             >
-              ${configArea}
+              ${translate(
+                `editor.${String(configArea).toLowerCase().replace(/[^a-z]/g, '')}`,
+                this.config.language ?? 'auto',
+                this.hass.language
+              )}
             </ha-control-button>
           `,
         )}
@@ -100,7 +109,11 @@ class CardEditor extends BaseEditor {
               selected=${this.configArea === configArea || nothing}
               @click=${() => this.onConfigSectionClick(configArea)}
             >
-              ${configArea}
+              ${translate(
+              `editor.${String(configArea).toLowerCase().replace(/[^a-z]/g, '')}`,
+              this.config.language ?? 'auto',
+              this.hass.language
+            )}
             </ha-control-button>
           `,
         )}

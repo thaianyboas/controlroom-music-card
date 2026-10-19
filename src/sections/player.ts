@@ -54,6 +54,20 @@ export class Player extends AlertUpdatesBase {
     // render html.
     return html`
       <div class="player-section-container" style=${this.stylePlayerSection()}>
+      <div class="player-album-cover">
+          ${this.player.attributes.entity_picture || this.player.attributes.entity_picture_local
+            ? html`
+                <img
+                  src=${this.store.hass.hassUrl(
+                    this.player.attributes.entity_picture ||
+                    this.player.attributes.entity_picture_local
+                  )}
+                  alt="Album cover"
+                />
+              `
+            : html`<ha-icon icon="mdi:music"></ha-icon>`
+          }
+        </div>
         <crm-player-header style=${this.stylePlayerHeader()}
           class="player-section-header"
           .store=${this.store}
@@ -122,21 +136,41 @@ export class Player extends AlertUpdatesBase {
 
       .player-section-container {
         display: grid;
-        grid-template-columns: 100%;
-        grid-template-rows: min-content auto min-content;
+        grid-template-columns: 76px minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
         grid-template-areas:
-          'header'
-          'body'
-          'controls';
+          'cover header controls'
+          'cover body controls';
+        column-gap: 0.75rem;
         align-items: center;
         background-position: center;
         background-repeat: no-repeat;
         background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));  /* PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT */
+        background-image: none !important;
+        background-color: #101c18;
         text-align: -webkit-center;
         height: 100%;
         width: 100%;
       }
+      .player-album-cover {
+        grid-area: cover;
+        width: 76px;
+        height: 76px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #164d3c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8ee0b3;
+      }
 
+      .player-album-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
       .player-section-header {
         /* border: 1px solid red;      /* FOR TESTING CONTROL LAYOUT CHANGES */
         grid-area: header;

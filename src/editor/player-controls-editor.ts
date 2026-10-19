@@ -1,92 +1,88 @@
-// lovelace card imports.
+
 import { css, html, TemplateResult } from 'lit';
 
-// our imports.
 import { PLAYER_CONTROLS_ICON_SIZE_DEFAULT } from '../constants';
 import { BaseEditor } from './base-editor';
 import { Section } from '../types/section';
-
-
-const CONFIG_SETTINGS_SCHEMA = [
-  {
-    name: 'playerControlsIconSize',
-    label: 'Size of the icons in the Player controls area.',
-    help: 'default is "' + PLAYER_CONTROLS_ICON_SIZE_DEFAULT + '"',
-    required: false,
-    type: 'string',
-    default: PLAYER_CONTROLS_ICON_SIZE_DEFAULT,
-  },
-  {
-    name: 'playerControlsHideFavorites',
-    label: 'Hide favorite actions control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHideShuffle',
-    label: 'Hide shuffle control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHideTrackPrev',
-    label: 'Hide previous track control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHidePlayPause',
-    label: 'Hide play / pause control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHideTrackNext',
-    label: 'Hide next track control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHideRepeat',
-    label: 'Hide repeat control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHidePlayQueue',
-    label: 'Hide play queue control button in the controls area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerControlsHide',
-    label: 'Hide controls area of the Player section form',
-    required: false,
-    selector: { boolean: {} },
-  },
-];
-
+import { translate } from '../localization/i18n';
 
 class PlayerControlsSettingsEditor extends BaseEditor {
 
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult {
-
-    // ensure store is created.
     super.createStore();
 
-    // render html.
+    const t = (key: string): string =>
+      translate(
+        `editor.playerControlsSettings.${key}`,
+        this.config.language ?? 'auto',
+        this.hass.language
+      );
+
+    const configSettingsSchema = [
+      {
+        name: 'playerControlsIconSize',
+        label: t('iconSize'),
+        help: `${t('iconSizeHelp')} "${PLAYER_CONTROLS_ICON_SIZE_DEFAULT}"`,
+        required: false,
+        type: 'string',
+        default: PLAYER_CONTROLS_ICON_SIZE_DEFAULT,
+      },
+      {
+        name: 'playerControlsHideFavorites',
+        label: t('hideFavorites'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHideShuffle',
+        label: t('hideShuffle'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHideTrackPrev',
+        label: t('hidePrevious'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHidePlayPause',
+        label: t('hidePlayPause'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHideTrackNext',
+        label: t('hideNext'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHideRepeat',
+        label: t('hideRepeat'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHidePlayQueue',
+        label: t('hideQueue'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerControlsHide',
+        label: t('hideControls'),
+        required: false,
+        selector: { boolean: {} },
+      },
+    ];
+
     return html`
       <div class="schema-title">
-        Player Media Control area settings
+        ${t('description')}
       </div>
       <crm-editor-form
-        .schema=${CONFIG_SETTINGS_SCHEMA}
+        .schema=${configSettingsSchema}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
@@ -95,10 +91,6 @@ class PlayerControlsSettingsEditor extends BaseEditor {
     `;
   }
 
-
-  /**
-   * Style definitions used by this TemplateResult.
-   */
   static get styles() {
     return css`
       .schema-title {
@@ -107,9 +99,11 @@ class PlayerControlsSettingsEditor extends BaseEditor {
         font-size: 1rem;
         color: var(--secondary-text-color);
       }
-      `;
+    `;
   }
-
 }
 
-customElements.define('crm-player-controls-editor', PlayerControlsSettingsEditor);
+customElements.define(
+  'crm-player-controls-editor',
+  PlayerControlsSettingsEditor
+);

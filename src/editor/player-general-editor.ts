@@ -1,50 +1,47 @@
-// lovelace card imports.
+
 import { css, html, TemplateResult } from 'lit';
 
-// our imports.
 import { PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT } from '../constants';
 import { BaseEditor } from './base-editor';
 import { Section } from '../types/section';
-
-
-const CONFIG_SETTINGS_SCHEMA = [
-  {
-    name: 'playerBackgroundImageSize',
-    label: 'Size of the player background image',
-    help: 'default is "' + PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT + '"',
-    required: false,
-    type: 'string',
-  },
-  {
-    name: 'playerMinimizeOnIdle',
-    label: "Minimize player height when state is off / idle",
-    help: 'if height not "fill"',
-    required: false,
-    selector: { boolean: {} },
-  },
-];
-
+import { translate } from '../localization/i18n';
 
 class PlayerGeneralSettingsEditor extends BaseEditor {
 
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult {
-
-    // ensure store is created.
     super.createStore();
 
-    // render html.
+    const t = (key: string): string =>
+      translate(
+        `editor.playerGeneralSettings.${key}`,
+        this.config.language ?? 'auto',
+        this.hass.language
+      );
+
+    const configSettingsSchema = [
+      {
+        name: 'playerBackgroundImageSize',
+        label: t('backgroundImageSize'),
+        help: `${t('defaultIs')} "${PLAYER_BACKGROUND_IMAGE_SIZE_DEFAULT}"`,
+        required: false,
+        type: 'string',
+      },
+      {
+        name: 'playerMinimizeOnIdle',
+        label: t('minimizeOnIdle'),
+        help: t('minimizeOnIdleHelp'),
+        required: false,
+        selector: { boolean: {} },
+      },
+    ];
+
     return html`
       <div class="schema-title">
-        Player General area settings
+        ${t('description')}
       </div>
+
       <crm-editor-form
-        .schema=${CONFIG_SETTINGS_SCHEMA}
+        .schema=${configSettingsSchema}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
@@ -53,10 +50,6 @@ class PlayerGeneralSettingsEditor extends BaseEditor {
     `;
   }
 
-
-  /**
-   * Style definitions used by this TemplateResult.
-   */
   static get styles() {
     return css`
       .schema-title {
@@ -65,9 +58,11 @@ class PlayerGeneralSettingsEditor extends BaseEditor {
         font-size: 1rem;
         color: var(--secondary-text-color);
       }
-      `;
+    `;
   }
-
 }
 
-customElements.define('crm-player-general-editor', PlayerGeneralSettingsEditor);
+customElements.define(
+  'crm-player-general-editor',
+  PlayerGeneralSettingsEditor
+);

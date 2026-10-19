@@ -140,6 +140,9 @@ class PlayerControls extends AlertUpdatesBase {
         overflow: hidden auto;
         box-sizing: border-box;
         /* border: 1px solid red;  /*  FOR TESTING CONTROL LAYOUT CHANGES */
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .player-volume-container {
@@ -156,8 +159,8 @@ class PlayerControls extends AlertUpdatesBase {
         justify-content: var(--crm-player-controls-icon-justify-content, center);
         overflow: hidden;
         color: var(--crm-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+        --ha-icon-button-size: 36px;
+        --mdc-icon-size: 22px;
         mix-blend-mode: normal;
         width: 100%;
       }

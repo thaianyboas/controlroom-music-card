@@ -1,10 +1,10 @@
-// lovelace card imports.
+
 import { css, html, nothing, TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 
-// our imports.
 import { BaseEditor } from './base-editor';
+import { translate } from '../localization/i18n';
 import './editor-form';
 import './player-general-editor';
 import './player-header-editor';
@@ -13,35 +13,33 @@ import './player-volume-editor';
 
 /** Configuration area editor sections enum. */
 enum ConfigArea {
-  GENERAL = 'General',
-  HEADER = 'Header',
-  CONTROLS = 'Controls',
-  VOLUME = 'Volume',
+  GENERAL = 'general',
+  HEADER = 'header',
+  CONTROLS = 'controls',
+  VOLUME = 'volume',
 }
 
-/** Configuration area editor section keys array. */
 const { GENERAL, HEADER, CONTROLS, VOLUME } = ConfigArea;
-
 
 class PlayerSettingsEditor extends BaseEditor {
 
   @state() private configArea = GENERAL;
 
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult {
-
-    // ensure store is created.
     super.createStore();
+
+    const t = (key: string): string =>
+      translate(
+        `editor.playerSettings.${key}`,
+        this.config.language ?? 'auto',
+        this.hass.language
+      );
 
     return html`
       <div class="schema-title">
-        Settings that control the Player section look and feel
+        ${t('description')}
       </div>
+
       <ha-control-button-group>
         ${[GENERAL, HEADER, CONTROLS, VOLUME].map(
           (configArea) => html`
@@ -49,7 +47,7 @@ class PlayerSettingsEditor extends BaseEditor {
               selected=${this.configArea === configArea || nothing}
               @click=${() => this.onConfigPlayerSectionClick(configArea)}
             >
-              ${configArea}
+              ${t(configArea)}
             </ha-control-button>
           `,
         )}
@@ -59,48 +57,51 @@ class PlayerSettingsEditor extends BaseEditor {
     `;
   }
 
-
   private subEditor() {
-
-    // show the desired section editor.
     return choose(this.configArea, [
       [
         GENERAL,
-        () => html`<crm-player-general-editor .config=${this.config} .hass=${this.hass}></crm-player-general-editor>`,
+        () => html`
+          <crm-player-general-editor
+            .config=${this.config}
+            .hass=${this.hass}
+          ></crm-player-general-editor>
+        `,
       ],
       [
         HEADER,
-        () => html`<crm-player-header-editor .config=${this.config} .hass=${this.hass}></crm-player-header-editor>`,
+        () => html`
+          <crm-player-header-editor
+            .config=${this.config}
+            .hass=${this.hass}
+          ></crm-player-header-editor>
+        `,
       ],
       [
         CONTROLS,
-        () => html`<crm-player-controls-editor .config=${this.config} .hass=${this.hass}></crm-player-controls-editor>`,
+        () => html`
+          <crm-player-controls-editor
+            .config=${this.config}
+            .hass=${this.hass}
+          ></crm-player-controls-editor>
+        `,
       ],
       [
         VOLUME,
-        () => html`<crm-player-volume-editor .config=${this.config} .hass=${this.hass}></crm-player-volume-editor>`,
+        () => html`
+          <crm-player-volume-editor
+            .config=${this.config}
+            .hass=${this.hass}
+          ></crm-player-volume-editor>
+        `,
       ],
     ]);
   }
 
-
-  /**
-   * Handles the `click` event fired when an editor section button is clicked.
-   * 
-   * This will set the configArea attribute, which will display the selected editor section settings.
-   * 
-   * @param args Event arguments that contain the configArea that was clicked on.
-   */
   private onConfigPlayerSectionClick(configArea: ConfigArea) {
-
-    // show the section editor form.
     this.configArea = configArea;
   }
 
-
-  /**
-   * Style definitions used by this TemplateResult.
-   */
   static get styles() {
     return css`
       .schema-title {

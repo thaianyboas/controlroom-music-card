@@ -1,80 +1,77 @@
-// lovelace card imports.
+
 import { css, html, TemplateResult } from 'lit';
 
-// our imports.
 import { PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT } from '../constants';
 import { BaseEditor } from './base-editor';
 import { Section } from '../types/section';
-
-
-const CONFIG_SETTINGS_SCHEMA = [
-  {
-    name: 'playerHeaderTitle',
-    label: 'Section title text displayed in the header area',
-    required: false,
-    type: 'string',
-  },
-  {
-    name: 'playerHeaderArtistTrack',
-    label: 'Artist and Track info displayed in the header area',
-    required: false,
-    type: 'string',
-  },
-  {
-    name: 'playerHeaderAlbum',
-    label: 'Album info displayed in the header area',
-    required: false,
-    type: 'string',
-  },
-  {
-    name: 'playerHeaderNoMediaPlayingText',
-    label: 'Text to display in the header area when no media is currently playing',
-    required: false,
-    type: 'string',
-  },
-  {
-    name: 'playerHeaderBackgroundColor',
-    label: 'Color value (e.g. "#hhrrggbb") for header area background gradient',
-    help: "'transparent' to disable",
-    required: false,
-    type: 'string',
-    default: PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT,
-  },
-  {
-    name: 'playerHeaderHideProgressBar',
-    label: 'Hide progress bar in the header area',
-    required: false,
-    selector: { boolean: {} },
-  },
-  {
-    name: 'playerHeaderHide',
-    label: 'Hide header area of the Player section form',
-    required: false,
-    selector: { boolean: {} },
-  },
-];
-
+import { translate } from '../localization/i18n';
 
 class PlayerHeaderSettingsEditor extends BaseEditor {
 
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult {
-
-    // ensure store is created.
     super.createStore();
 
-    // render html.
+    const t = (key: string): string =>
+      translate(
+        `editor.playerHeaderSettings.${key}`,
+        this.config.language ?? 'auto',
+        this.hass.language
+      );
+
+    const configSettingsSchema = [
+      {
+        name: 'playerHeaderTitle',
+        label: t('title'),
+        required: false,
+        type: 'string',
+      },
+      {
+        name: 'playerHeaderArtistTrack',
+        label: t('artistTrack'),
+        required: false,
+        type: 'string',
+      },
+      {
+        name: 'playerHeaderAlbum',
+        label: t('album'),
+        required: false,
+        type: 'string',
+      },
+      {
+        name: 'playerHeaderNoMediaPlayingText',
+        label: t('noMediaPlayingText'),
+        required: false,
+        type: 'string',
+      },
+      {
+        name: 'playerHeaderBackgroundColor',
+        label: t('backgroundColor'),
+        help: t('backgroundColorHelp'),
+        required: false,
+        type: 'string',
+        default: PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT,
+      },
+      {
+        name: 'playerHeaderHideProgressBar',
+        label: t('hideProgressBar'),
+        required: false,
+        selector: { boolean: {} },
+      },
+      {
+        name: 'playerHeaderHide',
+        label: t('hideHeader'),
+        required: false,
+        selector: { boolean: {} },
+      },
+    ];
+
     return html`
       <div class="schema-title">
-        Player Header Status area settings
+        ${t('description')}
       </div>
+
       <crm-editor-form
-        .schema=${CONFIG_SETTINGS_SCHEMA}
+        .schema=${configSettingsSchema}
         .section=${Section.PLAYER}
         .store=${this.store}
         .config=${this.config}
@@ -83,10 +80,6 @@ class PlayerHeaderSettingsEditor extends BaseEditor {
     `;
   }
 
-
-  /**
-   * Style definitions used by this TemplateResult.
-   */
   static get styles() {
     return css`
       .schema-title {
@@ -95,9 +88,11 @@ class PlayerHeaderSettingsEditor extends BaseEditor {
         font-size: 1rem;
         color: var(--secondary-text-color);
       }
-      `;
+    `;
   }
-
 }
 
-customElements.define('crm-player-header-editor', PlayerHeaderSettingsEditor);
+customElements.define(
+  'crm-player-header-editor',
+  PlayerHeaderSettingsEditor
+);
