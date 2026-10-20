@@ -133,11 +133,11 @@ class CardEditor extends BaseEditor {
     ];
     const groups = [
       { id: 'general', title: labels.general, icon: 'mdi:cog-outline', areas: [ConfigArea.GENERAL] },
-      { id: 'design', title: labels.design, icon: 'mdi:palette-outline', areas: [ConfigArea.DESIGN] },
+      { id: 'design', title: labels.design, icon: 'mdi:palette-swatch-outline', areas: [ConfigArea.DESIGN] },
       { id: 'player', title: labels.player, icon: 'mdi:play-circle-outline', areas: [ConfigArea.PLAYER] },
-      { id: 'devices', title: labels.devices, icon: 'mdi:speaker', areas: [ConfigArea.DEVICE_BROWSER] },
-      { id: 'library', title: labels.library, icon: 'mdi:music-box-multiple-outline', areas: libraryAreas },
-      { id: 'advanced', title: labels.advanced, icon: 'mdi:tune-variant', areas: advancedAreas },
+      { id: 'devices', title: labels.devices, icon: 'mdi:speaker-wireless', areas: [ConfigArea.DEVICE_BROWSER] },
+      { id: 'library', title: labels.library, icon: 'mdi:bookshelf', areas: libraryAreas },
+      { id: 'advanced', title: labels.advanced, icon: 'mdi:cog-outline', areas: advancedAreas },
     ];
 
     return html`

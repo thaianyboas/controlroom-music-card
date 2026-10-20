@@ -2,19 +2,19 @@
 import { css, html, LitElement, TemplateResult, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
-  mdiAccountMusic,
+  mdiAccountMusicOutline,
   mdiAlbum,
-  mdiBookmarkMusicOutline,
-  mdiBookOpenVariant,
-  mdiDramaMasks,
+  mdiBookmarkOutline,
+  mdiBookOpenOutline,
+  mdiShapeOutline,
   mdiHistory,
-  mdiMicrophone,
-  mdiMusic,
-  mdiPlayCircle,
-  mdiPlaylistPlay,
+  mdiMicrophoneOutline,
+  mdiMusicNoteOutline,
+  mdiPlayCircleOutline,
+  mdiPlaylistMusicOutline,
   mdiPodcast,
-  mdiSearchWeb,
-  mdiSpeaker,
+  mdiMagnify,
+  mdiSpeakerWireless,
 } from '@mdi/js';
 
 // our imports.
@@ -39,21 +39,21 @@ export class Footer extends LitElement {
 
     return html`
       <ha-icon-button
-        .path=${mdiPlayCircle}
+        .path=${mdiPlayCircleOutline}
         label="Player"
         @click=${() => this.onSectionClick(Section.PLAYER)}
         selected=${this.getSectionSelected(Section.PLAYER)}
         hide=${this.getSectionEnabled(Section.PLAYER)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiSpeaker}
+        .path=${mdiSpeakerWireless}
         label="Devices"
         @click=${() => this.onSectionClick(Section.DEVICES)}
         selected=${this.getSectionSelected(Section.DEVICES)}
         hide=${this.getSectionEnabled(Section.DEVICES)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiBookmarkMusicOutline}
+        .path=${mdiBookmarkOutline}
         label="User Presets"
         @click=${() => this.onSectionClick(Section.USERPRESETS)}
         selected=${this.getSectionSelected(Section.USERPRESETS)}
@@ -67,14 +67,14 @@ export class Footer extends LitElement {
         hide=${this.getSectionEnabled(Section.RECENTS)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiDramaMasks}
+        .path=${mdiShapeOutline}
         label='Categories'
         @click=${() => this.onSectionClick(Section.CATEGORYS)}
         selected=${this.getSectionSelected(Section.CATEGORYS)}
         hide=${this.getSectionEnabled(Section.CATEGORYS)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiPlaylistPlay}
+        .path=${mdiPlaylistMusicOutline}
         label='Playlist Favorites'
         @click=${() => this.onSectionClick(Section.PLAYLIST_FAVORITES)}
         selected=${this.getSectionSelected(Section.PLAYLIST_FAVORITES)}
@@ -88,21 +88,21 @@ export class Footer extends LitElement {
         hide=${this.getSectionEnabled(Section.ALBUM_FAVORITES)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiAccountMusic}
+        .path=${mdiAccountMusicOutline}
         label='Artist Favorites'
         @click=${() => this.onSectionClick(Section.ARTIST_FAVORITES)}
         selected=${this.getSectionSelected(Section.ARTIST_FAVORITES)}
         hide=${this.getSectionEnabled(Section.ARTIST_FAVORITES)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiMusic}
+        .path=${mdiMusicNoteOutline}
         label='Track Favorites'
         @click=${() => this.onSectionClick(Section.TRACK_FAVORITES)}
         selected=${this.getSectionSelected(Section.TRACK_FAVORITES)}
         hide=${this.getSectionEnabled(Section.TRACK_FAVORITES)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiBookOpenVariant}
+        .path=${mdiBookOpenOutline}
         label='Audiobook Favorites'
         @click=${() => this.onSectionClick(Section.AUDIOBOOK_FAVORITES)}
         selected=${this.getSectionSelected(Section.AUDIOBOOK_FAVORITES)}
@@ -116,14 +116,14 @@ export class Footer extends LitElement {
         hide=${this.getSectionEnabled(Section.SHOW_FAVORITES)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiMicrophone}
+        .path=${mdiMicrophoneOutline}
         label='Episode Favorites'
         @click=${() => this.onSectionClick(Section.EPISODE_FAVORITES)}
         selected=${this.getSectionSelected(Section.EPISODE_FAVORITES)}
         hide=${this.getSectionEnabled(Section.EPISODE_FAVORITES)}
       ></ha-icon-button>
       <ha-icon-button
-        .path=${mdiSearchWeb}
+        .path=${mdiMagnify}
         label='Search Spotify'
         @click=${() => this.onSectionClick(Section.SEARCH_MEDIA)}
         selected=${this.getSectionSelected(Section.SEARCH_MEDIA)}
