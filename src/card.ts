@@ -1357,6 +1357,13 @@ export class Card extends AlertUpdatesBase {
       styleInfo['height'] = `${CARD_EDIT_PREVIEW_HEIGHT}`;
       styleInfo['width'] = `${CARD_EDIT_PREVIEW_WIDTH}`;
 
+      // ControlRoom: altura compacta na prévia do editor.
+      // Mantém o tamanho original para playlists e outras seções.
+      if (this.section == Section.PLAYER && this.config.height != 'fill') {
+        styleInfo['height'] = 'auto';
+        styleInfo['min-height'] = '0';
+      }
+
       // adjust css styling for minimized player format.
       if (this.config.playerMinimizeOnIdle && (this.section == Section.PLAYER) && this.store.player.isPoweredOffOrIdle()) {
         if (this.config.height != 'fill') {
