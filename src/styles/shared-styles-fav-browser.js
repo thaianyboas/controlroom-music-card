@@ -2,7 +2,7 @@ import { css } from 'lit';
 
 /**
  * Shared styles for favorites browsers.
- * 
+ *
  * See the following link for more information:
  * https://codepen.io/neoky/pen/mGpaKN
  */
@@ -14,6 +14,7 @@ export const sharedStylesFavBrowser = css`
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
   }
 
   .media-browser-section-title {
@@ -25,7 +26,7 @@ export const sharedStylesFavBrowser = css`
     font-weight: bold;
     font-size: var(--spc-media-browser-section-title-font-size, 1.0rem);
     line-height: var(--spc-media-browser-section-title-font-size, 1.0rem);
-    color: var(--spc-media-browser-section-title-color, var(--secondary-text-color, #ffffff)); 
+    color: var(--spc-media-browser-section-title-color, var(--secondary-text-color, #ffffff));
     color: var(--spc-media-browser-section-title-color);
   }
 
@@ -44,16 +45,17 @@ export const sharedStylesFavBrowser = css`
   .media-browser-controls {
     padding: 0.2rem 0.4rem 0.2rem;
     white-space: nowrap;
-    --ha-select-height: 2.5rem;           /* ha dropdown control height */
-    --mdc-menu-item-height: 2.5rem;       /* mdc dropdown list item height */
-    --ha-icon-button-size: 2.5rem;       /* mdc icon button size */
-    --md-menu-item-top-space: 0.5rem;     /* top spacing between items */
-    --md-menu-item-bottom-space: 0.5rem;  /* bottom spacing between items */
-    --md-menu-item-one-line-container-height: 2.0rem;  /* menu item height */
+    --ha-select-height: 2.5rem;
+    --mdc-menu-item-height: 2.5rem;
+    --ha-icon-button-size: 2.5rem;
+    --md-menu-item-top-space: 0.5rem;
+    --md-menu-item-bottom-space: 0.5rem;
+    --md-menu-item-one-line-container-height: 2.0rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-direction: row;
+    flex-shrink: 0;
   }
 
   .media-browser-control-filter {
@@ -72,21 +74,27 @@ export const sharedStylesFavBrowser = css`
     text-overflow: ellipsis;
   }
 
+  /* Compact list: roughly two rows of cover art, with internal scrolling.
+     Adjust this variable if your cover sizes differ. */
   .media-browser-content {
     margin: 0.5rem;
-    flex: 3;
-    max-height: 100vh;
+    flex: 0 1 auto;
+    height: var(--crm-browser-list-height, 230px);
+    max-height: var(--crm-browser-list-height, 230px);
+    min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-color: var(--primary-text-color) var(--secondary-background-color);
-    scrollbar-width: inherit;
+    scrollbar-width: auto;
   }
 
   .media-browser-list {
-    height: 100%;
+    height: auto;
+    min-height: 0;
   }
 
   .media-browser-actions {
-    height: 100%;
+    min-height: 100%;
   }
 
   ha-alert {

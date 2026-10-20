@@ -4,7 +4,7 @@ import { DEBUG_APP_NAME } from '../constants';
 const debuglog = Debug(DEBUG_APP_NAME + ":editor");
 
 // lovelace card imports.
-import { css, html, nothing, PropertyValues, TemplateResult } from 'lit';
+import { css, html, PropertyValues, TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 
@@ -30,7 +30,7 @@ import './show-fav-browser-editor';
 import './track-fav-browser-editor';
 import './userpreset-browser-editor';
 import { BaseEditor } from './base-editor';
-import { translate } from '../localization/i18n';
+import { translate, resolveLanguage } from '../localization/i18n';
 import { ConfigArea } from '../types/config-area';
 import { Section } from '../types/section';
 import { Store } from '../model/store';
@@ -69,58 +69,84 @@ class CardEditor extends BaseEditor {
     //  JSON.stringify(Store.selectedConfigArea),
     //);
 
-    return html`
-      <ha-control-button-group>
-        ${[ConfigArea.GENERAL, ConfigArea.DESIGN, ConfigArea.PLAYER, ConfigArea.DEVICE_BROWSER, ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER].map(
-      (configArea) => html`
-            <ha-control-button
-              selected=${this.configArea === configArea || nothing}
-              @click=${() => this.onConfigSectionClick(configArea)}
-            >
-              ${translate(
-              `editor.${String(configArea).toLowerCase().replace(/[^a-z]/g, '')}`,
-              this.config.language ?? 'auto',
-              this.hass.language
-            )}
-            </ha-control-button>
-          `,
-        )}
-      </ha-control-button-group>
-      <ha-control-button-group>
-        ${[ConfigArea.PLAYLIST_FAVORITES, ConfigArea.ALBUM_FAVORITES, ConfigArea.ARTIST_FAVORITES, ConfigArea.TRACK_FAVORITES, ConfigArea.AUDIOBOOK_FAVORITES].map(
-      (configArea) => html`
-            <ha-control-button
-              selected=${this.configArea === configArea || nothing}
-              @click=${() => this.onConfigSectionClick(configArea)}
-            >
-              ${translate(
-                `editor.${String(configArea).toLowerCase().replace(/[^a-z]/g, '')}`,
-                this.config.language ?? 'auto',
-                this.hass.language
-              )}
-            </ha-control-button>
-          `,
-        )}
-      </ha-control-button-group>
-      <ha-control-button-group>
-        ${[ConfigArea.EPISODE_FAVORITES, ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER, ConfigArea.SEARCH_MEDIA_BROWSER].map(
-          (configArea) => html`
-            <ha-control-button
-              selected=${this.configArea === configArea || nothing}
-              @click=${() => this.onConfigSectionClick(configArea)}
-            >
-              ${translate(
-              `editor.${String(configArea).toLowerCase().replace(/[^a-z]/g, '')}`,
-              this.config.language ?? 'auto',
-              this.hass.language
-            )}
-            </ha-control-button>
-          `,
-        )}
-      </ha-control-button-group>
+    const lang = resolveLanguage(this.config.language ?? 'auto', this.hass.locale?.language || this.hass.language);
+    const labels = {
+      pt: { general: 'Geral', design: 'Aparência', player: 'Reprodutor', devices: 'Dispositivos', library: 'Biblioteca', advanced: 'Avançado', settings: 'Configurações do cartão', choose: 'Escolha uma seção' },
+      de: { general: 'Allgemein', design: 'Darstellung', player: 'Player', devices: 'Geräte', library: 'Bibliothek', advanced: 'Erweitert', settings: 'Karteneinstellungen', choose: 'Bereich auswählen' },
+      en: { general: 'General', design: 'Appearance', player: 'Player', devices: 'Devices', library: 'Library', advanced: 'Advanced', settings: 'Card settings', choose: 'Choose a section' },
+    }[lang];
 
-      <div class="crm-card-editor">
-        ${this.subEditor()}
+    const libraryAreas = [
+      ConfigArea.PLAYLIST_FAVORITES, ConfigArea.ALBUM_FAVORITES,
+      ConfigArea.ARTIST_FAVORITES, ConfigArea.TRACK_FAVORITES,
+      ConfigArea.AUDIOBOOK_FAVORITES, ConfigArea.EPISODE_FAVORITES,
+      ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER,
+    ];
+    const advancedAreas = [
+      ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER,
+      ConfigArea.SEARCH_MEDIA_BROWSER,
+    ];
+    const groups = [
+      { id: 'general', title: labels.general, icon: 'mdi:cog-outline', areas: [ConfigArea.GENERAL] },
+      { id: 'design', title: labels.design, icon: 'mdi:palette-outline', areas: [ConfigArea.DESIGN] },
+      { id: 'player', title: labels.player, icon: 'mdi:play-circle-outline', areas: [ConfigArea.PLAYER] },
+      { id: 'devices', title: labels.devices, icon: 'mdi:speaker', areas: [ConfigArea.DEVICE_BROWSER] },
+      { id: 'library', title: labels.library, icon: 'mdi:music-box-multiple-outline', areas: libraryAreas },
+      { id: 'advanced', title: labels.advanced, icon: 'mdi:tune-variant', areas: advancedAreas },
+    ];
+
+    return html`
+      <div class="crm-settings-shell">
+        <div class="crm-settings-heading">
+          <ha-icon icon="mdi:music-circle-outline"></ha-icon>
+          <div>
+            <div class="crm-settings-brand">ControlRoom</div>
+            <div class="crm-settings-caption">${labels.settings}</div>
+          </div>
+        </div>
+        <nav class="crm-settings-nav" aria-label=${labels.choose}>
+          ${groups.map((group) => {
+            const active = group.areas.includes(this.configArea);
+            return html`
+              <div class="crm-settings-group">
+                <button
+                  type="button"
+                  class="crm-settings-category ${active ? 'active' : ''}"
+                  aria-expanded=${active && group.areas.length > 1 ? 'true' : 'false'}
+                  @click=${() => {
+                    if (!active) this.onConfigSectionClick(group.areas[0]);
+                  }}
+                >
+                  <ha-icon icon=${group.icon}></ha-icon>
+                  <span>${group.title}</span>
+                  <ha-icon class="crm-settings-chevron" icon=${active && group.areas.length > 1 ? 'mdi:chevron-down' : 'mdi:chevron-right'}></ha-icon>
+                </button>
+                ${active && group.areas.length > 1 ? html`
+                  <div class="crm-settings-subnav">
+                    ${group.areas.map((area) => html`
+                      <button
+                        type="button"
+                        class="crm-settings-subitem ${this.configArea === area ? 'selected' : ''}"
+                        aria-current=${this.configArea === area ? 'page' : 'false'}
+                        @click=${() => this.onConfigSectionClick(area)}
+                      >
+                        ${translate(
+                          `editor.${String(area).toLowerCase().replace(/[^a-z]/g, '')}`,
+                          this.config.language ?? 'auto',
+                          this.hass.locale?.language || this.hass.language
+                        )}
+                      </button>
+                    `)}
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          })}
+        </nav>
+        <div class="crm-settings-divider"></div>
+        <div class="crm-card-editor">
+          ${this.subEditor()}
+        </div>
       </div>
     `;
   }
@@ -142,22 +168,61 @@ class CardEditor extends BaseEditor {
    */
   static get styles() {
     return css`
-
+      :host { display: block; min-width: 0; }
+      .crm-settings-shell { min-width: 0; color: var(--primary-text-color); }
+      .crm-settings-heading {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 4px 16px;
+      }
+      .crm-settings-heading > ha-icon { color: var(--primary-color); --mdc-icon-size: 28px; }
+      .crm-settings-brand { font-size: 16px; font-weight: 650; letter-spacing: -0.02em; }
+      .crm-settings-caption { margin-top: 3px; font-size: 12px; color: var(--secondary-text-color); }
+      .crm-settings-nav { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+      .crm-settings-category, .crm-settings-subitem {
+        width: 100%; box-sizing: border-box; border: 0; font: inherit;
+        text-align: left; cursor: pointer; color: var(--primary-text-color);
+        background: transparent; transition: background 150ms ease, color 150ms ease;
+      }
+      .crm-settings-category {
+        display: flex; align-items: center; gap: 12px;
+        min-height: 46px; padding: 10px 12px; border-radius: 12px;
+        font-size: 14px; font-weight: 500;
+      }
+      .crm-settings-category > ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }
+      .crm-settings-category > span { flex: 1; }
+      .crm-settings-category .crm-settings-chevron { --mdc-icon-size: 18px; opacity: 0.6; }
+      .crm-settings-category:hover, .crm-settings-subitem:hover {
+        background: var(--secondary-background-color);
+      }
+      .crm-settings-category.active {
+        background: var(--secondary-background-color);
+        font-weight: 600;
+      }
+      .crm-settings-category.active > ha-icon:first-child { color: var(--primary-color); }
+      .crm-settings-subnav {
+        margin: 4px 0 8px 22px; padding-left: 14px;
+        border-left: 1px solid var(--divider-color);
+        display: flex; flex-direction: column; gap: 2px;
+      }
+      .crm-settings-subitem {
+        min-height: 36px; padding: 8px 12px; border-radius: 9px;
+        font-size: 13px; color: var(--secondary-text-color);
+      }
+      .crm-settings-subitem.selected {
+        background: var(--secondary-background-color);
+        color: var(--primary-color); font-weight: 600;
+      }
+      .crm-settings-category:focus-visible, .crm-settings-subitem:focus-visible {
+        outline: 2px solid var(--primary-color); outline-offset: 2px;
+      }
+      .crm-settings-divider { height: 1px; background: var(--divider-color); margin: 16px 0; }
       .crm-card-editor {
-        /* control the look and feel of the HA-FORM element. */
+        min-width: 0;
         --ha-form-style-integer-margin-bottom: 0.5rem;
         --ha-form-style-multiselect-margin-bottom: 0.5rem;
         --ha-form-style-selector-margin-bottom: 0.5rem;
         --ha-form-style-selector-boolean-min-height: 28px;
         --ha-form-style-string-margin-bottom: 0.5rem;
-      }
-
-      ha-control-button-group {
-        margin-bottom: 8px;
-      }
-
-      ha-control-button[selected] {
-        --control-button-background-color: var(--primary-color);
       }
     `;
   }

@@ -18,10 +18,52 @@ import { MediaPlayer } from '../model/media-player';
 import { formatTitleInfo } from '../utils/media-browser-utils';
 import { getHomeAssistantErrorMessage, getUtcNowTimestamp } from '../utils/utils';
 import { ISpotifyConnectDevice } from '../types/spotifyplus/spotify-connect-device';
+import { resolveLanguage } from '../localization/i18n';
 import {
   EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW,
 } from '../constants';
 
+
+type DeviceTextKey = 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError';
+
+const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
+  de: {
+    filter: 'Nach Gerätename filtern',
+    settingsTitle: 'Sichtbare Geräte auswählen',
+    settingsHint: 'Spotify Connect-Geräte können die Wiedergabe übernehmen. Andere Home Assistant-Mediaplayer öffnen ihre eigene Steuerung.',
+    done: 'Fertig',
+    selectDevices: 'Geräte auswählen',
+    saveError: 'Geräteeinstellungen konnten in diesem Browser nicht gespeichert werden.',
+    transferring: 'Wiedergabe wird auf Gerät übertragen',
+    selectError: 'Wiedergabegerät konnte nicht ausgewählt werden.',
+    fetchError: 'Spotify Connect-Geräte konnten nicht geladen werden:',
+    refreshError: 'Spotify Connect-Geräte konnten nicht aktualisiert werden:',
+  },
+  pt: {
+    filter: 'Filtrar por nome do dispositivo',
+    settingsTitle: 'Selecionar dispositivos visíveis',
+    settingsHint: 'Dispositivos Spotify Connect podem receber a reprodução. Outros reprodutores de mídia do Home Assistant abrem seus próprios controles.',
+    done: 'Concluído',
+    selectDevices: 'Selecionar dispositivos',
+    saveError: 'Não foi possível salvar as preferências dos dispositivos neste navegador.',
+    transferring: 'Transferindo a reprodução para o dispositivo',
+    selectError: 'Não foi possível selecionar o dispositivo.',
+    fetchError: 'Falha ao carregar dispositivos Spotify Connect:',
+    refreshError: 'Falha ao atualizar dispositivos Spotify Connect:',
+  },
+  en: {
+    filter: 'Filter by device name',
+    settingsTitle: 'Select visible devices',
+    settingsHint: 'Spotify Connect devices can take over playback. Other Home Assistant media players open their own controls.',
+    done: 'Done',
+    selectDevices: 'Select devices',
+    saveError: 'Could not save device preferences in this browser.',
+    transferring: 'Transferring playback to device',
+    selectError: 'Could not select source.',
+    fetchError: 'Get Spotify Connect Devices failed:',
+    refreshError: 'Spotify Connect Device refresh failed:',
+  },
+};
 
 @customElement("crm-device-browser")
 export class DeviceBrowser extends FavBrowserBase {
@@ -31,6 +73,11 @@ export class DeviceBrowser extends FavBrowserBase {
 
   /** True to refresh device list from real-time data; False to refresh from internal cache. */
   private refreshDeviceList?: boolean;
+
+  private deviceText(key: DeviceTextKey): string {
+    const language = resolveLanguage('auto', this.store.hass?.locale?.language || this.store.hass?.language);
+    return deviceTexts[language][key];
+  }
 
   @state() private showDeviceSettings = false;
   @state() private deviceVisibility: Record<string, boolean> = {};
@@ -70,7 +117,7 @@ export class DeviceBrowser extends FavBrowserBase {
     try {
       localStorage.setItem(this.visibilityStorageKey, JSON.stringify(this.deviceVisibility));
     } catch {
-      this.alertErrorSet('Could not save device preferences in this browser.');
+      this.alertErrorSet(this.deviceText('saveError'));
     }
   }
 
@@ -112,8 +159,8 @@ export class DeviceBrowser extends FavBrowserBase {
   private renderDeviceSettings() {
     return html`
       <div class="crm-device-settings">
-        <div class="crm-settings-title">Sichtbare Geräte auswählen</div>
-        <div class="crm-settings-hint">Spotify Connect-Geräte können die Wiedergabe übernehmen. Andere Home Assistant-Mediaplayer öffnen ihre eigene Steuerung.</div>
+        <div class="crm-settings-title">${this.deviceText('settingsTitle')}</div>
+        <div class="crm-settings-hint">${this.deviceText('settingsHint')}</div>
         <div class="crm-settings-subtitle">Spotify Connect</div>
         ${(this.mediaList || []).map(item => html`
           <label class="crm-device-option">
@@ -132,7 +179,7 @@ export class DeviceBrowser extends FavBrowserBase {
             <span><strong>${item.name}</strong><small>${item.id} · ${item.state}</small></span>
           </label>
         `)}
-        <button class="crm-settings-done" @click=${() => this.showDeviceSettings = false}>Fertig</button>
+        <button class="crm-settings-done" @click=${() => this.showDeviceSettings = false}>${this.deviceText('done')}</button>
       </div>
     `;
   }
@@ -171,7 +218,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.DEVICES);
-    this.filterCriteriaPlaceholder = "filter by device name";
+    this.filterCriteriaPlaceholder = deviceTexts.en.filter;
 
   }
 
@@ -182,6 +229,9 @@ export class DeviceBrowser extends FavBrowserBase {
    * Setting properties inside this method will *not* trigger the element to update.
   */
   protected render(): TemplateResult | void {
+
+    // Update the placeholder before FavBrowserBase builds the search field.
+    this.filterCriteriaPlaceholder = this.deviceText('filter');
 
     // invoke base class method.
     super.render();
@@ -213,7 +263,7 @@ export class DeviceBrowser extends FavBrowserBase {
         <div class="media-browser-controls">
           ${!(this.isActionsVisible || false) ? html`` : html`${this.btnHideActionsHtml}`}
           ${this.filterCriteriaHtml}${this.formatMediaListHtml}${this.refreshMediaListHtml}
-          <button class="crm-settings-button" title="Geräte auswählen" aria-label="Geräte auswählen" @click=${() => this.showDeviceSettings = !this.showDeviceSettings}>
+          <button class="crm-settings-button" title=${this.deviceText('selectDevices')} aria-label=${this.deviceText('selectDevices')} @click=${() => this.showDeviceSettings = !this.showDeviceSettings}>
             <ha-svg-icon .path=${mdiCogOutline}></ha-svg-icon>
           </button>
         </div>
@@ -333,7 +383,7 @@ export class DeviceBrowser extends FavBrowserBase {
       this.progressShow();
 
       // update status.
-      this.alertInfo = "Transferring playback to device \"" + mediaItem.Name + "\" ...";
+      this.alertInfo = this.deviceText('transferring') + ' "' + mediaItem.Name + '" ...';
 
       // transfer by device id by default; for Sonos, always use device name (restricted device).
       let deviceId = '';
@@ -355,7 +405,7 @@ export class DeviceBrowser extends FavBrowserBase {
     catch (error) {
 
       // set error message and reset scroll position to zero so the message is displayed.
-      this.alertErrorSet("Could not select source.  " + getHomeAssistantErrorMessage(error));
+      this.alertErrorSet(this.deviceText('selectError') + ' ' + getHomeAssistantErrorMessage(error));
       this.mediaBrowserContentElement.scrollTop = 0;
 
     }
@@ -420,7 +470,7 @@ export class DeviceBrowser extends FavBrowserBase {
             this.mediaListLastUpdatedOn = 0;
 
             // call base class method, indicating media list update failed.
-            super.updatedMediaListError("Get Spotify Connect Devices failed: " + getHomeAssistantErrorMessage(error));
+            super.updatedMediaListError(this.deviceText('fetchError') + ' ' + getHomeAssistantErrorMessage(error));
 
             // reject the promise.
             reject(error);
@@ -453,7 +503,7 @@ export class DeviceBrowser extends FavBrowserBase {
       this.progressHide();
 
       // set alert error message.
-      super.updatedMediaListError("Spotify Connect Device refresh failed: " + getHomeAssistantErrorMessage(error));
+      super.updatedMediaListError(this.deviceText('refreshError') + ' ' + getHomeAssistantErrorMessage(error));
       return true;
 
     }

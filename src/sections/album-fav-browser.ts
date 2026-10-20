@@ -1,4 +1,5 @@
-// lovelace card imports.
+
+ // lovelace card imports.
 import { html, PropertyValues, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
@@ -13,6 +14,7 @@ import { formatTitleInfo } from '../utils/media-browser-utils';
 import { getHomeAssistantErrorMessage, getUtcNowTimestamp } from '../utils/utils';
 import { IAlbum } from '../types/spotifyplus/album';
 import { GetAlbums } from '../types/spotifyplus/album-page-saved';
+import { resolveLanguage } from '../localization/i18n';
 import {
   EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW,
 } from '../constants';
@@ -32,17 +34,29 @@ export class AlbumFavBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.ALBUM_FAVORITES);
-    this.filterCriteriaPlaceholder = "filter by album name";
 
   }
 
 
   /**
-   * Invoked on each update to perform rendering tasks. 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
+   * Invoked on each update to perform rendering tasks.
+   * This method may return any value renderable by lit-html's ChildPart.
+   */
   protected render(): TemplateResult | void {
+
+    // Detect Home Assistant language automatically.
+    const language = resolveLanguage(
+      'auto',
+      this.store.hass?.locale?.language || this.store.hass?.language
+    );
+
+    const placeholders = {
+      de: 'Nach Albumname filtern',
+      pt: 'Filtrar por nome do álbum',
+      en: 'Filter by album name',
+    };
+
+    this.filterCriteriaPlaceholder = placeholders[language];
 
     // invoke base class method.
     super.render();
@@ -76,15 +90,15 @@ export class AlbumFavBrowser extends FavBrowserBase {
           ${!(this.isActionsVisible || false) ? html`` : html`${this.btnHideActionsHtml}`}
           ${this.filterCriteriaHtml}${this.formatMediaListHtml}${this.refreshMediaListHtml}
         </div>
-        <div id="mediaBrowserContentElement" class="media-browser-content">
+        <div id="mediaBrowserContentElement" class="media-browser-content>
           ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ""}
           ${this.alertInfo ? html`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>` : ""}
           ${(() => {
-            // if actions are not visbile, then render the media list.
+            // if actions are not visible, then render the media list.
             if (!this.isActionsVisible) {
               if (this.favBrowserItemsPerRow === 1) {
                 return (
-                  html`<crm-media-browser-list 
+                  html`<crm-media-browser-list
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
@@ -95,7 +109,7 @@ export class AlbumFavBrowser extends FavBrowserBase {
                 )
               } else {
                 return (
-                  html`<crm-media-browser-icons 
+                  html`<crm-media-browser-icons
                         class="media-browser-list"
                         .items=${filteredItems}
                         .itemsPerRow=${this.favBrowserItemsPerRow}
@@ -105,11 +119,11 @@ export class AlbumFavBrowser extends FavBrowserBase {
                        ></crm-media-browser-icons>`
                 )
               }
-            // if actions are visbile, then render the actions display.
+            // if actions are visible, then render the actions display.
             } else {
               return html`<crm-album-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-album-actions>`;
             }
-          })()}  
+          })()}
         </div>
       </div>
     `;
@@ -117,15 +131,11 @@ export class AlbumFavBrowser extends FavBrowserBase {
 
 
   /**
-   * Called when the element has rendered for the first time. Called once in the
-   * lifetime of an element. Useful for one-time setup work that requires access to
-   * the DOM.
+   * Called when the element has rendered for the first time.
    */
   protected firstUpdated(changedProperties: PropertyValues): void {
 
     // ensure we are NOT editing the card configuration!
-    // this is because the `firstUpdated` method will fire every time the configuration changes!
-    // if we already updated the media list, then don't do it again.
     if (!this.isCardInEditPreview) {
 
       // set auto-refresh media list flag prior to calling base-class method.
@@ -149,8 +159,7 @@ export class AlbumFavBrowser extends FavBrowserBase {
 
     try {
 
-      // we use the `Promise.allSettled` approach here like we do with actions, so
-      // that we can easily add promises if more data gathering is needed in the future.
+      // we use the Promise.allSettled approach here like we do with actions.
       const promiseRequests = new Array<Promise<unknown>>();
 
       // create promise - get media list.
@@ -197,9 +206,6 @@ export class AlbumFavBrowser extends FavBrowserBase {
       this.progressShow();
 
       // execute all promises, and wait for all of them to settle.
-      // we use `finally` logic so we can clear the progress indicator.
-      // any exceptions raised should have already been handled in the 
-      // individual promise definitions; nothing else to do at this point.
       Promise.allSettled(promiseRequests).finally(() => {
 
         // clear the progress indicator.
