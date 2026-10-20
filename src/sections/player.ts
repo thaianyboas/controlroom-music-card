@@ -125,8 +125,8 @@ export class Player extends AlertUpdatesBase {
         padding: 20px 22px;
         border-radius: 20px;
         border: 1px solid rgba(64, 217, 154, 0.13);
-        background: #101b19 !important;
-        color: #f0fdf4;
+        background: var(--crm-background, #101b19) !important;
+        color: var(--crm-text, #f0fdf4);
         text-align: left;
       }
 
@@ -144,11 +144,11 @@ export class Player extends AlertUpdatesBase {
         z-index: -1;
         inset: 0;
         background: linear-gradient(90deg,
-          #101b19 0%,
-          rgba(16, 27, 25, .99) 28%,
-          rgba(16, 27, 25, .89) 48%,
-          rgba(16, 27, 25, .35) 76%,
-          rgba(16, 27, 25, .06) 100%);
+          var(--crm-background, #101b19) 0%,
+          var(--crm-background-overlay-99, rgba(16,27,25,.99)) 28%,
+          var(--crm-background-overlay-89, rgba(16,27,25,.89)) 48%,
+          var(--crm-background-overlay-35, rgba(16,27,25,.35)) 76%,
+          var(--crm-background-overlay-06, rgba(16,27,25,.06)) 100%);
       }
 
       .player-content {
@@ -270,8 +270,10 @@ export class Player extends AlertUpdatesBase {
         .player-artwork { inset: 0 0 0 26%; }
         .player-artwork-overlay {
           background: linear-gradient(90deg,
-            #101b19 0%, rgba(16,27,25,.98) 35%,
-            rgba(16,27,25,.78) 68%, rgba(16,27,25,.28) 100%);
+            var(--crm-background, #101b19) 0%,
+            var(--crm-background-overlay-98, rgba(16,27,25,.98)) 35%,
+            var(--crm-background-overlay-78, rgba(16,27,25,.78)) 68%,
+            var(--crm-background-overlay-28, rgba(16,27,25,.28)) 100%);
         }
         .player-info { max-width: 88%; }
         .player-title { font-size: 19px; }
@@ -572,16 +574,31 @@ export class Player extends AlertUpdatesBase {
 
     // Identidade visual ControlRoom: impede que as cores do tema do HA
     // ou da configuracao antiga deixem os controles azuis.
-    styleInfo['--crm-player-controls-color'] = '#f0fdf4';
-    styleInfo['--crm-player-controls-icon-color'] = '#f0fdf4';
-    styleInfo['--crm-player-controls-icon-toggle-color'] = '#40d99a';
-    styleInfo['--crm-player-progress-slider-color'] = '#40d99a';
-    styleInfo['--crm-player-progress-label-color'] = '#a6b7af';
-    styleInfo['--crm-player-volume-slider-color'] = '#40d99a';
-    styleInfo['--crm-player-volume-label-color'] = '#a6b7af';
-    styleInfo['--crm-player-header-title1-color'] = '#f0fdf4';
-    styleInfo['--crm-player-header-title2-color'] = '#e8f5ee';
-    styleInfo['--crm-player-header-title3-color'] = '#a6b7af';
+    const theme = this.store.config.crmTheme ?? 'dark';
+    const dark = theme === 'dark' ||
+      (theme === 'auto' && this.store.hass?.themes?.darkMode !== false);
+    const custom = theme === 'custom';
+
+    const themeText = custom
+      ? (this.store.config.crmText || '#f0fdf4')
+      : dark ? '#f0fdf4' : '#183329';
+
+    const themeAccent = custom
+      ? (this.store.config.crmAccent || '#34d399')
+      : dark ? '#40d99a' : '#16875c';
+
+    const muted = dark ? '#a6b7af' : '#657a70';
+
+    styleInfo['--crm-player-controls-color'] = themeText;
+    styleInfo['--crm-player-controls-icon-color'] = themeText;
+    styleInfo['--crm-player-controls-icon-toggle-color'] = themeAccent;
+    styleInfo['--crm-player-progress-slider-color'] = themeAccent;
+    styleInfo['--crm-player-progress-label-color'] = muted;
+    styleInfo['--crm-player-volume-slider-color'] = themeAccent;
+    styleInfo['--crm-player-volume-label-color'] = muted;
+    styleInfo['--crm-player-header-title1-color'] = themeText;
+    styleInfo['--crm-player-header-title2-color'] = themeText;
+    styleInfo['--crm-player-header-title3-color'] = muted;
     styleInfo['--crm-player-header-bg-color'] = 'transparent';
     styleInfo['--crm-player-controls-bg-color'] = 'transparent';
     return styleMap(styleInfo);

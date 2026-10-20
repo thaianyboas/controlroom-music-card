@@ -355,7 +355,7 @@ export class Card extends AlertUpdatesBase {
 
       .crm-card-content-section {
         margin: var(--crm-card-content-margin, ${unsafeCSS(CARD_CONTENT_MARGIN_DEFAULT)});
-        color: #e5f5ee;
+        color: var(--crm-text);
         flex: 1 1 auto;
         min-height: 0;
         min-width: 0;
@@ -369,7 +369,7 @@ export class Card extends AlertUpdatesBase {
         display: flex;
         align-items: center;
         background-repeat: no-repeat;
-        background: #101b19 !important;
+        background: var(--crm-background) !important;
         background-image: none !important;
         border-top: 1px solid rgba(64, 217, 154, 0.12);
       }
@@ -1258,6 +1258,32 @@ export class Card extends AlertUpdatesBase {
   if (this.config?.crmBorderRadius) {
     styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;
   }
+  // Gradientes adaptáveis para o reprodutor.
+  // Preserva exatamente os valores originais do tema escuro.
+  const backgroundColor = custom
+    ? (this.config?.crmBackground || '#101b19')
+    : palette.background;
+
+  const hex = /^#([0-9a-f]{6})$/i.exec(backgroundColor.trim());
+
+  if (hex) {
+    const value = hex[1];
+    const r = parseInt(value.slice(0, 2), 16);
+    const g = parseInt(value.slice(2, 4), 16);
+    const b = parseInt(value.slice(4, 6), 16);
+
+    const overlay = (opacity: number): string =>
+      `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+    styleInfo['--crm-background-overlay-99'] = overlay(0.99);
+    styleInfo['--crm-background-overlay-98'] = overlay(0.98);
+    styleInfo['--crm-background-overlay-89'] = overlay(0.89);
+    styleInfo['--crm-background-overlay-78'] = overlay(0.78);
+    styleInfo['--crm-background-overlay-35'] = overlay(0.35);
+    styleInfo['--crm-background-overlay-28'] = overlay(0.28);
+    styleInfo['--crm-background-overlay-06'] = overlay(0.06);
+  }
+
 
   // load basic layout settings.
   let editTabHeight = '0px';
