@@ -76,7 +76,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
   private friendlyState(state: string): string {
     const language = resolveLanguage(
-      this.config.language ?? 'auto',
+      'auto',
       this.store.hass?.locale?.language || this.store.hass?.language
     );
 
@@ -95,43 +95,8 @@ export class DeviceBrowser extends FavBrowserBase {
   }
 
   private deviceText(key: DeviceTextKey): string {
-    const language = resolveLanguage(this.config.language ?? 'auto', this.store.hass?.locale?.language || this.store.hass?.language);
+    const language = resolveLanguage('auto', this.store.hass?.locale?.language || this.store.hass?.language);
     return deviceTexts[language][key];
-  }
-
-  @state() private deviceSourceFilter: 'all' | 'spotify' | 'ha' = 'all';
-
-  private setDeviceSourceFilter(source: 'all' | 'spotify' | 'ha'): void {
-    this.deviceSourceFilter = source;
-    try {
-      localStorage.setItem('controlroom_device_source_filter', source);
-    } catch {
-      // Storage is optional; the filter still works without it.
-    }
-  }
-
-  private renderSourceFilter() {
-    const language = resolveLanguage(
-      this.config.language ?? 'auto',
-      this.store.hass?.locale?.language || this.store.hass?.language
-    );
-
-    const labels = {
-      de: ['Alle', 'Spotify', 'Home Assistant'],
-      pt: ['Todos', 'Spotify', 'Home Assistant'],
-      en: ['All', 'Spotify', 'Home Assistant']
-    };
-
-    return html`
-      <div class="crm-source-filter">
-        ${(['all', 'spotify', 'ha'] as const).map((source, index) => html`
-          <button
-            class=${this.deviceSourceFilter === source ? 'active' : ''}
-            @click=${() => this.setDeviceSourceFilter(source)}
-          >${labels[language][index]}</button>
-        `)}
-      </div>
-    `;
   }
 
   @state() private showDeviceSettings = false;
@@ -198,7 +163,6 @@ export class DeviceBrowser extends FavBrowserBase {
 
   private renderHaPlayers(filterName: string) {
     return this.getHaPlayers()
-      .filter(() => this.deviceSourceFilter !== 'spotify')
       .filter(item => this.isVisible(this.haKey(item.id), false))
       .filter(item => item.name.toLocaleLowerCase().includes(filterName))
       .map(item => html`
@@ -206,7 +170,7 @@ export class DeviceBrowser extends FavBrowserBase {
           <ha-svg-icon .path=${item.id.includes('tv') ? mdiTelevision : item.id.includes('phone') || item.id.includes('iphone') || item.id.includes('handy') ? mdiCellphone : mdiSpeaker}></ha-svg-icon>
           <span class="crm-ha-device-text">
             <strong>${item.name}</strong>
-            <small>Home Assistant · ${this.friendlyState(item.state)}</small>
+            <small>Home Assistant · ${item.state}</small>
           </span>
         </button>
       `);
@@ -217,7 +181,6 @@ export class DeviceBrowser extends FavBrowserBase {
       <div class="crm-device-settings">
         <div class="crm-settings-title">${this.deviceText('settingsTitle')}</div>
         <div class="crm-settings-hint">${this.deviceText('settingsHint')}</div>
-        ${this.deviceSourceFilter !== 'ha' ? html`
         <div class="crm-settings-subtitle">Spotify Connect</div>
         ${(this.mediaList || []).map(item => html`
           <label class="crm-device-option">
@@ -227,8 +190,6 @@ export class DeviceBrowser extends FavBrowserBase {
             <span><strong>${item.Name}</strong><small>Spotify Connect</small></span>
           </label>
         `)}
-        ` : ''}
-        ${this.deviceSourceFilter !== 'spotify' ? html`
         <div class="crm-settings-subtitle">Home Assistant · media_player</div>
         ${this.getHaPlayers().map(item => html`
           <label class="crm-device-option">
@@ -238,7 +199,6 @@ export class DeviceBrowser extends FavBrowserBase {
             <span><strong>${item.name}</strong><small>${this.friendlyState(item.state)}</small></span>
           </label>
         `)}
-        ` : ''}
         <button class="crm-settings-done" @click=${() => this.showDeviceSettings = false}>${this.deviceText('done')}</button>
       </div>
     `;
@@ -248,29 +208,6 @@ export class DeviceBrowser extends FavBrowserBase {
     return [
       ...super.styles,
       css`
-        .crm-source-filter {
-          display: flex;
-          gap: 5px;
-          padding: 5px 12px;
-          flex-shrink: 0;
-        }
-        .crm-source-filter button {
-          flex: 1;
-          min-width: 0;
-          padding: 7px 4px;
-          border: 1px solid #294437;
-          border-radius: 8px;
-          background: transparent;
-          color: #a8baaf;
-          font-size: 11px;
-          cursor: pointer;
-        }
-        .crm-source-filter button.active {
-          background: #174b37;
-          color: #67e6ad;
-          border-color: #32845f;
-          font-weight: 600;
-        }
         .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:#40d99a; cursor:pointer; }
         .crm-settings-button ha-svg-icon { width:23px; height:23px; }
         .crm-device-settings { padding: 12px; color:#f0f8f2; max-width:100%; box-sizing:border-box; overflow:auto; }
@@ -324,7 +261,6 @@ export class DeviceBrowser extends FavBrowserBase {
     if (!this.isActionsVisible) {
       const filterName = (this.filterCriteria || "").toLocaleLowerCase();
       filteredItems = (this.mediaList || [])
-        .filter(() => this.deviceSourceFilter !== 'ha')
         .filter(item => this.isVisible(this.spotifyKey(item), true))
         .filter(item => (item.Name || '').toLocaleLowerCase().includes(filterName));
       this.filterItemCount = filteredItems.length;
@@ -351,7 +287,6 @@ export class DeviceBrowser extends FavBrowserBase {
             <ha-svg-icon .path=${mdiCogOutline}></ha-svg-icon>
           </button>
         </div>
-        ${this.renderSourceFilter()}
         <div id="mediaBrowserContentElement" class="media-browser-content">
           ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ""}
           ${this.alertInfo ? html`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>` : ""}
@@ -414,14 +349,6 @@ export class DeviceBrowser extends FavBrowserBase {
     // invoke base class method.
     super.firstUpdated(changedProperties);
     this.loadVisibility();
-    try {
-      const savedSource = localStorage.getItem('controlroom_device_source_filter');
-      if (savedSource === 'all' || savedSource === 'spotify' || savedSource === 'ha') {
-        this.deviceSourceFilter = savedSource;
-      }
-    } catch {
-      // Keep the default filter if storage is unavailable.
-    }
   }
 
 
