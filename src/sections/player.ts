@@ -5,6 +5,7 @@ import { styleMap, StyleInfo } from 'lit-html/directives/style-map.js';
 
 // our imports - card components.
 import '../components/player-header';
+import '../components/player-progress';
 import '../components/player-body-audiobook';
 import '../components/player-body-idle';
 import '../components/player-body-queue';
@@ -42,81 +43,60 @@ export class Player extends AlertUpdatesBase {
    * Setting properties inside this method will *not* trigger the element to update.
   */
   protected render(): TemplateResult | void {
-
-    // set common references from application common storage area.
     this.config = this.store.config;
     this.player = this.store.player;
 
-    // get idle state in case we are minimizing height.
     const isOffIdle = this.player.isPoweredOffOrIdle();
+    const artwork = this.player.attributes.entity_picture || this.player.attributes.entity_picture_local;
+    const artworkUrl = !isOffIdle && artwork
+      ? this.store.hass.hassUrl(artwork)
+      : '/local/Bild%20f%C3%BCr%20Spotify.jpg';
 
-    // render html.
+    const title = !isOffIdle && this.player.attributes.media_title
+      ? this.player.attributes.media_title
+      : 'Bereit für Musik';
+    const artist = !isOffIdle && this.player.attributes.media_artist
+      ? this.player.attributes.media_artist
+      : 'Wähle deine Lieblingsmusik';
+    const source = this.player.attributes.source || 'Wohnung Musik';
+
     return html`
-      <div class="player-section-container" style=${this.stylePlayerSection()}>
-      <div class="player-album-cover">
-          ${this.player.attributes.entity_picture || this.player.attributes.entity_picture_local
-            ? html`
-                <img
-                  src=${this.store.hass.hassUrl(
-                    this.player.attributes.entity_picture ||
-                    this.player.attributes.entity_picture_local
-                  )}
-                  alt="Album cover"
-                />
-              `
-            : html`
-              <img
-                src="/local/Bild%20f%C3%BCr%20Spotify.jpg"
-                alt="ControlRoom Music"
-              />
-            `
-          }
-        </div>
-        <crm-player-header style=${this.stylePlayerHeader()}
-          class="player-section-header"
-          .store=${this.store}
-        ></crm-player-header>
-        <div class="player-section-body">
-          <div class="player-alert-bgcolor">
-            ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ""}
-            ${this.alertInfo ? html`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>` : ""}
+      <div class="player-section-container ${isOffIdle ? 'is-idle' : 'is-active'}"
+           style=${this.stylePlayerSection()}>
+        <div class="player-artwork" style=${styleMap({ 'background-image': `url("${artworkUrl}")` })}></div>
+        <div class="player-artwork-overlay"></div>
+
+        <div class="player-content">
+          <div class="player-source">
+            <ha-icon icon="mdi:speaker-wireless"></ha-icon>
+            <span>${source}</span>
+            <span class="source-indicator ${isOffIdle ? 'offline' : ''}"></span>
           </div>
-          ${(() => {
-            if (isOffIdle && this.config.playerMinimizeOnIdle && this.config.height != "fill") {
-              return (html`<crm-player-body-idle class="player-section-body-content" style="display:block" .store=${this.store}></crm-player-body-idle>`);
-            } else if ((this.config.playerControlsHideFavorites || false) == true) {
-              return (html``); // if favorites disabled then we don't need to display favorites body.
-            } else if (this.player.attributes.sp_item_type == 'track') {
-              return (html`<crm-player-body-track class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></crm-player-body-track>`);
-            } else if (this.player.attributes.sp_item_type == 'podcast') {
-              return (html`<crm-player-body-show class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></crm-player-body-show>`);
-            } else if (this.player.attributes.sp_item_type == 'audiobook') {
-              return (html`<crm-player-body-audiobook class="player-section-body-content" .store=${this.store} .mediaContentId=${this.mediaContentId}></crm-player-body-audiobook>`);
-            } else {
-              return (html`<div class="player-section-body-content"></div>`);
-            }
-          })()}
-          ${(() => {
-            if (isOffIdle && this.config.playerMinimizeOnIdle && this.config.height != "fill") {
-              return (html``); // if idle then we don't need to display queue body.
-            } else  if ((this.config.playerControlsHidePlayQueue || false) == true) {
-              return (html``); // if play queue disabled then we don't need to display queue body.
-            } else if (this.player.attributes.sp_item_type == 'track') {
-              return (html`<crm-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></crm-player-body-queue>`);
-            } else if (this.player.attributes.sp_item_type == 'podcast') {
-              return (html`<crm-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></crm-player-body-queue>`);
-            } else if (this.player.attributes.sp_item_type == 'audiobook') {
-              return (html`<crm-player-body-queue class="player-section-body-queue" .store=${this.store} .mediaContentId=${this.mediaContentId} id="elmPlayerBodyQueue"></crm-player-body-queue>`);
-            } else {
-              return (html`<div class="player-section-body-queue"></div>`);
-            }
-          })()}
+
+          <div class="player-info">
+            <div class="player-title">${title}</div>
+            <div class="player-artist">${artist}</div>
+          </div>
+
+          <div class="player-alert-bgcolor">
+            ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ''}
+            ${this.alertInfo ? html`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>` : ''}
+          </div>
+
+          <div class="player-bottom">
+            <crm-player-controls
+              class="player-section-controls"
+              style=${this.stylePlayerControls()}
+              .store=${this.store}
+              .mediaContentId=${this.mediaContentId}
+            ></crm-player-controls>
+            <div class="player-progress-wrap">
+              ${isOffIdle ? html`<div class="idle-progress"></div>` : html`
+                <crm-player-progress .store=${this.store}></crm-player-progress>
+              `}
+            </div>
+          </div>
         </div>
-        <crm-player-controls style=${this.stylePlayerControls()}
-          class="player-section-controls"
-          .store=${this.store}
-          .mediaContentId=${this.mediaContentId}
-        ></crm-player-controls>
       </div>
     `;
   }
@@ -126,140 +106,162 @@ export class Player extends AlertUpdatesBase {
    * style definitions used by this component.
    * */
   static get styles() {
-
     return css`
-
-      .hoverable:focus,
-      .hoverable:hover {
-        color: var(--dark-primary-color);
-      }
-
-      .hoverable:active {
-        color: var(--primary-color);
-      }
-
-      /* ControlRoom Music: player vertical e responsivo. */
       :host {
         display: block;
         width: 100%;
-        height: 100%;
         min-width: 0;
+        height: auto;
       }
 
       .player-section-container {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: auto auto auto auto;
-        grid-template-areas:
-          'cover'
-          'header'
-          'body'
-          'controls';
-        gap: 0.8rem;
-        justify-items: stretch;
-        align-items: center;
+        position: relative;
+        isolation: isolate;
         box-sizing: border-box;
-        padding: 1.1rem 1rem 1rem;
+        overflow: hidden;
         width: 100%;
-        height: 100%;
         min-width: 0;
-        min-height: 0;
+        min-height: 235px;
+        padding: 20px 22px;
+        border-radius: 20px;
+        border: 1px solid rgba(64, 217, 154, 0.13);
+        background: #101b19 !important;
+        color: #f0fdf4;
+        text-align: left;
+      }
+
+      .player-artwork {
+        position: absolute;
+        z-index: -2;
+        inset: 0 0 0 36%;
+        background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: var(--crm-player-background-size, var(--crm-player-background-size-default, 100% 100%));
-        background-image: none !important;
-        background-color: #101b19;
-        color: #f0fdf4;
-        border-radius: 18px;
-        text-align: center;
       }
 
-      .player-album-cover {
-        grid-area: cover;
-        width: min(100%, 270px);
-        max-height: 100%;
-        aspect-ratio: 1 / 1;
-        justify-self: center;
-        align-self: center;
-        border-radius: 18px;
-        overflow: hidden;
-        background: #243c34;
+      .player-artwork-overlay {
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background: linear-gradient(90deg,
+          #101b19 0%,
+          rgba(16, 27, 25, .99) 28%,
+          rgba(16, 27, 25, .89) 48%,
+          rgba(16, 27, 25, .35) 76%,
+          rgba(16, 27, 25, .06) 100%);
+      }
+
+      .player-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 193px;
+        width: 100%;
+        gap: 14px;
+      }
+
+      .player-source {
         display: flex;
         align-items: center;
-        justify-content: center;
-        color: #86efac;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+        gap: 9px;
+        color: #d7e9df;
+        font-size: 13px;
+        font-weight: 500;
+        min-width: 0;
       }
-
-      .player-album-cover img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
+      .player-source ha-icon {
+        --mdc-icon-size: 19px;
+        color: #40d99a;
       }
+      .player-source span:nth-child(2) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .source-indicator {
+        flex: 0 0 7px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #40d99a;
+      }
+      .source-indicator.offline { background: #778c82; }
 
-      .player-section-header {
-        grid-area: header;
-        display: block;
+      .player-info {
+        min-width: 0;
+        max-width: 67%;
+      }
+      .player-title {
+        color: #f7fff9;
+        font-size: clamp(19px, 2.6vw, 26px);
+        font-weight: 650;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .player-artist {
+        margin-top: 5px;
+        color: #b5c9bd;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .player-alert-bgcolor { background: transparent; }
+
+      .player-bottom {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 14px;
         width: 100%;
         min-width: 0;
-        box-sizing: border-box;
-        padding: 0.25rem 0;
-        background: transparent;
       }
-
-      .player-section-body {
-        grid-area: body;
-        width: 100%;
-        min-width: 0;
-        min-height: 0;
-        height: auto;
-        overflow: hidden;
-        padding: 0;
-        box-sizing: border-box;
-        background: transparent;
-      }
-
-      .player-section-body-content,
-      .player-section-body-queue {
-        height: auto;
-        min-height: 0;
-        background: transparent;
-        overflow: hidden;
-        display: none;
-        transition: opacity 0.25s, display 0.25s;
-        transition-behavior: allow-discrete;
-      }
-
       .player-section-controls {
-        grid-area: controls;
         display: block;
-        width: 100%;
+        flex: 0 1 auto;
         min-width: 0;
         max-width: 100%;
-        overflow-x: hidden;
-        overflow-y: visible;
-        padding: 0.25rem 0;
-        box-sizing: border-box;
         background: transparent;
+        --crm-player-controls-icon-color: #f0fdf4;
+        --crm-player-controls-icon-toggle-color: #40d99a;
+      }
+      .player-progress-wrap {
+        flex: 1 1 110px;
+        min-width: 80px;
+        max-width: 260px;
+      }
+      .player-progress-wrap crm-player-progress {
+        display: block;
+        width: 100%;
+        --crm-player-progress-slider-color: #40d99a;
+      }
+      .idle-progress {
+        height: 4px;
+        border-radius: 99px;
+        background: rgba(185, 218, 200, .25);
       }
 
-      @media (max-width: 420px) {
+      @media (max-width: 520px) {
         .player-section-container {
-          padding: 0.75rem 0.6rem;
-          gap: 0.4rem;
+          min-height: 205px;
+          padding: 16px;
+          border-radius: 17px;
         }
-        .player-album-cover {
-          width: min(100%, 220px);
-          border-radius: 14px;
+        .player-content { min-height: 171px; gap: 12px; }
+        .player-artwork { inset: 0 0 0 28%; }
+        .player-artwork-overlay {
+          background: linear-gradient(90deg,
+            #101b19 0%, rgba(16,27,25,.98) 35%,
+            rgba(16,27,25,.73) 68%, rgba(16,27,25,.24) 100%);
         }
+        .player-info { max-width: 78%; }
+        .player-title { font-size: 20px; }
+        .player-artist { font-size: 12px; }
+        .player-bottom { flex-wrap: wrap; gap: 4px; }
+        .player-progress-wrap { flex-basis: 100%; max-width: 100%; }
       }
-
-      /* have to set a background color for alerts due to parent background transparency. */
-      .player-alert-bgcolor {
-        background-color: rgba(var(--rgb-card-background-color), 0.92);
-      }
-
     `;
   }
 
@@ -532,30 +534,6 @@ export class Player extends AlertUpdatesBase {
     return styleMap(styleInfo);
 
   }
-
-
-  /**
-   * Returns an element style for the header portion of the form.
-   */
-  private stylePlayerHeader() {
-
-    // build style info object.
-    const styleInfo: StyleInfo = <StyleInfo>{};
-
-    // show / hide the header.
-    if (this.config.playerHeaderHide || false)
-      styleInfo['display'] = `none`;
-
-    // adjust css styling for minimized player format.
-    if (this.config.playerMinimizeOnIdle && this.store.player.isPoweredOffOrIdle()) {
-      if (this.config.height != 'fill') {
-        styleInfo['display'] = `none`;
-      }
-    }
-
-    return styleMap(styleInfo);
-  }
-
 
   /**
    * Returns an element style for the player controls portion of the form.
