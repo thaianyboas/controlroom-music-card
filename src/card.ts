@@ -283,7 +283,7 @@ export class Card extends AlertUpdatesBase {
       :host {
         display: block;
         width: 100% !important;
-        height: 100% !important;
+        height: auto;
       }
 
       * { 
@@ -1303,6 +1303,13 @@ export class Card extends AlertUpdatesBase {
       styleInfo['height'] = CARD_DEFAULT_HEIGHT;
     }
 
+    // ControlRoom: compact player, footer immediately after the player surface.
+    // Explicit 'fill' mode remains full-height by user choice.
+    if (this.section == Section.PLAYER && this.config.height != 'fill') {
+      styleInfo['height'] = 'auto';
+      styleInfo['min-height'] = '0';
+    }
+
     // adjust css styling for minimized player format.
     if (this.config.playerMinimizeOnIdle && (this.section == Section.PLAYER) && this.store.player.isPoweredOffOrIdle()) {
       if (this.config.height != 'fill') {
@@ -1360,6 +1367,15 @@ export class Card extends AlertUpdatesBase {
 
     // build style info object.
     const styleInfo: StyleInfo = <StyleInfo>{};
+
+    // ControlRoom: allow the horizontal player to take only the space it needs.
+    // Keep the other browser sections scrollable and at their configured height.
+    if (this.section == Section.PLAYER && this.config.height != 'fill') {
+      styleInfo['flex'] = '0 0 auto';
+      styleInfo['height'] = 'auto';
+      styleInfo['min-height'] = '0';
+      styleInfo['overflow'] = 'visible';
+    }
 
     // adjust css styling for minimized player format.
     if (this.config.playerMinimizeOnIdle && (this.section == Section.PLAYER) && this.store.player.isPoweredOffOrIdle()) {
