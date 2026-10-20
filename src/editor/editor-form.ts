@@ -14,7 +14,7 @@ class Form extends BaseEditor {
   @property({ attribute: false }) schema!: unknown;
   @property({ attribute: false }) data!: unknown;
   @property({ attribute: false }) changed!: (ev: CustomEvent) => void;
-  @property({ attribute: false }) isRenderRootStylesUpdated = false;
+  private isRenderRootStylesUpdated = false;
 
   @query('#elmHaForm') private _elmHaForm?: LitElement;
 
@@ -69,7 +69,11 @@ class Form extends BaseEditor {
   }
 
   protected onValueChanged(args: CustomEvent): void {
-    const changedConfig = args.detail.value as CardConfig;
+    // The ha-form event is handled here, not by outer studio panels.
+    // Avoid duplicate handlers when the event crosses shadow boundaries.
+    args.stopPropagation();
+    const changedConfig = args.detail?.value as CardConfig | undefined;
+    if (!changedConfig) return;
     this.configChanged(changedConfig);
   }
 

@@ -1,4 +1,5 @@
-import { css, html, TemplateResult } from 'lit';
+import { css, html, nothing, TemplateResult } from 'lit';
+import { state } from 'lit/decorators.js';
 
 import {
   CARD_VERSION,
@@ -10,23 +11,77 @@ import { BaseEditor } from './base-editor';
 import { translate } from '../localization/i18n';
 import { Section } from '../types/section';
 
+type Language = 'auto' | 'pt' | 'de' | 'en';
+
 class GeneralEditor extends BaseEditor {
+  @state() private showSections = false;
+  @state() private showAdvanced = false;
+
+  private updateField(name: string, value: unknown): void {
+    this.configChanged({ ...this.config, [name]: value });
+  }
 
   private onLanguageChange(event: Event): void {
-    const select = event.currentTarget as HTMLSelectElement;
-    const language = select.value as 'auto' | 'pt' | 'de' | 'en';
-    if (language === (this.config.language ?? 'auto')) return;
-    this.configChanged({ ...this.config, language });
+    const value = (event.currentTarget as HTMLSelectElement).value as Language;
+    this.updateField('language', value);
+  }
+
+  private onTextChange(event: Event): void {
+    const input = event.currentTarget as HTMLInputElement;
+    this.updateField(input.name, input.value);
+  }
+
+  private onDefaultSectionChange(event: Event): void {
+    this.updateField('sectionDefault', (event.currentTarget as HTMLSelectElement).value);
+  }
+
+  private onSectionChange(event: Event): void {
+    const input = event.currentTarget as HTMLInputElement;
+    const selected: Section[] = Array.isArray(this.config.sections)
+      ? [...this.config.sections]
+      : [];
+    const section = input.value as Section;
+    const next = input.checked
+      ? [...new Set([...selected, section])]
+      : selected.filter((value: Section) => value !== section);
+    this.updateField('sections', next);
+  }
+
+  private onTouchChange(event: Event): void {
+    this.updateField('touchSupportDisabled', (event.currentTarget as HTMLInputElement).checked);
   }
 
   protected render(): TemplateResult {
     super.createStore();
 
+    const language = (this.config.language ?? 'auto') as Language;
     const t = (key: string): string =>
-      translate(key, this.config.language ?? 'auto', this.hass.language);
+      translate(key, language, this.hass.locale?.language || this.hass.language);
     const g = (key: string): string => t(`editor.generalSettings.${key}`);
 
-    const sectionOptions = {
+    const lang = language === 'auto'
+      ? (this.hass.locale?.language || this.hass.language || 'en').toLowerCase()
+      : language;
+    const pt = lang.startsWith('pt');
+    const de = lang.startsWith('de');
+    const ui = {
+      settings: pt ? 'Configurações do cartão' : de ? 'Karteneinstellungen' : 'Card settings',
+      essentials: pt ? 'Informações básicas' : de ? 'Grundlegende Angaben' : 'Basic information',
+      dimensions: pt ? 'Dimensões' : de ? 'Abmessungen' : 'Dimensions',
+      optional: pt ? 'Opcional' : de ? 'Optional' : 'Optional',
+      sections: pt ? 'Seções visíveis' : de ? 'Sichtbare Bereiche' : 'Visible sections',
+      sectionsHint: pt ? 'Escolha o que aparece no cartão' : de ? 'Wähle die Bereiche für die Karte' : 'Choose what appears on the card',
+      advanced: pt ? 'Mais configurações' : de ? 'Weitere Einstellungen' : 'More settings',
+      sectionDefault: g('sectionDefault'),
+      touch: g('touchSupportDisabled'),
+      width: g('width'),
+      height: g('height'),
+      title: g('title'),
+      language: g('language'),
+      entity: g('entity'),
+    };
+
+    const sectionOptions: Record<string, string> = {
       player: t('editor.player'),
       albumfavorites: g('albumFavorites'),
       artistfavorites: g('artistFavorites'),
@@ -42,159 +97,219 @@ class GeneralEditor extends BaseEditor {
       userpresets: g('userPresets'),
     };
 
-    const defaultSectionOptions = Object.entries(sectionOptions)
-      .map(([value, label]) => [value, label]);
-
-    // Language is rendered separately to avoid the large HA radio/select control.
-    // All other fields retain their original config keys and schema types.
-    const schema = [
-      {
-        name: 'sections',
-        label: g('sections'),
-        help: g('sectionsHelp'),
-        required: false,
-        type: 'multi_select',
-        options: sectionOptions,
-      },
-      {
-        name: 'entity',
-        label: g('entity'),
-        help: g('entityHelp'),
-        required: true,
-        selector: {
-          entity: {
-            multiple: false,
-            filter: {
-              domain: DOMAIN_MEDIA_PLAYER,
-              integration: DOMAIN_SPOTIFYPLUS,
-            },
+    const selectedSections = Array.isArray(this.config.sections)
+      ? this.config.sections
+      : [];
+    const entitySchema = [{
+      name: 'entity',
+      label: ui.entity,
+      required: true,
+      selector: {
+        entity: {
+          multiple: false,
+          filter: {
+            domain: DOMAIN_MEDIA_PLAYER,
+            integration: DOMAIN_SPOTIFYPLUS,
           },
         },
       },
-      {
-        name: 'title',
-        label: g('title'),
-        help: g('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'width',
-        label: g('width'),
-        help: g('widthHelp'),
-        required: false,
-        type: 'string',
-        default: 35.15,
-      },
-      {
-        name: 'height',
-        label: g('height'),
-        help: g('heightHelp'),
-        required: false,
-        type: 'string',
-        default: 35.15,
-      },
-      {
-        name: 'sectionDefault',
-        label: g('sectionDefault'),
-        required: false,
-        type: 'select',
-        options: defaultSectionOptions,
-      },
-      {
-        name: 'touchSupportDisabled',
-        label: g('touchSupportDisabled'),
-        help: g('touchSupportDisabledHelp'),
-        required: false,
-        selector: { boolean: {} },
-      },
-    ];
-
-    const language = this.config.language ?? 'auto';
+    }];
 
     return html`
-      <div class="studio-heading">
-        <div class="studio-heading-title">${g('description')}</div>
-        <span class="studio-version">v${CARD_VERSION}</span>
-      </div>
-
-      <div class="studio-language">
-        <div class="studio-language-copy">
-          <span class="studio-label">${g('language')}</span>
-          <span class="studio-hint">${g('languageHelp')}</span>
+      <div class="studio">
+        <div class="studio-top">
+          <div>
+            <div class="studio-eyebrow">CONTROLROOM STUDIO</div>
+            <div class="studio-title">${ui.settings}</div>
+          </div>
+          <span class="studio-version">v${CARD_VERSION}</span>
         </div>
-        <div class="studio-select-wrap">
-          <select
-            class="studio-select"
-            aria-label=${g('language')}
-            .value=${language}
-            @change=${this.onLanguageChange}
+
+        <div class="studio-panel">
+          <div class="studio-section-title">${ui.essentials}</div>
+
+          <label class="studio-field">
+            <span class="studio-label">${ui.language}</span>
+            <span class="studio-select-container">
+              <select
+                class="studio-input studio-select"
+                .value=${language}
+                @change=${this.onLanguageChange}
+              >
+                <option value="auto">🌐 ${t('editor.automaticLanguage')}</option>
+                <option value="pt">🇧🇷 Português</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="en">🇺🇸 English</option>
+              </select>
+              <ha-icon icon="mdi:chevron-down"></ha-icon>
+            </span>
+          </label>
+
+          <div class="studio-field studio-entity">
+            <crm-editor-form
+              .schema=${entitySchema}
+              .section=${Section.PLAYER}
+              .store=${this.store}
+              .config=${this.config}
+              .hass=${this.hass}
+            ></crm-editor-form>
+          </div>
+
+          <label class="studio-field">
+            <span class="studio-label">${ui.title}</span>
+            <input
+              class="studio-input"
+              type="text"
+              name="title"
+              .value=${String(this.config.title ?? '')}
+              placeholder=${ui.optional}
+              @change=${this.onTextChange}
+            />
+          </label>
+
+          <div class="studio-section-title studio-dimensions">${ui.dimensions}</div>
+          <div class="studio-grid">
+            <label class="studio-field">
+              <span class="studio-label">${ui.width}</span>
+              <input
+                class="studio-input"
+                type="text"
+                name="width"
+                .value=${String(this.config.width ?? '')}
+                placeholder="35.15"
+                @change=${this.onTextChange}
+              />
+            </label>
+            <label class="studio-field">
+              <span class="studio-label">${ui.height}</span>
+              <input
+                class="studio-input"
+                type="text"
+                name="height"
+                .value=${String(this.config.height ?? '')}
+                placeholder="35.15"
+                @change=${this.onTextChange}
+              />
+            </label>
+          </div>
+        </div>
+
+        <div class="studio-panel studio-fold">
+          <button
+            type="button"
+            class="studio-fold-button"
+            aria-expanded=${this.showSections ? 'true' : 'false'}
+            @click=${() => { this.showSections = !this.showSections; }}
           >
-            <option value="auto" ?selected=${language === 'auto'}>🌐 ${t('editor.automaticLanguage')}</option>
-            <option value="pt" ?selected=${language === 'pt'}>🇧🇷 Português</option>
-            <option value="de" ?selected=${language === 'de'}>🇩🇪 Deutsch</option>
-            <option value="en" ?selected=${language === 'en'}>🇺🇸 English</option>
-          </select>
-          <span class="studio-chevron" aria-hidden="true">⌄</span>
+            <ha-icon icon="mdi:view-grid-outline"></ha-icon>
+            <span class="studio-fold-text">
+              <strong>${ui.sections}</strong>
+              <small>${ui.sectionsHint}</small>
+            </span>
+            <ha-icon icon=${this.showSections ? 'mdi:chevron-up' : 'mdi:chevron-down'}></ha-icon>
+          </button>
+          ${this.showSections ? html`
+            <div class="studio-fold-body">
+              <div class="studio-check-grid">
+                ${Object.entries(sectionOptions).map(([value, label]) => html`
+                  <label class="studio-check">
+                    <input
+                      type="checkbox"
+                      .value=${value}
+                      .checked=${selectedSections.includes(value as Section)}
+                      @change=${this.onSectionChange}
+                    />
+                    <span>${label}</span>
+                  </label>
+                `)}
+              </div>
+            </div>
+          ` : nothing}
+        </div>
+
+        <div class="studio-panel studio-fold">
+          <button
+            type="button"
+            class="studio-fold-button"
+            aria-expanded=${this.showAdvanced ? 'true' : 'false'}
+            @click=${() => { this.showAdvanced = !this.showAdvanced; }}
+          >
+            <ha-icon icon="mdi:tune-variant"></ha-icon>
+            <span class="studio-fold-text"><strong>${ui.advanced}</strong></span>
+            <ha-icon icon=${this.showAdvanced ? 'mdi:chevron-up' : 'mdi:chevron-down'}></ha-icon>
+          </button>
+          ${this.showAdvanced ? html`
+            <div class="studio-fold-body">
+              <label class="studio-field">
+                <span class="studio-label">${ui.sectionDefault}</span>
+                <span class="studio-select-container">
+                  <select
+                    class="studio-input studio-select"
+                    .value=${String(this.config.sectionDefault ?? '')}
+                    @change=${this.onDefaultSectionChange}
+                  >
+                    <option value="">—</option>
+                    ${Object.entries(sectionOptions).map(([value, label]) =>
+                      html`<option value=${value}>${label}</option>`)}
+                  </select>
+                  <ha-icon icon="mdi:chevron-down"></ha-icon>
+                </span>
+              </label>
+              <label class="studio-switch-row">
+                <span>${ui.touch}</span>
+                <input
+                  type="checkbox"
+                  .checked=${Boolean(this.config.touchSupportDisabled)}
+                  @change=${this.onTouchChange}
+                />
+              </label>
+            </div>
+          ` : nothing}
         </div>
       </div>
-
-      <crm-editor-form
-        class="crm-editor-form"
-        .schema=${schema}
-        .section=${Section.PLAYER}
-        .store=${this.store}
-        .config=${this.config}
-        .hass=${this.hass}
-      ></crm-editor-form>
     `;
   }
 
   static get styles() {
     return css`
       :host { display: block; min-width: 0; }
-      .studio-heading {
-        display: flex; align-items: center; justify-content: space-between;
-        gap: 12px; margin: 4px 0 16px;
-      }
-      .studio-heading-title {
-        color: var(--primary-text-color); font-size: 13px; font-weight: 600;
-      }
-      .studio-version {
-        flex-shrink: 0; font-size: 11px; color: var(--secondary-text-color);
-        background: var(--secondary-background-color, rgba(128,128,128,.1));
-        border-radius: 999px; padding: 4px 8px;
-      }
-      .studio-language {
-        display: flex; align-items: center; justify-content: space-between;
-        gap: 12px; min-width: 0; padding: 12px 13px;
-        margin-bottom: 14px;
-        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        background: var(--card-background-color, var(--ha-card-background, transparent));
-        border-radius: 12px;
-      }
-      .studio-language-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; }
-      .studio-label { color: var(--primary-text-color); font-size: 13px; font-weight: 600; }
-      .studio-hint { color: var(--secondary-text-color); font-size: 11px; line-height: 1.35; }
-      .studio-select-wrap { position: relative; flex: 0 0 auto; max-width: 54%; }
-      .studio-select {
-        appearance: none; -webkit-appearance: none;
-        width: 100%; min-width: 124px; max-width: 100%;
-        padding: 9px 27px 9px 11px; border-radius: 9px;
-        background: var(--secondary-background-color, rgba(128,128,128,.12));
-        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        color: var(--primary-text-color); font: inherit; font-size: 12px;
-        cursor: pointer; outline-offset: 2px;
-      }
-      .studio-select:focus-visible { outline: 2px solid var(--primary-color); }
-      .studio-select option { background: var(--card-background-color, #1c1c26); color: var(--primary-text-color, white); }
-      .studio-chevron { position: absolute; right: 10px; top: 50%; transform: translateY(-55%); pointer-events: none; color: var(--secondary-text-color); }
-      .crm-editor-form { display: block; min-width: 0; }
-      @media (max-width: 360px) {
-        .studio-language { align-items: stretch; flex-direction: column; }
-        .studio-select-wrap { max-width: 100%; }
-        .studio-select { width: 100%; }
-      }
+      * { box-sizing: border-box; }
+      .studio { display: grid; gap: 10px; min-width: 0; color: var(--primary-text-color); }
+      .studio-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 2px 2px 8px; }
+      .studio-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .12em; color: var(--secondary-text-color); }
+      .studio-title { margin-top: 4px; font-size: 16px; font-weight: 650; }
+      .studio-version { font-size: 11px; color: var(--secondary-text-color); }
+      .studio-panel { min-width: 0; border: 1px solid var(--divider-color); border-radius: 14px; padding: 15px; background: var(--card-background-color, var(--ha-card-background)); }
+      .studio-section-title { font-size: 12px; font-weight: 700; margin: 0 0 13px; }
+      .studio-dimensions { margin-top: 17px; }
+      .studio-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; margin-bottom: 13px; }
+      .studio-field:last-child { margin-bottom: 0; }
+      .studio-label { font-size: 12px; font-weight: 550; color: var(--secondary-text-color); }
+      .studio-input { display: block; width: 100%; min-width: 0; height: 38px; padding: 0 11px; border-radius: 9px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); color: var(--primary-text-color); font: inherit; font-size: 13px; }
+      .studio-input:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+      .studio-select-container { display: block; position: relative; }
+      .studio-select { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer; }
+      .studio-select-container > ha-icon { position: absolute; right: 10px; top: 9px; --mdc-icon-size: 19px; pointer-events: none; color: var(--secondary-text-color); }
+      .studio-select option { background: var(--card-background-color, #202029); color: var(--primary-text-color); }
+      .studio-entity { margin: 1px 0 13px; }
+      .studio-entity crm-editor-form { display: block; min-width: 0; }
+      .studio-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .studio-grid .studio-field { margin-bottom: 0; }
+      .studio-fold { padding: 0; overflow: hidden; }
+      .studio-fold-button { width: 100%; min-height: 57px; padding: 12px 14px; display: flex; align-items: center; gap: 11px; border: 0; background: transparent; color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
+      .studio-fold-button > ha-icon { --mdc-icon-size: 19px; color: var(--secondary-text-color); }
+      .studio-fold-button > ha-icon:last-child { --mdc-icon-size: 18px; }
+      .studio-fold-button:hover { background: var(--secondary-background-color); }
+      .studio-fold-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
+      .studio-fold-text { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+      .studio-fold-text strong { font-size: 13px; font-weight: 600; }
+      .studio-fold-text small { font-size: 11px; color: var(--secondary-text-color); }
+      .studio-fold-body { padding: 0 14px 14px; }
+      .studio-check-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+      .studio-check { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 9px; border-radius: 8px; background: var(--secondary-background-color); font-size: 12px; cursor: pointer; overflow-wrap: anywhere; }
+      .studio-check input, .studio-switch-row input { accent-color: var(--primary-color); flex-shrink: 0; }
+      .studio-switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; cursor: pointer; padding: 5px 0; }
+      @media (max-width: 340px) { .studio-check-grid { grid-template-columns: 1fr; } }
     `;
   }
 }

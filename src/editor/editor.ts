@@ -30,7 +30,7 @@ import './show-fav-browser-editor';
 import './track-fav-browser-editor';
 import './userpreset-browser-editor';
 import { BaseEditor } from './base-editor';
-import { translate, resolveLanguage } from '../localization/i18n';
+import { resolveLanguage } from '../localization/i18n';
 import { ConfigArea } from '../types/config-area';
 import { Section } from '../types/section';
 import { Store } from '../model/store';
@@ -76,6 +76,50 @@ class CardEditor extends BaseEditor {
       de: { general: 'Allgemein', design: 'Darstellung', player: 'Player', devices: 'Geräte', library: 'Bibliothek', advanced: 'Erweitert', settings: 'Karteneinstellungen', choose: 'Bereich auswählen' },
       en: { general: 'General', design: 'Appearance', player: 'Player', devices: 'Devices', library: 'Library', advanced: 'Advanced', settings: 'Card settings', choose: 'Choose a section' },
     }[lang];
+
+    // Explicit labels avoid relying on translation keys generated from enum values.
+    const areaNames: Record<string, Record<string, string>> = {
+      pt: {
+        [ConfigArea.PLAYLIST_FAVORITES]: 'Playlists favoritas',
+        [ConfigArea.ALBUM_FAVORITES]: 'Álbuns favoritos',
+        [ConfigArea.ARTIST_FAVORITES]: 'Artistas favoritos',
+        [ConfigArea.TRACK_FAVORITES]: 'Músicas favoritas',
+        [ConfigArea.AUDIOBOOK_FAVORITES]: 'Audiolivros favoritos',
+        [ConfigArea.EPISODE_FAVORITES]: 'Episódios favoritos',
+        [ConfigArea.SHOW_FAVORITES]: 'Podcasts favoritos',
+        [ConfigArea.CATEGORY_BROWSER]: 'Categorias',
+        [ConfigArea.USERPRESET_BROWSER]: 'Presets personalizados',
+        [ConfigArea.RECENT_BROWSER]: 'Reproduzidos recentemente',
+        [ConfigArea.SEARCH_MEDIA_BROWSER]: 'Pesquisa de mídia',
+      },
+      de: {
+        [ConfigArea.PLAYLIST_FAVORITES]: 'Lieblingsplaylists',
+        [ConfigArea.ALBUM_FAVORITES]: 'Lieblingsalben',
+        [ConfigArea.ARTIST_FAVORITES]: 'Lieblingskünstler',
+        [ConfigArea.TRACK_FAVORITES]: 'Lieblingssongs',
+        [ConfigArea.AUDIOBOOK_FAVORITES]: 'Lieblingshörbücher',
+        [ConfigArea.EPISODE_FAVORITES]: 'Lieblingsepisoden',
+        [ConfigArea.SHOW_FAVORITES]: 'Lieblingssendungen',
+        [ConfigArea.CATEGORY_BROWSER]: 'Kategorien',
+        [ConfigArea.USERPRESET_BROWSER]: 'Benutzer-Presets',
+        [ConfigArea.RECENT_BROWSER]: 'Zuletzt gespielt',
+        [ConfigArea.SEARCH_MEDIA_BROWSER]: 'Mediensuche',
+      },
+      en: {
+        [ConfigArea.PLAYLIST_FAVORITES]: 'Favorite playlists',
+        [ConfigArea.ALBUM_FAVORITES]: 'Favorite albums',
+        [ConfigArea.ARTIST_FAVORITES]: 'Favorite artists',
+        [ConfigArea.TRACK_FAVORITES]: 'Favorite tracks',
+        [ConfigArea.AUDIOBOOK_FAVORITES]: 'Favorite audiobooks',
+        [ConfigArea.EPISODE_FAVORITES]: 'Favorite episodes',
+        [ConfigArea.SHOW_FAVORITES]: 'Favorite shows',
+        [ConfigArea.CATEGORY_BROWSER]: 'Categories',
+        [ConfigArea.USERPRESET_BROWSER]: 'User presets',
+        [ConfigArea.RECENT_BROWSER]: 'Recently played',
+        [ConfigArea.SEARCH_MEDIA_BROWSER]: 'Media search',
+      },
+    };
+    const areaLabels = areaNames[lang] ?? areaNames.en;
 
     const libraryAreas = [
       ConfigArea.PLAYLIST_FAVORITES, ConfigArea.ALBUM_FAVORITES,
@@ -131,11 +175,7 @@ class CardEditor extends BaseEditor {
                             aria-current=${this.configArea === area ? 'page' : 'false'}
                             @click=${() => this.onConfigSectionClick(area)}
                           >
-                            ${translate(
-                              `editor.${String(area).toLowerCase().replace(/[^a-z]/g, '')}`,
-                              this.config.language ?? 'auto',
-                              this.hass.locale?.language || this.hass.language
-                            )}
+                            ${areaLabels[area] ?? String(area)}
                           </button>
                         `)}
                       </div>
