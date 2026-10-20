@@ -29,6 +29,94 @@ import '../components/show-actions';
 import '../components/track-actions';
 import { sharedStylesFavBrowser } from '../styles/shared-styles-fav-browser.js';
 import { FavBrowserBase } from './fav-browser-base';
+// ControlRoom UI translations. This file lives beside the existing localization/i18n.ts.
+import { resolveLanguage } from '../localization/i18n';
+
+type Lang = 'de' | 'pt' | 'en';
+
+const strings = {
+  de: {
+    searchFor: 'Suchen nach',
+    searchByName: 'Nach Namen suchen...',
+    selectSearchType: 'Bitte wähle einen Suchtyp aus.',
+    enterSearch: 'Bitte gib einen Suchbegriff ein.',
+    searching: 'Suche nach',
+    searchFailed: 'Suche fehlgeschlagen',
+  },
+  pt: {
+    searchFor: 'Pesquisar',
+    searchByName: 'Pesquisar por nome...',
+    selectSearchType: 'Selecione um tipo de pesquisa.',
+    enterSearch: 'Digite um termo para pesquisar.',
+    searching: 'Pesquisando',
+    searchFailed: 'Falha na pesquisa',
+  },
+  en: {
+    searchFor: 'Search for',
+    searchByName: 'Search by name...',
+    selectSearchType: 'Please select a search type.',
+    enterSearch: 'Please enter a search term.',
+    searching: 'Searching',
+    searchFailed: 'Search failed',
+  },
+} as const;
+
+function crmLanguage(hass: any): Lang {
+  return resolveLanguage('auto', hass?.locale?.language || hass?.language);
+}
+
+function crmText(hass: any, key: keyof typeof strings['en']): string {
+  return strings[crmLanguage(hass)][key];
+}
+
+const searchLabels: Record<Lang, Record<string, string>> = {
+  de: {
+    albums: 'Alben', artists: 'Künstler', audiobooks: 'Hörbücher',
+    episodes: 'Episoden', playlists: 'Playlists', shows: 'Podcasts',
+    tracks: 'Titel', album_tracks: 'Albumtitel',
+    artist_top_tracks: 'Top-Titel des Künstlers',
+    artist_albums: 'Künstleralben',
+    artist_albums_compilation: 'Kompilationen',
+    artist_albums_single: 'Singles',
+    artist_albums_appearson: 'Gastauftritte',
+    artist_related_artists: 'Ähnliche Künstler',
+    audiobook_episodes: 'Hörbuchkapitel',
+    show_episodes: 'Podcast-Episoden',
+  },
+  pt: {
+    albums: 'Álbuns', artists: 'Artistas', audiobooks: 'Audiolivros',
+    episodes: 'Episódios', playlists: 'Playlists', shows: 'Podcasts',
+    tracks: 'Faixas', album_tracks: 'Faixas do álbum',
+    artist_top_tracks: 'Mais tocadas do artista',
+    artist_albums: 'Álbuns do artista',
+    artist_albums_compilation: 'Coletâneas',
+    artist_albums_single: 'Singles',
+    artist_albums_appearson: 'Participações',
+    artist_related_artists: 'Artistas relacionados',
+    audiobook_episodes: 'Capítulos do audiolivro',
+    show_episodes: 'Episódios do podcast',
+  },
+  en: {
+    albums: 'Albums', artists: 'Artists', audiobooks: 'Audiobooks',
+    episodes: 'Episodes', playlists: 'Playlists', shows: 'Shows',
+    tracks: 'Tracks', album_tracks: 'Album tracks',
+    artist_top_tracks: 'Artist top tracks',
+    artist_albums: 'Artist albums',
+    artist_albums_compilation: 'Compilations',
+    artist_albums_single: 'Singles',
+    artist_albums_appearson: 'Appears on',
+    artist_related_artists: 'Related artists',
+    audiobook_episodes: 'Audiobook chapters',
+    show_episodes: 'Show episodes',
+  },
+};
+
+function crmSearchTypeLabel(hass: any, searchType: string | undefined): string {
+  if (!searchType) return '';
+  const normalized = String(searchType).trim().toLowerCase().replace(/[\s-]+/g, '_');
+  return searchLabels[crmLanguage(hass)][normalized] || String(searchType);
+}
+
 import { Section } from '../types/section';
 import { MediaPlayer } from '../model/media-player';
 import { formatTitleInfo } from '../utils/media-browser-utils';
@@ -46,7 +134,6 @@ import {
 const CACHE_KEY_SEARCH_MEDIA_TYPE = "_searchmediatype";
 const CACHE_KEY_SEARCH_EVENT_ARGS = "_searcheventargs";
 
-const SEARCH_FOR_PREFIX = "Search for ";
 
 // basic search types that require filter criteria.
 const SEARCH_TYPES_BASIC = [SearchMediaTypes.ALBUMS, SearchMediaTypes.ARTISTS, SearchMediaTypes.AUDIOBOOKS, SearchMediaTypes.EPISODES,
@@ -58,7 +145,6 @@ export class SearchBrowser extends FavBrowserBase {
 
   // private state properties.
   @state() private searchMediaType?: string;
-  @state() private searchMediaTypeTitle?: string;
   @state() private searchEventArgs?: SearchMediaEventArgs | null;
 
   // html form element objects.
@@ -82,10 +168,16 @@ export class SearchBrowser extends FavBrowserBase {
    * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
    * Setting properties inside this method will *not* trigger the element to update.
   */
+  private localizedSearchTitle(): string {
+    return `${crmText(this.hass, 'searchFor')} ${crmSearchTypeLabel(this.hass, this.searchMediaType)}`;
+  }
+
   protected render(): TemplateResult | void {
 
     // invoke base class method.
     super.render();
+
+    this.filterCriteriaPlaceholder = crmText(this.hass, 'searchByName');
 
     // format title and sub-title details.
     const title = formatTitleInfo(this.config.searchMediaBrowserTitle, this.config, this.player, this.mediaListLastUpdatedOn, this.mediaList);
@@ -152,7 +244,6 @@ export class SearchBrowser extends FavBrowserBase {
         // hidden type is currently selected - reset current selection to first enabled
         // if a general search type is selected.
         this.searchMediaType = this.config.searchMediaBrowserSearchTypes[0];
-        this.searchMediaTypeTitle = SEARCH_FOR_PREFIX + this.searchMediaType;
 
         // clear the media list, as the items no longer match the search media type.
         this.mediaList = undefined;
@@ -173,73 +264,73 @@ export class SearchBrowser extends FavBrowserBase {
       <ha-dropdown slot="actionItems" id="searchMediaType" style="padding-right: 0.5rem;">
         <ha-assist-chip id="searchMediaTypeTitle"
           slot="trigger"
-          .label=${this.searchMediaTypeTitle || SEARCH_FOR_PREFIX + " ..."}>
+          .label=${this.localizedSearchTitle()}>
           <ha-svg-icon slot="trailing-icon" .path=${mdiMenuDown}></ha-svg-icon>
         </ha-assist-chip>
         <ha-dropdown-item .value=${SearchMediaTypes.ALBUMS} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.ALBUMS)}>
           <ha-svg-icon slot="icon" .path=${mdiAlbum}></ha-svg-icon>
-          ${SearchMediaTypes.ALBUMS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ALBUMS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTISTS} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.ARTISTS)}>
           <ha-svg-icon slot="icon" .path=${mdiAccountMusic}></ha-svg-icon>
-          ${SearchMediaTypes.ARTISTS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTISTS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.AUDIOBOOKS} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.AUDIOBOOKS)}>
           <ha-svg-icon slot="icon" .path=${mdiBookOpenVariant}></ha-svg-icon>
-          ${SearchMediaTypes.AUDIOBOOKS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.AUDIOBOOKS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.EPISODES} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.EPISODES)}>
           <ha-svg-icon slot="icon" .path=${mdiMicrophone}></ha-svg-icon>
-          ${SearchMediaTypes.EPISODES}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.EPISODES)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.PLAYLISTS} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.PLAYLISTS)}>
           <ha-svg-icon slot="icon" .path=${mdiPlaylistPlay}></ha-svg-icon>
-          ${SearchMediaTypes.PLAYLISTS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.PLAYLISTS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.SHOWS} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.SHOWS)}>
           <ha-svg-icon slot="icon" .path=${mdiPodcast}></ha-svg-icon>
-          ${SearchMediaTypes.SHOWS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.SHOWS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.TRACKS} @click=${this.onSearchMediaTypeChanged} hide=${this.hideSearchType(SearchMediaTypes.TRACKS)}>
           <ha-svg-icon slot="icon" .path=${mdiMusic}></ha-svg-icon>
-          ${SearchMediaTypes.TRACKS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.TRACKS)}
         </ha-dropdown-item>
         <wa-divider hide=${!isSearchArgsUri}></wa-divider>
         <ha-dropdown-item .value=${SearchMediaTypes.ALBUM_TRACKS} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriAlbum)}>
           <ha-svg-icon slot="icon" .path=${mdiMusic}></ha-svg-icon>
-          ${SearchMediaTypes.ALBUM_TRACKS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ALBUM_TRACKS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTIST_TOP_TRACKS} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriArtist)}>
           <ha-svg-icon slot="icon" .path=${mdiMusic}></ha-svg-icon>
-          ${SearchMediaTypes.ARTIST_TOP_TRACKS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTIST_TOP_TRACKS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTIST_ALBUMS} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriArtist)}>
           <ha-svg-icon slot="icon" .path=${mdiAlbum}></ha-svg-icon>
-          ${SearchMediaTypes.ARTIST_ALBUMS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTIST_ALBUMS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTIST_ALBUMS_COMPILATION} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriArtist)}>
           <ha-svg-icon slot="icon" .path=${mdiAlbum}></ha-svg-icon>
-          ${SearchMediaTypes.ARTIST_ALBUMS_COMPILATION}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTIST_ALBUMS_COMPILATION)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTIST_ALBUMS_SINGLE} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriArtist)}>
           <ha-svg-icon slot="icon" .path=${mdiAlbum}></ha-svg-icon>
-          ${SearchMediaTypes.ARTIST_ALBUMS_SINGLE}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTIST_ALBUMS_SINGLE)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTIST_ALBUMS_APPEARSON} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriArtist)}>
           <ha-svg-icon slot="icon" .path=${mdiAlbum}></ha-svg-icon>
-          ${SearchMediaTypes.ARTIST_ALBUMS_APPEARSON}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTIST_ALBUMS_APPEARSON)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.ARTIST_RELATED_ARTISTS} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriArtist)}>
           <ha-svg-icon slot="icon" .path=${mdiAccountMusic}></ha-svg-icon>
-          ${SearchMediaTypes.ARTIST_RELATED_ARTISTS}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.ARTIST_RELATED_ARTISTS)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.AUDIOBOOK_EPISODES} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriAudiobook)}>
           <ha-svg-icon slot="icon" .path=${mdiMicrophone}></ha-svg-icon>
-          ${SearchMediaTypes.AUDIOBOOK_EPISODES}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.AUDIOBOOK_EPISODES)}
         </ha-dropdown-item>
         <ha-dropdown-item .value=${SearchMediaTypes.SHOW_EPISODES} @click=${this.onSearchMediaTypeChanged} hide=${(!isSearchArgsUriShow)}>
           <ha-svg-icon slot="icon" .path=${mdiMicrophone}></ha-svg-icon>
-          ${SearchMediaTypes.SHOW_EPISODES}
+          ${crmSearchTypeLabel(this.hass, SearchMediaTypes.SHOW_EPISODES)}
         </ha-dropdown-item>
       </ha-dropdown>
       `;
@@ -507,7 +598,6 @@ export class SearchBrowser extends FavBrowserBase {
     // load search-related values from the cache.
     this.searchMediaType = storageService.getStorageValue(this.cacheKeyBase + this.mediaType + CACHE_KEY_SEARCH_MEDIA_TYPE, defaultSearchType);
     this.searchEventArgs = storageService.getStorageValue(this.cacheKeyBase + this.mediaType + CACHE_KEY_SEARCH_EVENT_ARGS, defaultSearchType);
-    this.searchMediaTypeTitle = SEARCH_FOR_PREFIX + this.searchMediaType;
 
     if (debuglog.enabled) {
       debuglog("storageValuesLoad - parameters loaded from cache: searchMediaType, searchEventArgs");
@@ -592,7 +682,6 @@ export class SearchBrowser extends FavBrowserBase {
 
     // store searchType and adjust the title.
     this.searchMediaType = searchType;
-    this.searchMediaTypeTitle = SEARCH_FOR_PREFIX + this.searchMediaType;
 
     // clear the media list, as the items no longer match the search media type.
     this.mediaList = undefined;
@@ -624,13 +713,13 @@ export class SearchBrowser extends FavBrowserBase {
 
     // validations.
     if (!this.searchMediaType) {
-      this.alertErrorSet("Please select the type of content to search for");
+      this.alertErrorSet(crmText(this.hass, 'selectSearchType'));
       this.searchMediaTypeElement.focus();
       return false;
     }
 
     if ((!this.isFilterCriteriaReadOnly) && (!this.filterCriteria)) {
-      this.alertErrorSet("Please enter criteria to search for");
+      this.alertErrorSet(crmText(this.hass, 'enterSearch'));
       this.filterCriteriaElement.focus();
       return false;
     }
@@ -684,7 +773,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseUpdateMediaList = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching Spotify " + this.searchMediaType + " catalog for \"" + this.filterCriteria + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.filterCriteria + "\" ...";
 
           // set service parameters.
           const limitTotal = this.config.searchMediaBrowserSearchLimit || 50;
@@ -700,7 +789,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -716,7 +805,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -730,7 +819,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetAlbumTracks = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const albumId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -764,7 +853,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -780,7 +869,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -794,7 +883,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetArtistAlbums = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const artistId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -812,7 +901,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -828,7 +917,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -842,7 +931,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetArtistAlbumsAppearsOn = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const artistId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -860,7 +949,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -876,7 +965,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -890,7 +979,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetArtistAlbumsCompilation = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const artistId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -908,7 +997,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -924,7 +1013,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -938,7 +1027,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetArtistAlbumsSingle = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const artistId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -956,7 +1045,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -972,7 +1061,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -986,7 +1075,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetArtistRelatedArtists = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const artistId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -1001,7 +1090,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -1017,7 +1106,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -1031,7 +1120,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetArtistTopTracks = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const artistId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -1047,7 +1136,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -1063,7 +1152,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -1077,7 +1166,7 @@ export class SearchBrowser extends FavBrowserBase {
         const promiseGetShowEpisodes = new Promise((resolve, reject) => {
 
           // update status.
-          this.alertInfo = "Searching " + this.searchMediaType + " for \"" + this.searchEventArgs?.title + "\" ...";
+          this.alertInfo = crmText(this.hass, "searching") + " " + crmSearchTypeLabel(this.hass, this.searchMediaType) + " – \"" + this.searchEventArgs?.title + "\" ...";
 
           // set service parameters.
           const showId = getIdFromSpotifyUri(this.searchEventArgs?.uri);
@@ -1093,7 +1182,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = result.date_last_refreshed || getUtcNowTimestamp();
 
               // clear certain info messsages if they are temporary.
-              if (this.alertInfo?.startsWith("Searching ")) {
+              if (this.alertInfo?.startsWith(crmText(this.hass, "searching"))) {
                 this.alertInfoClear();
               }
 
@@ -1109,7 +1198,7 @@ export class SearchBrowser extends FavBrowserBase {
               this.mediaListLastUpdatedOn = 0;
 
               // call base class method, indicating media list update failed.
-              super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+              super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
               reject(error);
 
             })
@@ -1154,7 +1243,7 @@ export class SearchBrowser extends FavBrowserBase {
       this.progressHide();
 
       // set alert error message.
-      super.updatedMediaListError("Spotify " + this.searchMediaType + " search failed: " + getHomeAssistantErrorMessage(error));
+      super.updatedMediaListError(crmText(this.hass, "searchFailed") + " (" + crmSearchTypeLabel(this.hass, this.searchMediaType) + "): " + getHomeAssistantErrorMessage(error));
       return true;
 
     }

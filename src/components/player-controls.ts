@@ -5,7 +5,7 @@ import { DEBUG_APP_NAME } from '../constants';
 const debuglog = Debug(DEBUG_APP_NAME + ":player-controls");
 
 // lovelace card imports.
-import { css, html, PropertyValues, TemplateResult, nothing, unsafeCSS } from 'lit';
+import { css, html, PropertyValues, TemplateResult, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { styleMap, StyleInfo } from 'lit-html/directives/style-map.js';
 import {
@@ -26,8 +26,6 @@ import {
 
 // our imports.
 import {
-  PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT,
-  PLAYER_CONTROLS_ICON_SIZE_DEFAULT,
   PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT
 } from '../constants';
 import { CardConfig } from '../types/card-config';
@@ -104,8 +102,8 @@ class PlayerControls extends AlertUpdatesBase {
               <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${mdiInformationSlabBoxOutline} label="More Information" style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(SHUFFLE_SET)}    hide=${this.hideFeature(SHUFFLE_SET)}    .path=${this.getShuffleIcon()} label="Shuffle" style=${this.styleIcon(colorShuffle)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PREVIOUS_TRACK)} hide=${this.hideFeature(PREVIOUS_TRACK)} .path=${mdiSkipPrevious} label="Previous Track" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" style=${this.styleIcon(colorPlay)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PAUSE)}          hide=${this.hideFeature(PAUSE)}          .path=${mdiPause} label="Pause" style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(colorPlay)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PAUSE)}          hide=${this.hideFeature(PAUSE)}          .path=${mdiPause} label="Pause" class="play-pause" style=${this.styleIcon()}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(NEXT_TRACK)}     hide=${this.hideFeature(NEXT_TRACK)}     .path=${mdiSkipNext} label="Next Track" style=${this.styleIcon()}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(REPEAT_SET)}     hide=${this.hideFeature(REPEAT_SET)}     .path=${this.getRepeatIcon()} label="Repeat" style=${this.styleIcon(colorRepeat)} ></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PLAY_QUEUE)}     hide=${this.hideFeature(PLAY_QUEUE)}     .path=${mdiPlaylistMusic} label="Play Queue Information" style=${this.styleIcon(colorQueueItems)} ></ha-icon-button>
@@ -116,7 +114,7 @@ class PlayerControls extends AlertUpdatesBase {
           </div>
           <div class="iconsPower" hide=${idle}>
               <ha-icon-button @click=${() => this.onClickAction(TURN_OFF)}       hide=${this.hideFeature(TURN_OFF)}       .path=${mdiPower} label="Turn Off" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" style=${this.styleIcon(true)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(true)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(DEVICES)}        hide=${this.hideFeature(DEVICES)}        .path=${mdiSpeaker} label="Devices" style=${this.styleIcon()}></ha-icon-button>
           </div>
       </div>
@@ -134,57 +132,93 @@ class PlayerControls extends AlertUpdatesBase {
    * */
   static get styles() {
     return css`
-      .player-controls-container {
-        max-width: var(--crm-player-controls-max-width, 40rem);
-        text-align: center;
-        overflow: hidden auto;
+      :host {
+        display: block;
+        min-width: 0;
+        width: 100%;
         box-sizing: border-box;
-        /* border: 1px solid red;  /*  FOR TESTING CONTROL LAYOUT CHANGES */
+      }
+
+      .player-controls-container,
+      .player-volume-container {
+        width: 100%;
+        max-width: var(--crm-player-controls-max-width, 40rem);
+        min-width: 0;
+        box-sizing: border-box;
+        text-align: center;
+      }
+
+      .player-controls-container {
         display: flex;
         align-items: center;
         justify-content: center;
       }
 
-      .player-volume-container {
-        max-width: var(--crm-player-controls-max-width, 40rem);
-        text-align: center;
-        overflow: hidden auto;
-        box-sizing: border-box;
-        /* border: 1px solid blue;  /*  FOR TESTING CONTROL LAYOUT CHANGES */
-      }
-
-      .icons {
-        display: inline-flex;
-        align-items: center;
-        justify-content: var(--crm-player-controls-icon-justify-content, center);
-        overflow: hidden;
-        color: var(--crm-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: 36px;
-        --mdc-icon-size: 22px;
-        mix-blend-mode: normal;
-        width: 100%;
-      }
-
+      .icons,
       .iconsPower {
         display: inline-flex;
         align-items: center;
         justify-content: var(--crm-player-controls-icon-justify-content, center);
-        overflow: hidden;
-        color: var(--crm-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
+        gap: 2px;
+        min-width: 0;
+        max-width: 100%;
+        color: var(--crm-player-controls-icon-color, #edf7f0);
+        --ha-icon-button-size: 32px;
+        --mdc-icon-size: 20px;
         mix-blend-mode: normal;
-        width: 100%;
+      }
+
+      .icons > ha-icon-button,
+      .iconsPower > ha-icon-button {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        transition: background-color 160ms ease, transform 160ms ease;
+      }
+
+      .icons > ha-icon-button:hover,
+      .iconsPower > ha-icon-button:hover {
+        background-color: rgba(64, 217, 154, 0.12);
+      }
+
+      .icons > ha-icon-button:active,
+      .iconsPower > ha-icon-button:active {
+        transform: scale(0.94);
+      }
+
+      .icons > ha-icon-button.play-pause,
+      .iconsPower > ha-icon-button.play-pause {
+        background-color: #40d99a;
+        color: #102019 !important;
+        --ha-icon-button-size: 36px;
+        --mdc-icon-size: 22px;
+        margin: 0 3px;
+      }
+
+      .icons > ha-icon-button.play-pause:hover,
+      .iconsPower > ha-icon-button.play-pause:hover {
+        background-color: #67e9b2;
       }
 
       .iconsVolume {
-        display: inline;
-        align-items: center;
-        overflow: hidden;
-        color: var(--crm-player-controls-icon-color, #ffffff);
-        --ha-icon-button-size: var(--crm-player-controls-icon-button-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_BUTTON_SIZE_DEFAULT)});
-        --mdc-icon-size: var(--crm-player-controls-icon-size, ${unsafeCSS(PLAYER_CONTROLS_ICON_SIZE_DEFAULT)});
-        mix-blend-mode: normal;
+        display: block;
+        min-width: 0;
+        width: 100%;
+        color: var(--crm-player-controls-icon-color, #edf7f0);
+        --ha-icon-button-size: 32px;
+        --mdc-icon-size: 20px;
+      }
+
+      @media (max-width: 520px) {
+        .icons, .iconsPower {
+          gap: 0;
+          --ha-icon-button-size: 28px;
+          --mdc-icon-size: 18px;
+        }
+        .icons > ha-icon-button.play-pause,
+        .iconsPower > ha-icon-button.play-pause {
+          --ha-icon-button-size: 34px;
+          margin: 0 1px;
+        }
       }
 
       *[hide] {

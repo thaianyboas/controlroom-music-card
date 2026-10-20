@@ -4,8 +4,9 @@ import { DEBUG_APP_NAME } from '../constants';
 const debuglog = Debug(DEBUG_APP_NAME + ":device-browser");
 
 // lovelace card imports.
-import { html, PropertyValues, TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, html, PropertyValues, TemplateResult } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { mdiCogOutline, mdiSpeaker, mdiCellphone, mdiTelevision } from '@mdi/js';
 
 // our imports.
 import '../components/media-browser-list';
@@ -30,6 +31,137 @@ export class DeviceBrowser extends FavBrowserBase {
 
   /** True to refresh device list from real-time data; False to refresh from internal cache. */
   private refreshDeviceList?: boolean;
+
+  @state() private showDeviceSettings = false;
+  @state() private deviceVisibility: Record<string, boolean> = {};
+  private preferencesLoaded = false;
+
+  // Spotify Connect devices and HA media_player entities have different actions.
+  private spotifyKey(item: ISpotifyConnectDevice): string {
+    return `spotify:${item.Id || item.Name}`;
+  }
+
+  private haKey(entityId: string): string {
+    return `ha:${entityId}`;
+  }
+
+  private get visibilityStorageKey(): string {
+    const account = this.player?.attributes?.sp_user_id || 'default';
+    return `controlroom_devices_visibility_${account}`;
+  }
+
+  private loadVisibility(): void {
+    if (this.preferencesLoaded) return;
+    this.preferencesLoaded = true;
+    try {
+      const stored = localStorage.getItem(this.visibilityStorageKey);
+      this.deviceVisibility = stored ? JSON.parse(stored) : {};
+    } catch {
+      this.deviceVisibility = {};
+    }
+  }
+
+  private isVisible(key: string, defaultValue: boolean): boolean {
+    return this.deviceVisibility[key] ?? defaultValue;
+  }
+
+  private toggleVisibility(key: string, checked: boolean): void {
+    this.deviceVisibility = { ...this.deviceVisibility, [key]: checked };
+    try {
+      localStorage.setItem(this.visibilityStorageKey, JSON.stringify(this.deviceVisibility));
+    } catch {
+      this.alertErrorSet('Could not save device preferences in this browser.');
+    }
+  }
+
+  private getHaPlayers(): Array<{ id: string; name: string; state: string }> {
+    const states = this.hass?.states || {};
+    return Object.keys(states)
+      .filter(id => id.startsWith('media_player.'))
+      .map(id => ({
+        id,
+        name: String(states[id]?.attributes?.friendly_name || id),
+        state: String(states[id]?.state || 'unknown'),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  private showHaMoreInfo(entityId: string): void {
+    this.dispatchEvent(new CustomEvent('hass-more-info', {
+      bubbles: true,
+      composed: true,
+      detail: { entityId },
+    }));
+  }
+
+  private renderHaPlayers(filterName: string) {
+    return this.getHaPlayers()
+      .filter(item => this.isVisible(this.haKey(item.id), false))
+      .filter(item => item.name.toLocaleLowerCase().includes(filterName))
+      .map(item => html`
+        <button class="crm-ha-device" @click=${() => this.showHaMoreInfo(item.id)}>
+          <ha-svg-icon .path=${item.id.includes('tv') ? mdiTelevision : item.id.includes('phone') || item.id.includes('iphone') || item.id.includes('handy') ? mdiCellphone : mdiSpeaker}></ha-svg-icon>
+          <span class="crm-ha-device-text">
+            <strong>${item.name}</strong>
+            <small>Home Assistant · ${item.state}</small>
+          </span>
+        </button>
+      `);
+  }
+
+  private renderDeviceSettings() {
+    return html`
+      <div class="crm-device-settings">
+        <div class="crm-settings-title">Sichtbare Geräte auswählen</div>
+        <div class="crm-settings-hint">Spotify Connect-Geräte können die Wiedergabe übernehmen. Andere Home Assistant-Mediaplayer öffnen ihre eigene Steuerung.</div>
+        <div class="crm-settings-subtitle">Spotify Connect</div>
+        ${(this.mediaList || []).map(item => html`
+          <label class="crm-device-option">
+            <input type="checkbox"
+              .checked=${this.isVisible(this.spotifyKey(item), true)}
+              @change=${(ev: Event) => this.toggleVisibility(this.spotifyKey(item), (ev.target as HTMLInputElement).checked)}>
+            <span><strong>${item.Name}</strong><small>${item.Id || 'Spotify Connect'}</small></span>
+          </label>
+        `)}
+        <div class="crm-settings-subtitle">Home Assistant · media_player</div>
+        ${this.getHaPlayers().map(item => html`
+          <label class="crm-device-option">
+            <input type="checkbox"
+              .checked=${this.isVisible(this.haKey(item.id), false)}
+              @change=${(ev: Event) => this.toggleVisibility(this.haKey(item.id), (ev.target as HTMLInputElement).checked)}>
+            <span><strong>${item.name}</strong><small>${item.id} · ${item.state}</small></span>
+          </label>
+        `)}
+        <button class="crm-settings-done" @click=${() => this.showDeviceSettings = false}>Fertig</button>
+      </div>
+    `;
+  }
+
+  static override get styles() {
+    return [
+      ...super.styles,
+      css`
+        .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:#40d99a; cursor:pointer; }
+        .crm-settings-button ha-svg-icon { width:23px; height:23px; }
+        .crm-device-settings { padding: 12px; color:#f0f8f2; max-width:100%; box-sizing:border-box; overflow:auto; }
+        .crm-settings-title { font-weight:700; margin-bottom:6px; }
+        .crm-settings-hint { font-size:12px; color:#a8baaf; margin-bottom:14px; }
+        .crm-settings-subtitle { color:#40d99a; font-weight:600; margin:14px 0 8px; }
+        .crm-device-option { display:flex; align-items:center; gap:12px; padding:9px 4px; cursor:pointer; border-bottom:1px solid #23372d; min-width:0; }
+        .crm-device-option input { accent-color:#40d99a; width:18px; height:18px; flex-shrink:0; }
+        .crm-device-option span { min-width:0; display:flex; flex-direction:column; gap:3px; }
+        .crm-device-option strong { font-size:13px; font-weight:500; overflow-wrap:anywhere; }
+        .crm-device-option small { font-size:11px; color:#a8baaf; overflow-wrap:anywhere; }
+        .crm-settings-done { margin-top:16px; padding:10px 18px; border:0; border-radius:8px; background:#40d99a; color:#102019; font-weight:700; cursor:pointer; }
+        .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:#f0f8f2; border:0; text-align:left; cursor:pointer; }
+        .crm-ha-device ha-svg-icon { color:#40d99a; width:22px; height:22px; flex-shrink:0; }
+        .crm-ha-device-text { min-width:0; display:flex; flex-direction:column; gap:3px; }
+        .crm-ha-device-text strong { font-size:14px; font-weight:500; }
+        .crm-ha-device-text small { font-size:11px; }
+      `
+    ];
+  }
+
 
 
   /**
@@ -58,8 +190,10 @@ export class DeviceBrowser extends FavBrowserBase {
     let filteredItems: Array<ISpotifyConnectDevice> | undefined;
     if (!this.isActionsVisible) {
       const filterName = (this.filterCriteria || "").toLocaleLowerCase();
-      filteredItems = this.mediaList?.filter((item: ISpotifyConnectDevice) => (item.Name.toLocaleLowerCase().indexOf(filterName) !== -1));
-      this.filterItemCount = filteredItems?.length;
+      filteredItems = (this.mediaList || [])
+        .filter(item => this.isVisible(this.spotifyKey(item), true))
+        .filter(item => (item.Name || '').toLocaleLowerCase().includes(filterName));
+      this.filterItemCount = filteredItems.length;
     }
 
     // format title and sub-title details.
@@ -79,10 +213,14 @@ export class DeviceBrowser extends FavBrowserBase {
         <div class="media-browser-controls">
           ${!(this.isActionsVisible || false) ? html`` : html`${this.btnHideActionsHtml}`}
           ${this.filterCriteriaHtml}${this.formatMediaListHtml}${this.refreshMediaListHtml}
+          <button class="crm-settings-button" title="Geräte auswählen" aria-label="Geräte auswählen" @click=${() => this.showDeviceSettings = !this.showDeviceSettings}>
+            <ha-svg-icon .path=${mdiCogOutline}></ha-svg-icon>
+          </button>
         </div>
         <div id="mediaBrowserContentElement" class="media-browser-content">
           ${this.alertError ? html`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>` : ""}
           ${this.alertInfo ? html`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>` : ""}
+          ${this.showDeviceSettings ? this.renderDeviceSettings() : html`
           ${(() => {
             // if actions are not visbile, then render the media list.
             if (!this.isActionsVisible) {
@@ -114,6 +252,8 @@ export class DeviceBrowser extends FavBrowserBase {
               return html`<crm-device-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-device-actions>`;
             }
           })()}  
+          ${!this.isActionsVisible ? this.renderHaPlayers((this.filterCriteria || '').toLocaleLowerCase()) : ''}
+          `}
         </div>
       </div>
     `;
@@ -138,6 +278,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super.firstUpdated(changedProperties);
+    this.loadVisibility();
   }
 
 

@@ -28,6 +28,7 @@ import { truncateMediaList } from '../utils/media-browser-utils';
 import { getHomeAssistantErrorMessage, isCardInEditPreview, loadHaFormLazyControls } from '../utils/utils';
 import { FilterSectionMediaEventArgs } from '../events/filter-section-media';
 import { AlertUpdatesBase } from './alert-updates-base';
+import { resolveLanguage, translate } from '../localization/i18n';
 
 /** Keys used to access cached storage items. */
 const CACHE_KEY_FILTER_CRITERIA = "_filtercriteria";
@@ -130,6 +131,15 @@ export class FavBrowserBase extends AlertUpdatesBase {
    * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
    * Setting properties inside this method will *not* trigger the element to update.
   */
+  /** Translate UI text using the existing ControlRoom dictionaries, with a safe fallback. */
+  private uiText(key: string, de: string, pt: string, en: string): string {
+    const haLanguage = (this.hass as any)?.locale?.language || this.hass?.language;
+    const translated = translate(key, 'auto', haLanguage);
+    if (translated !== key) return translated;
+    const language = resolveLanguage('auto', haLanguage);
+    return { de, pt, en }[language];
+  }
+
   protected render(): TemplateResult | void {
 
     if (debuglog.enabled) {
@@ -165,7 +175,9 @@ export class FavBrowserBase extends AlertUpdatesBase {
         .hass=${this.hass}
         .value=${this.filterCriteria || ""}
         .autofocus=${false}
-        .placeholder=${this.filterCriteriaPlaceholder || "search by name"}
+        .placeholder=${this.mediaType === Section.SEARCH_MEDIA
+          ? this.uiText("search.searchByName", "Nach Namen suchen", "Pesquisar por nome", "Search by name")
+          : (this.filterCriteriaPlaceholder || this.uiText("search.searchByName", "Nach Namen suchen", "Pesquisar por nome", "Search by name"))}
         @input=${this.onFilterCriteriaChange}
         @keypress=${this.onFilterCriteriaKeyPress}
       ></ha-input-search>
@@ -182,7 +194,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
     this.refreshMediaListHtml = html`
       <ha-icon-button
         slot="refresh-button"
-        label="Refresh Media List"
+        .label=${this.uiText("search.refresh", "Liste aktualisieren", "Atualizar lista", "Refresh media list")}
         action="refresh"
         .path=${mdiRefresh}
         @click=${this.onFilterActionsClick}
@@ -195,7 +207,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
       <ha-button-menu y="0" x="-180" style="display:none">
         <ha-icon-button
           slot="trigger"
-          label="Format Media List"
+          .label=${this.uiText("search.formatList", "Listenformat", "Formato da lista", "Format media list")}
           .path=${mdiFormatColumns}
         ></ha-icon-button>
         <div style="width:220px; padding:10px; border:1px solid var(--ha-card-border-color,var(--divider-color,#e0e0e0))">
@@ -217,7 +229,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
       <ha-icon-button
         style="margin-right: 0.25rem;"
         slot="back-button"
-        label="Back to Media List"
+        .label=${this.uiText("search.back", "Zurück zur Liste", "Voltar à lista", "Back to media list")}
         action="hideactions"
         .path=${mdiArrowLeft}
         @click=${this.onFilterActionsClick}
@@ -611,7 +623,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
 
     // do not display actions if editing card configuration.
     if (this.isCardInEditPreview) {
-      this.alertInfo = "Cannot display actions while editing card configuration";
+      this.alertInfo = this.uiText("search.actionsUnavailable", "Aktionen sind während der Kartenbearbeitung nicht verfügbar", "Ações indisponíveis durante a edição do cartão", "Cannot display actions while editing card configuration");
       return;
     }
 
@@ -716,7 +728,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
     catch (error) {
 
       // set error message and reset scroll position to zero so the message is displayed.
-      this.alertErrorSet("Could not play media item.  " + getHomeAssistantErrorMessage(error));
+      this.alertErrorSet(this.uiText("search.playFailed", "Medium konnte nicht abgespielt werden. ", "Não foi possível reproduzir o item. ", "Could not play media item. ") + getHomeAssistantErrorMessage(error));
       this.mediaBrowserContentElement.scrollTop = 0;
 
     }
@@ -745,14 +757,14 @@ export class FavBrowserBase extends AlertUpdatesBase {
       await this.spotifyPlusService.AddPlayerQueueItems(this.player, mediaItem.uri);
 
       // set info message and reset scroll position to zero so the message is displayed.
-      this.alertInfo = "Item added to play queue: \"" + mediaItem.name + "\".";
+      this.alertInfo = this.uiText("search.addedToQueue", "Zur Warteschlange hinzugefügt", "Adicionado à fila", "Added to queue") + ": \"" + mediaItem.name + "\".";
       this.mediaBrowserContentElement.scrollTop = 0;
 
     }
     catch (error) {
 
       // set error message and reset scroll position to zero so the message is displayed.
-      this.alertErrorSet("Could not queue media item.  " + getHomeAssistantErrorMessage(error));
+      this.alertErrorSet(this.uiText("search.queueFailed", "Element konnte nicht zur Warteschlange hinzugefügt werden. ", "Não foi possível adicionar à fila. ", "Could not queue media item. ") + getHomeAssistantErrorMessage(error));
       this.mediaBrowserContentElement.scrollTop = 0;
 
     }
@@ -834,14 +846,14 @@ export class FavBrowserBase extends AlertUpdatesBase {
     if (!this.isUpdateInProgress) {
       this.isUpdateInProgress = true;
     } else {
-      this.alertErrorSet(ERROR_REFRESH_IN_PROGRESS);
+      this.alertErrorSet(this.uiText("search.refreshInProgress", "Aktualisierung läuft bereits – bitte warten", "Atualização em andamento — aguarde", ERROR_REFRESH_IN_PROGRESS));
       return false;
     }
 
     // if player reference not set then we are done.
     if (!player) {
       this.isUpdateInProgress = false;
-      this.alertErrorSet("Player reference not set in updateMediaList");
+      this.alertErrorSet(this.uiText("search.playerMissing", "Player nicht konfiguriert", "Reprodutor não configurado", "Player not configured"));
       return false;
     }
 
@@ -892,7 +904,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
 
     // if no items then update status.
     if ((this.mediaList) && (this.mediaList.length == 0)) {
-      this.alertInfo = "No items found";
+      this.alertInfo = this.uiText("search.noItems", "Keine Einträge gefunden", "Nenhum item encontrado", "No items found");
     }
 
     // cache media list parameters and results.
@@ -934,7 +946,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
     }
 
     // set alert status text.
-    this.alertErrorSet(alertErrorMessage || "Unknown Error");
+    this.alertErrorSet(alertErrorMessage || this.uiText("search.unknownError", "Unbekannter Fehler", "Erro desconhecido", "Unknown error"));
 
   }
 
