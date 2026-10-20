@@ -138,15 +138,25 @@ export class Footer extends LitElement {
    */
   static get styles() {
     return css`
-      :host > * {
-        color: var(--crm-footer-icon-color, inherit);
+      :host > ha-icon-button {
+        color: #e5f5ee;
+        --primary-color: #40d99a;
+        --mdc-theme-primary: #40d99a;
+        --ha-icon-button-selected-color: #40d99a;
+        --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.14);
+        border-radius: 50%;
       }
 
-      :host > *[selected] {
-        color: var(--crm-footer-icon-color-selected, var(--dark-primary-color));
+      :host > ha-icon-button[selected] {
+        color: #40d99a !important;
+        background-color: rgba(64, 217, 154, 0.12);
+        --primary-color: #40d99a;
+        --mdc-theme-primary: #40d99a;
+        --ha-icon-button-selected-color: #40d99a;
+        --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.12);
       }
 
-      :host > *[hide] {
+      :host > ha-icon-button[hide] {
         display: none;
       }
     `;

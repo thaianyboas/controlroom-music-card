@@ -213,8 +213,8 @@ export class Player extends AlertUpdatesBase {
       .player-bottom {
         margin-top: auto;
         display: flex;
-        align-items: center;
-        gap: 14px;
+        align-items: flex-end;
+        gap: 10px;
         width: 100%;
         min-width: 0;
       }
@@ -231,6 +231,8 @@ export class Player extends AlertUpdatesBase {
         flex: 1 1 110px;
         min-width: 80px;
         max-width: 260px;
+        align-self: flex-end;
+        padding-bottom: 1px;
       }
       .player-progress-wrap crm-player-progress {
         display: block;
@@ -243,24 +245,75 @@ export class Player extends AlertUpdatesBase {
         background: rgba(185, 218, 200, .25);
       }
 
-      @media (max-width: 520px) {
+      /* Mobile: controls and timeline use separate rows instead of widening the dashboard. */
+      @media (max-width: 600px) {
+        :host {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+        }
         .player-section-container {
-          min-height: 205px;
-          padding: 16px;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          min-height: 225px;
+          padding: 15px 14px;
           border-radius: 17px;
         }
-        .player-content { min-height: 171px; gap: 12px; }
-        .player-artwork { inset: 0 0 0 28%; }
+        .player-content {
+          width: 100%;
+          min-width: 0;
+          min-height: 193px;
+          gap: 12px;
+        }
+        .player-artwork { inset: 0 0 0 26%; }
         .player-artwork-overlay {
           background: linear-gradient(90deg,
             #101b19 0%, rgba(16,27,25,.98) 35%,
-            rgba(16,27,25,.73) 68%, rgba(16,27,25,.24) 100%);
+            rgba(16,27,25,.78) 68%, rgba(16,27,25,.28) 100%);
         }
-        .player-info { max-width: 78%; }
-        .player-title { font-size: 20px; }
+        .player-info { max-width: 88%; }
+        .player-title { font-size: 19px; }
         .player-artist { font-size: 12px; }
-        .player-bottom { flex-wrap: wrap; gap: 4px; }
-        .player-progress-wrap { flex-basis: 100%; max-width: 100%; }
+        .player-bottom {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 7px;
+          min-width: 0;
+          width: 100%;
+        }
+        .player-section-controls {
+          display: block;
+          flex: 0 0 auto;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+          overflow-x: auto;
+          overflow-y: hidden;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+          --crm-player-controls-icon-size: 21px;
+          --crm-player-controls-icon-button-size: 31px;
+        }
+        .player-section-controls::-webkit-scrollbar { display: none; }
+        .player-progress-wrap {
+          display: block;
+          flex: 0 0 auto;
+          width: 100%;
+          min-width: 0;
+          max-width: 100%;
+          box-sizing: border-box;
+          align-self: stretch;
+          padding-bottom: 0;
+        }
+        .player-progress-wrap crm-player-progress {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
       }
     `;
   }

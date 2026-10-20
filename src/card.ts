@@ -84,7 +84,7 @@ import { formatTitleInfo, removeSpecialChars } from './utils/media-browser-utils
 const HEADER_HEIGHT = 2;
 const FOOTER_HEIGHT = 4;
 const CARD_DEFAULT_HEIGHT = '35.15rem';
-const CARD_DEFAULT_WIDTH = '35.15rem';
+const CARD_DEFAULT_WIDTH = '100%';
 const CARD_EDIT_PREVIEW_HEIGHT = '42rem';
 const CARD_EDIT_PREVIEW_WIDTH = '100%';
 const CARD_PICK_PREVIEW_HEIGHT = '100%';
@@ -283,6 +283,9 @@ export class Card extends AlertUpdatesBase {
       :host {
         display: block;
         width: 100% !important;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         height: auto;
       }
 
@@ -326,8 +329,9 @@ export class Card extends AlertUpdatesBase {
         flex-direction: column;
         overflow: hidden;
         height: calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height));
-        min-width: 20rem;
-        width: calc(100vw - var(--mdc-drawer-width));
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
         color: var(--crm-text);
         background: linear-gradient(145deg, var(--crm-background) 0%, var(--crm-background-secondary) 100%);
         border: 1px solid rgba(52, 211, 153, 0.16);
@@ -360,11 +364,14 @@ export class Card extends AlertUpdatesBase {
 
       .crm-card-footer-container {
         width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         display: flex;
         align-items: center;
         background-repeat: no-repeat;
-        background-color: var(--crm-footer-background-color, var(--crm-player-footer-bg-color, var(--card-background-color, transparent)));
-        background-image: var(--crm-footer-background-image, linear-gradient(rgba(0, 0, 0, 0.6), rgb(0, 0, 0)));
+        background: #101b19 !important;
+        background-image: none !important;
+        border-top: 1px solid rgba(64, 217, 154, 0.12);
       }
 
       .crm-card-footer {
@@ -373,13 +380,29 @@ export class Card extends AlertUpdatesBase {
         align-self: flex-start;
         align-items: center;
         justify-content: space-around;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        min-width: 0;
         width: 100%;
+        gap: 0;
         --ha-icon-button-size: var(--crm-footer-icon-button-size, 2.5rem);
         --mdc-icon-size: var(--crm-footer-icon-size, 1.75rem);
         --mdc-ripple-top: 0px;
         --mdc-ripple-left: 0px;
         --mdc-ripple-fg-size: 10px;
+      }
+
+      /* Keep footer controls inside narrow dashboard columns. */
+      .crm-card-footer > * {
+        flex: 0 1 auto;
+        min-width: 0;
+      }
+
+      @media (max-width: 480px) {
+        .crm-card-footer {
+          margin: 0.1rem 0;
+          --ha-icon-button-size: 2.25rem;
+          --mdc-icon-size: 1.35rem;
+        }
       }
 
       .crm-loader {
@@ -1286,10 +1309,13 @@ export class Card extends AlertUpdatesBase {
     if (this.config.width == 'fill') {
       styleInfo['width'] = '100%';
     } else if (isNumber(String(this.config.width))) {
-      styleInfo['width'] = String(this.config.width) + 'rem';
+      styleInfo['width'] = `min(100%, ${String(this.config.width)}rem)`;
     } else {
       styleInfo['width'] = CARD_DEFAULT_WIDTH;
     }
+
+    styleInfo['max-width'] = '100%';
+    styleInfo['min-width'] = '0';
 
     // set card height based on configuration.
     // - if 'fill', then use 100% of the vertical space.
