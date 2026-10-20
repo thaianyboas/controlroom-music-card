@@ -3196,7 +3196,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
       .icons > ha-icon-button.play-pause,
       .iconsPower > ha-icon-button.play-pause {
-        background-color: #40d99a;
+        background-color: var(--crm-accent, #40d99a);
         color: #102019 !important;
         --ha-icon-button-size: 36px;
         --mdc-icon-size: 22px;
@@ -3440,14 +3440,14 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         display: flex;
         align-items: center;
         gap: 9px;
-        color: #d7e9df;
+        color: var(--crm-player-secondary-text, #d7e9df);
         font-size: 13px;
         font-weight: 500;
         min-width: 0;
       }
       .player-source ha-icon {
         --mdc-icon-size: 19px;
-        color: #40d99a;
+        color: var(--crm-accent, #40d99a);
       }
       .player-source span:nth-child(2) {
         overflow: hidden;
@@ -3459,7 +3459,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #40d99a;
+        background: var(--crm-accent, #40d99a);
       }
       .source-indicator.offline { background: #778c82; }
 
@@ -3468,7 +3468,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         max-width: 67%;
       }
       .player-title {
-        color: #f7fff9;
+        color: var(--crm-text, #f7fff9);
         font-size: clamp(19px, 2.6vw, 26px);
         font-weight: 650;
         line-height: 1.2;
@@ -3478,7 +3478,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       }
       .player-artist {
         margin-top: 5px;
-        color: #b5c9bd;
+        color: var(--crm-player-secondary-text, #b5c9bd);
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -3500,8 +3500,8 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         min-width: 0;
         max-width: 100%;
         background: transparent;
-        --crm-player-controls-icon-color: #f0fdf4;
-        --crm-player-controls-icon-toggle-color: #40d99a;
+        --crm-player-controls-icon-color: var(--crm-text, #f0fdf4);
+        --crm-player-controls-icon-toggle-color: var(--crm-accent, #40d99a);
       }
       .player-progress-wrap {
         flex: 1 1 110px;
@@ -3513,7 +3513,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       .player-progress-wrap crm-player-progress {
         display: block;
         width: 100%;
-        --crm-player-progress-slider-color: #40d99a;
+        --crm-player-progress-slider-color: var(--crm-accent, #40d99a);
       }
       .idle-progress {
         height: 4px;
@@ -3593,7 +3593,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           min-width: 0;
         }
       }
-    `}stylePlayerSection(){const e={},t=this.player.isPoweredOffOrUnknown(),i=this.player.isIdle();let s,r=!1;const o=this.config.customImageUrls?.default,a=this.config.customImageUrls?.playerBackground,n=this.config.customImageUrls?.playerIdleBackground,l=this.config.customImageUrls?.playerOffBackground;let d,c;this.store.player&&(d=this.store.player.attributes.media_content_id,c=this.store.player.attributes.entity_picture||this.store.player.attributes.entity_picture_local,c&&(c=this.store.hass.hassUrl(c))),this.config.playerBackgroundImageSize?e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`:"fill"==this.config.width&&(e["--crm-player-background-size-default"]="contain");const h=this.config.playerControlsMaxWidth;h&&(e["--crm-player-controls-max-width"]=`${h}`);const u=this.config.playerControlsIconJustifyContent;u&&(e["--crm-player-controls-icon-justify-content"]=`${u}`),t?(this.store.card.playerMediaContentId="configImagePlayerBgOff","none"==(l||"").toLowerCase()?e["background-image"]=void 0:l?(e["background-image"]=`url(${l})`,s=l):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${pe}))`,e["--crm-player-background-size-default"]=`${me}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):i?(this.store.card.playerMediaContentId="configImagePlayerBgIdle","none"==(n||"").toLowerCase()?e["background-image"]=void 0:n?(e["background-image"]=`url(${n})`,s=n):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${pe}))`,e["--crm-player-background-size-default"]=`${me}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):a?(this.store.card.playerMediaContentId="configImagePlayerBg","none"==(a||"").toLowerCase()?e["background-image"]=void 0:a&&(e["background-image"]=`url(${a})`,s=a)):c?(this.store.card.playerMediaContentId=d,s=c,e["background-image"]=`var(--crm-player-background-image, url(${c}))`):o?(this.store.card.playerMediaContentId="configImageDefault",s=o,e["background-image"]=`url(${o}`):(this.store.card.playerMediaContentId="BRAND_LOGO_IMAGE_BASE64",this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${pe}))`,e["--crm-player-background-size-default"]=`${me}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`));let p=this.config.playerControlsBackgroundColor;const m=this.config.playerControlsColor,g=this.config.playerControlsIconSize;let v=this.config.playerControlsIconColor;const f=this.config.playerControlsIconToggleColor;let b=this.config.playerHeaderBackgroundColor,y=this.config.playerHeaderTitle1Color;const A=this.config.playerHeaderTitle1FontSize;let w=this.config.playerHeaderTitle2Color;const S=this.config.playerHeaderTitle2FontSize;let C=this.config.playerHeaderTitle3Color;const I=this.config.playerHeaderTitle3FontSize,k=this.config.playerMinimizedTitleColor,T=this.config.playerMinimizedTitleFontSize,$=this.config.playerProgressSliderColor,x=this.config.playerProgressLabelColor,E=this.config.playerProgressLabelFontSize,P=this.config.playerProgressLabelPaddingLR,_=this.config.playerVolumeSliderColor,R=this.config.playerVolumeSliderThickness;let L=this.config.playerVolumeLabelColor;const F=this.config.playerVolumeLabelFontSize;r&&(p=p||"transparent",v=v||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",b=b||"transparent",y=y||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",w=w||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",C=C||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",L=L||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)"),this.store.card.playerImage=s,p&&(e["--crm-player-controls-bg-color"]=`${p} `),m&&(e["--crm-player-controls-color"]=`${m}`),f&&(e["--crm-player-controls-icon-toggle-color"]=`${f}`),v&&(e["--crm-player-controls-icon-color"]=`${v}`),g&&(e["--crm-player-controls-icon-size"]=`${g}`,e["--crm-player-controls-icon-button-size"]=`var(--crm-player-controls-icon-size, ${g})`),b&&(e["--crm-player-header-bg-color"]=`${b}`),y&&(e["--crm-player-header-title1-color"]=`${y}`),A&&(e["--crm-player-header-title1-font-size"]=`${A}`),w&&(e["--crm-player-header-title2-color"]=`${w}`),S&&(e["--crm-player-header-title2-font-size"]=`${S}`),C&&(e["--crm-player-header-title3-color"]=`${C}`),I&&(e["--crm-player-header-title3-font-size"]=`${I}`),k&&(e["--crm-player-minimized-title-color"]=`${k}`),T&&(e["--crm-player-minimized-title-font-size"]=`${T}`),x&&(e["--crm-player-progress-label-color"]=`${x}`),E&&(e["--crm-player-progress-label-font-size"]=`${E}`),P&&(e["--crm-player-progress-label-padding-lr"]=`${P}`),$&&(e["--crm-player-progress-slider-color"]=`${$}`),L&&(e["--crm-player-volume-label-color"]=`${L}`),F&&(e["--crm-player-volume-label-font-size"]=`${F}`),_&&(e["--crm-player-volume-slider-color"]=`${_}`),R&&(e["--crm-player-volume-slider-thickness"]=`${R}`);const O=this.store.config.crmTheme??"dark",M="dark"===O||"auto"===O&&!1!==this.store.hass?.themes?.darkMode,H="custom"===O,B=H?this.store.config.crmText||"#f0fdf4":M?"#f0fdf4":"#183329",V=H?this.store.config.crmAccent||"#34d399":M?"#40d99a":"#16875c",U=M?"#a6b7af":"#657a70";return e["--crm-player-controls-color"]=B,e["--crm-player-controls-icon-color"]=B,e["--crm-player-controls-icon-toggle-color"]=V,e["--crm-player-progress-slider-color"]=V,e["--crm-player-progress-label-color"]=U,e["--crm-player-volume-slider-color"]=V,e["--crm-player-volume-label-color"]=U,e["--crm-player-header-title1-color"]=B,e["--crm-player-header-title2-color"]=B,e["--crm-player-header-title3-color"]=U,e["--crm-player-header-bg-color"]="transparent",e["--crm-player-controls-bg-color"]="transparent",Me(e)}stylePlayerControls(){const e={};return this.config.playerControlsHide&&(e.display="none"),this.config.playerMinimizeOnIdle&&this.store.player.isPoweredOffOrIdle()&&"fill"!=this.config.height&&(e["justify-items"]="flex-start",e["padding-left"]="0px"),Me(e)}};Ce([Ve({attribute:!1})],jr.prototype,"mediaContentId",void 0),Ce([Ue()],jr.prototype,"config",void 0),jr=Ce([He("crm-player")],jr);let Yr=class extends qs{constructor(){super(Yt.PLAYLIST_FAVORITES)}render(){const e=je("auto",this.store.hass?.locale?.language||this.store.hass?.language);let t;if(this.filterCriteriaPlaceholder={de:"Nach Playlistnamen filtern",pt:"Filtrar por nome da playlist",en:"Filter by playlist name"}[e],super.render(),!this.isActionsVisible){const e=(this.filterCriteria||"").toLocaleLowerCase();t=this.mediaList?.filter(t=>-1!==t.name.toLocaleLowerCase().indexOf(e)),this.filterItemCount=t?.length}const i=bi(this.config.playlistFavBrowserTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,t),s=bi(this.config.playlistFavBrowserSubTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,t);return this.shuffleOnPlay=this.config.playlistFavBrowserShuffleOnPlay||!1,this.favBrowserItemsPerRow||(this.favBrowserItemsPerRow=this.config.playlistFavBrowserItemsPerRow||4),B`
+    `}stylePlayerSection(){const e={},t=this.player.isPoweredOffOrUnknown(),i=this.player.isIdle();let s,r=!1;const o=this.config.customImageUrls?.default,a=this.config.customImageUrls?.playerBackground,n=this.config.customImageUrls?.playerIdleBackground,l=this.config.customImageUrls?.playerOffBackground;let d,c;this.store.player&&(d=this.store.player.attributes.media_content_id,c=this.store.player.attributes.entity_picture||this.store.player.attributes.entity_picture_local,c&&(c=this.store.hass.hassUrl(c))),this.config.playerBackgroundImageSize?e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`:"fill"==this.config.width&&(e["--crm-player-background-size-default"]="contain");const h=this.config.playerControlsMaxWidth;h&&(e["--crm-player-controls-max-width"]=`${h}`);const u=this.config.playerControlsIconJustifyContent;u&&(e["--crm-player-controls-icon-justify-content"]=`${u}`),t?(this.store.card.playerMediaContentId="configImagePlayerBgOff","none"==(l||"").toLowerCase()?e["background-image"]=void 0:l?(e["background-image"]=`url(${l})`,s=l):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${pe}))`,e["--crm-player-background-size-default"]=`${me}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):i?(this.store.card.playerMediaContentId="configImagePlayerBgIdle","none"==(n||"").toLowerCase()?e["background-image"]=void 0:n?(e["background-image"]=`url(${n})`,s=n):this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${pe}))`,e["--crm-player-background-size-default"]=`${me}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`)):a?(this.store.card.playerMediaContentId="configImagePlayerBg","none"==(a||"").toLowerCase()?e["background-image"]=void 0:a&&(e["background-image"]=`url(${a})`,s=a)):c?(this.store.card.playerMediaContentId=d,s=c,e["background-image"]=`var(--crm-player-background-image, url(${c}))`):o?(this.store.card.playerMediaContentId="configImageDefault",s=o,e["background-image"]=`url(${o}`):(this.store.card.playerMediaContentId="BRAND_LOGO_IMAGE_BASE64",this.config.playerMinimizeOnIdle?e["background-image"]="var(--crm-player-background-image-off)":(e["background-image"]=`var(--crm-player-background-image-off, url(${pe}))`,e["--crm-player-background-size-default"]=`${me}`,r=!0),this.config.playerBackgroundImageSize&&(e["--crm-player-background-size"]=`${this.config.playerBackgroundImageSize}`));let p=this.config.playerControlsBackgroundColor;const m=this.config.playerControlsColor,g=this.config.playerControlsIconSize;let v=this.config.playerControlsIconColor;const f=this.config.playerControlsIconToggleColor;let b=this.config.playerHeaderBackgroundColor,y=this.config.playerHeaderTitle1Color;const A=this.config.playerHeaderTitle1FontSize;let w=this.config.playerHeaderTitle2Color;const S=this.config.playerHeaderTitle2FontSize;let C=this.config.playerHeaderTitle3Color;const I=this.config.playerHeaderTitle3FontSize,k=this.config.playerMinimizedTitleColor,T=this.config.playerMinimizedTitleFontSize,$=this.config.playerProgressSliderColor,x=this.config.playerProgressLabelColor,E=this.config.playerProgressLabelFontSize,P=this.config.playerProgressLabelPaddingLR,_=this.config.playerVolumeSliderColor,R=this.config.playerVolumeSliderThickness;let L=this.config.playerVolumeLabelColor;const F=this.config.playerVolumeLabelFontSize;r&&(p=p||"transparent",v=v||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",b=b||"transparent",y=y||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",w=w||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",C=C||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)",L=L||"var(--primary-text-color, PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT)"),this.store.card.playerImage=s,p&&(e["--crm-player-controls-bg-color"]=`${p} `),m&&(e["--crm-player-controls-color"]=`${m}`),f&&(e["--crm-player-controls-icon-toggle-color"]=`${f}`),v&&(e["--crm-player-controls-icon-color"]=`${v}`),g&&(e["--crm-player-controls-icon-size"]=`${g}`,e["--crm-player-controls-icon-button-size"]=`var(--crm-player-controls-icon-size, ${g})`),b&&(e["--crm-player-header-bg-color"]=`${b}`),y&&(e["--crm-player-header-title1-color"]=`${y}`),A&&(e["--crm-player-header-title1-font-size"]=`${A}`),w&&(e["--crm-player-header-title2-color"]=`${w}`),S&&(e["--crm-player-header-title2-font-size"]=`${S}`),C&&(e["--crm-player-header-title3-color"]=`${C}`),I&&(e["--crm-player-header-title3-font-size"]=`${I}`),k&&(e["--crm-player-minimized-title-color"]=`${k}`),T&&(e["--crm-player-minimized-title-font-size"]=`${T}`),x&&(e["--crm-player-progress-label-color"]=`${x}`),E&&(e["--crm-player-progress-label-font-size"]=`${E}`),P&&(e["--crm-player-progress-label-padding-lr"]=`${P}`),$&&(e["--crm-player-progress-slider-color"]=`${$}`),L&&(e["--crm-player-volume-label-color"]=`${L}`),F&&(e["--crm-player-volume-label-font-size"]=`${F}`),_&&(e["--crm-player-volume-slider-color"]=`${_}`),R&&(e["--crm-player-volume-slider-thickness"]=`${R}`);const O=this.store.config.crmTheme??"dark",M="dark"===O||"auto"===O&&!1!==this.store.hass?.themes?.darkMode,H="custom"===O,B=H?this.store.config.crmText||"#f0fdf4":M?"#f0fdf4":"#183329",V=H?this.store.config.crmAccent||"#34d399":M?"#40d99a":"#16875c",U=M?"#a6b7af":"#657a70";return e["--crm-player-secondary-text"]=H?B:M?"#b5c9bd":"#657a70",e["--crm-player-controls-color"]=B,e["--crm-player-controls-icon-color"]=B,e["--crm-player-controls-icon-toggle-color"]=V,e["--crm-player-progress-slider-color"]=V,e["--crm-player-progress-label-color"]=U,e["--crm-player-volume-slider-color"]=V,e["--crm-player-volume-label-color"]=U,e["--crm-player-header-title1-color"]=B,e["--crm-player-header-title2-color"]=B,e["--crm-player-header-title3-color"]=U,e["--crm-player-header-bg-color"]="transparent",e["--crm-player-controls-bg-color"]="transparent",Me(e)}stylePlayerControls(){const e={};return this.config.playerControlsHide&&(e.display="none"),this.config.playerMinimizeOnIdle&&this.store.player.isPoweredOffOrIdle()&&"fill"!=this.config.height&&(e["justify-items"]="flex-start",e["padding-left"]="0px"),Me(e)}};Ce([Ve({attribute:!1})],jr.prototype,"mediaContentId",void 0),Ce([Ue()],jr.prototype,"config",void 0),jr=Ce([He("crm-player")],jr);let Yr=class extends qs{constructor(){super(Yt.PLAYLIST_FAVORITES)}render(){const e=je("auto",this.store.hass?.locale?.language||this.store.hass?.language);let t;if(this.filterCriteriaPlaceholder={de:"Nach Playlistnamen filtern",pt:"Filtrar por nome da playlist",en:"Filter by playlist name"}[e],super.render(),!this.isActionsVisible){const e=(this.filterCriteria||"").toLocaleLowerCase();t=this.mediaList?.filter(t=>-1!==t.name.toLocaleLowerCase().indexOf(e)),this.filterItemCount=t?.length}const i=bi(this.config.playlistFavBrowserTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,t),s=bi(this.config.playlistFavBrowserSubTitle,this.config,this.player,this.mediaListLastUpdatedOn,this.mediaList,t);return this.shuffleOnPlay=this.config.playlistFavBrowserShuffleOnPlay||!1,this.favBrowserItemsPerRow||(this.favBrowserItemsPerRow=this.config.playlistFavBrowserItemsPerRow||4),B`
       <div class="media-browser-section" style=${this.styleMediaBrowser()}>
         ${i?B`<div class="media-browser-section-title">${i}</div>`:B``}
         ${s?B`<div class="media-browser-section-subtitle">${s}</div>`:B``}
@@ -4529,19 +4529,19 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     `}static get styles(){return a`
       :host > ha-icon-button {
         color: #e5f5ee;
-        --primary-color: #40d99a;
-        --mdc-theme-primary: #40d99a;
-        --ha-icon-button-selected-color: #40d99a;
+        --primary-color: var(--crm-accent, #40d99a);
+        --mdc-theme-primary: var(--crm-accent, #40d99a);
+        --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.14);
         border-radius: 50%;
       }
 
       :host > ha-icon-button[selected] {
-        color: #40d99a !important;
+        color: var(--crm-accent, #40d99a) !important;
         background-color: rgba(64, 217, 154, 0.12);
-        --primary-color: #40d99a;
-        --mdc-theme-primary: #40d99a;
-        --ha-icon-button-selected-color: #40d99a;
+        --primary-color: var(--crm-accent, #40d99a);
+        --mdc-theme-primary: var(--crm-accent, #40d99a);
+        --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.12);
       }
 

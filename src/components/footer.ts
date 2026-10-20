@@ -140,19 +140,19 @@ export class Footer extends LitElement {
     return css`
       :host > ha-icon-button {
         color: #e5f5ee;
-        --primary-color: #40d99a;
-        --mdc-theme-primary: #40d99a;
-        --ha-icon-button-selected-color: #40d99a;
+        --primary-color: var(--crm-accent, #40d99a);
+        --mdc-theme-primary: var(--crm-accent, #40d99a);
+        --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.14);
         border-radius: 50%;
       }
 
       :host > ha-icon-button[selected] {
-        color: #40d99a !important;
+        color: var(--crm-accent, #40d99a) !important;
         background-color: rgba(64, 217, 154, 0.12);
-        --primary-color: #40d99a;
-        --mdc-theme-primary: #40d99a;
-        --ha-icon-button-selected-color: #40d99a;
+        --primary-color: var(--crm-accent, #40d99a);
+        --mdc-theme-primary: var(--crm-accent, #40d99a);
+        --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.12);
       }
 

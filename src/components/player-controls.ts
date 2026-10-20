@@ -187,7 +187,7 @@ class PlayerControls extends AlertUpdatesBase {
 
       .icons > ha-icon-button.play-pause,
       .iconsPower > ha-icon-button.play-pause {
-        background-color: #40d99a;
+        background-color: var(--crm-accent, #40d99a);
         color: #102019 !important;
         --ha-icon-button-size: 36px;
         --mdc-icon-size: 22px;

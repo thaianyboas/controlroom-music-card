@@ -164,14 +164,14 @@ export class Player extends AlertUpdatesBase {
         display: flex;
         align-items: center;
         gap: 9px;
-        color: #d7e9df;
+        color: var(--crm-player-secondary-text, #d7e9df);
         font-size: 13px;
         font-weight: 500;
         min-width: 0;
       }
       .player-source ha-icon {
         --mdc-icon-size: 19px;
-        color: #40d99a;
+        color: var(--crm-accent, #40d99a);
       }
       .player-source span:nth-child(2) {
         overflow: hidden;
@@ -183,7 +183,7 @@ export class Player extends AlertUpdatesBase {
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #40d99a;
+        background: var(--crm-accent, #40d99a);
       }
       .source-indicator.offline { background: #778c82; }
 
@@ -192,7 +192,7 @@ export class Player extends AlertUpdatesBase {
         max-width: 67%;
       }
       .player-title {
-        color: #f7fff9;
+        color: var(--crm-text, #f7fff9);
         font-size: clamp(19px, 2.6vw, 26px);
         font-weight: 650;
         line-height: 1.2;
@@ -202,7 +202,7 @@ export class Player extends AlertUpdatesBase {
       }
       .player-artist {
         margin-top: 5px;
-        color: #b5c9bd;
+        color: var(--crm-player-secondary-text, #b5c9bd);
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -224,8 +224,8 @@ export class Player extends AlertUpdatesBase {
         min-width: 0;
         max-width: 100%;
         background: transparent;
-        --crm-player-controls-icon-color: #f0fdf4;
-        --crm-player-controls-icon-toggle-color: #40d99a;
+        --crm-player-controls-icon-color: var(--crm-text, #f0fdf4);
+        --crm-player-controls-icon-toggle-color: var(--crm-accent, #40d99a);
       }
       .player-progress-wrap {
         flex: 1 1 110px;
@@ -237,7 +237,7 @@ export class Player extends AlertUpdatesBase {
       .player-progress-wrap crm-player-progress {
         display: block;
         width: 100%;
-        --crm-player-progress-slider-color: #40d99a;
+        --crm-player-progress-slider-color: var(--crm-accent, #40d99a);
       }
       .idle-progress {
         height: 4px;
@@ -588,6 +588,9 @@ export class Player extends AlertUpdatesBase {
       : dark ? '#40d99a' : '#16875c';
 
     const muted = dark ? '#a6b7af' : '#657a70';
+    styleInfo['--crm-player-secondary-text'] =
+      custom ? themeText : dark ? '#b5c9bd' : '#657a70';
+
 
     styleInfo['--crm-player-controls-color'] = themeText;
     styleInfo['--crm-player-controls-icon-color'] = themeText;
