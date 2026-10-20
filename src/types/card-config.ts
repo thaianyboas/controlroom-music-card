@@ -16,6 +16,8 @@ export interface CardConfig extends LovelaceCardConfig {
     crmBackground?: string;
     crmAccent?: string;
     crmText?: string;
+    crmIconMode?: 'auto' | 'custom';
+    crmIconColor?: string;
     crmBorderRadius?: string;
   
     /**

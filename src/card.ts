@@ -1255,6 +1255,48 @@ export class Card extends AlertUpdatesBase {
   styleInfo['--crm-text'] =
     custom ? (this.config?.crmText || palette.text) : palette.text;
 
+  // ControlRoom Music - cor automática dos ícones
+  const iconBackground = custom
+    ? (this.config?.crmBackground || palette.background)
+    : palette.background;
+
+  const hexMatch = /^#([0-9a-f]{6})$/i.exec(iconBackground.trim());
+  let iconDarkBackground = darkMode;
+
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    const rgb = [0, 2, 4].map((offset) =>
+      parseInt(hex.slice(offset, offset + 2), 16) / 255
+    );
+    const linear = rgb.map((value) =>
+      value <= 0.04045
+        ? value / 12.92
+        : Math.pow((value + 0.055) / 1.055, 2.4)
+    );
+    const luminance =
+      linear[0] * 0.2126 +
+      linear[1] * 0.7152 +
+      linear[2] * 0.0722;
+
+    iconDarkBackground = luminance < 0.179;
+  }
+
+  const automaticIconColor = selectedTheme === 'dark'
+    ? '#e5f5ee'
+    : selectedTheme === 'light'
+      ? '#183329'
+      : iconDarkBackground ? '#e5f5ee' : '#183329';
+
+  const manualIconColor = this.config?.crmIconColor;
+  const validManualColor =
+    typeof manualIconColor === 'string' &&
+    /^#[0-9a-f]{6}$/i.test(manualIconColor);
+
+  styleInfo['--crm-icon-color'] =
+    custom && this.config?.crmIconMode === 'custom' && validManualColor
+      ? manualIconColor
+      : automaticIconColor;
+
   if (this.config?.crmBorderRadius) {
     styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;
   }

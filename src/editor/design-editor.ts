@@ -3,7 +3,7 @@ import { css, html, TemplateResult } from 'lit';
 import { BaseEditor } from './base-editor';
 import { translate } from '../localization/i18n';
 
-type ColorField = 'crmBackground' | 'crmAccent' | 'crmText';
+type ColorField = 'crmBackground' | 'crmAccent' | 'crmText' | 'crmIconColor';
 type ThemeMode = 'auto' | 'light' | 'dark' | 'custom';
 
 class DesignEditor extends BaseEditor {
@@ -11,6 +11,7 @@ class DesignEditor extends BaseEditor {
     crmBackground: '#101b19',
     crmAccent: '#34d399',
     crmText: '#f0fdf4',
+    crmIconColor: '#183329',
     crmBorderRadius: '20px',
   };
 
@@ -123,6 +124,9 @@ class DesignEditor extends BaseEditor {
       customHint: pt ? 'Escolha suas próprias cores' : de ? 'Eigene Farben auswählen' : 'Choose your own colors',
       colors: pt ? 'Paleta de cores' : de ? 'Farbpalette' : 'Color palette',
       colorsHint: pt ? 'Personalize a identidade visual do cartão' : de ? 'Passe die Farben deiner Karte an' : 'Customize the card colors',
+      iconColor: pt ? 'Cor dos ícones' : de ? 'Symbolfarbe' : 'Icon color',
+      iconAuto: pt ? 'Automática' : de ? 'Automatisch' : 'Automatic',
+      iconCustom: pt ? 'Personalizada' : de ? 'Benutzerdefiniert' : 'Custom',
       shape: pt ? 'Formato' : de ? 'Form' : 'Shape',
       preview: pt ? 'Prévia das cores' : de ? 'Farbvorschau' : 'Color preview',
       previewTitle: pt ? 'Minha música' : de ? 'Meine Musik' : 'My music',
@@ -187,6 +191,21 @@ class DesignEditor extends BaseEditor {
             ${this.colorControl('crmBackground', t('background'), ui.reset)}
             ${this.colorControl('crmAccent', t('accent'), ui.reset)}
             ${this.colorControl('crmText', t('text'), ui.reset)}
+            <div class="color-row">
+              <span class="field-label">${ui.iconColor}</span>
+              <select
+                class="studio-input"
+                name="crmIconMode"
+                .value=${this.config.crmIconMode ?? 'auto'}
+                @change=${this.onTextChange}
+              >
+                <option value="auto">${ui.iconAuto}</option>
+                <option value="custom">${ui.iconCustom}</option>
+              </select>
+            </div>
+            ${this.config.crmIconMode === 'custom'
+              ? this.colorControl('crmIconColor', ui.iconColor, ui.reset)
+              : ''}
           </div>
         ` : ''}
 

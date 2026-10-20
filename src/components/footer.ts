@@ -139,7 +139,10 @@ export class Footer extends LitElement {
   static get styles() {
     return css`
       :host > ha-icon-button {
-        color: var(--crm-text, #e5f5ee);
+        color: var(--crm-icon-color, #e5f5ee) !important;
+        --mdc-icon-button-ink-color: var(--crm-icon-color, #e5f5ee);
+        --ha-icon-color: var(--crm-icon-color, #e5f5ee);
+        --state-icon-color: var(--crm-icon-color, #e5f5ee);
         --primary-color: var(--crm-accent, #40d99a);
         --mdc-theme-primary: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
