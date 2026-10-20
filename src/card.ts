@@ -1222,18 +1222,41 @@ export class Card extends AlertUpdatesBase {
   // build style info object.
   const styleInfo: StyleInfo = <StyleInfo>{};
 
-  // ControlRoom Music - Design
-  if (this.config?.crmBackground) {
-    styleInfo['--crm-background'] = this.config.crmBackground;
-  }
-  if (this.config?.crmAccent) {
-  styleInfo['--crm-accent'] = this.config.crmAccent;
-  }
-  if (this.config?.crmText) {
-  styleInfo['--crm-text'] = this.config.crmText;
-  }
+  // ControlRoom Music - Appearance
+  const selectedTheme = this.config?.crmTheme ?? 'dark';
+  const darkMode = selectedTheme === 'dark' ||
+    (selectedTheme === 'auto' && this.hass?.themes?.darkMode !== false);
+
+  const palette = darkMode
+    ? {
+        background: '#101b19',
+        secondary: '#091310',
+        accent: '#34d399',
+        text: '#f0fdf4',
+      }
+    : {
+        background: '#f7faf8',
+        secondary: '#e9f0ec',
+        accent: '#16875c',
+        text: '#183329',
+      };
+
+  const custom = selectedTheme === 'custom';
+
+  styleInfo['--crm-background'] =
+    custom ? (this.config?.crmBackground || palette.background) : palette.background;
+
+  styleInfo['--crm-background-secondary'] =
+    custom ? (this.config?.crmBackground || palette.secondary) : palette.secondary;
+
+  styleInfo['--crm-accent'] =
+    custom ? (this.config?.crmAccent || palette.accent) : palette.accent;
+
+  styleInfo['--crm-text'] =
+    custom ? (this.config?.crmText || palette.text) : palette.text;
+
   if (this.config?.crmBorderRadius) {
-  styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;
+    styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;
   }
 
   // load basic layout settings.

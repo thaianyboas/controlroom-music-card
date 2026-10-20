@@ -12,6 +12,7 @@ import { SearchMediaTypes } from './search-media-types';
  */
 export interface CardConfig extends LovelaceCardConfig {
     // ControlRoom Music - Design
+    crmTheme?: 'auto' | 'light' | 'dark' | 'custom';
     crmBackground?: string;
     crmAccent?: string;
     crmText?: string;

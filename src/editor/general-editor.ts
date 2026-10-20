@@ -14,6 +14,7 @@ import { Section } from '../types/section';
 type Language = 'auto' | 'pt' | 'de' | 'en';
 
 class GeneralEditor extends BaseEditor {
+  @state() private showEssentials = true;
   @state() private showSections = false;
   @state() private showAdvanced = false;
 
@@ -79,6 +80,7 @@ class GeneralEditor extends BaseEditor {
       title: g('title'),
       language: g('language'),
       entity: g('entity'),
+      accountHint: pt ? 'Escolha a entidade SpotifyPlus vinculada à conta desejada.' : de ? 'Wähle die SpotifyPlus-Entität des gewünschten Kontos.' : 'Choose the SpotifyPlus entity linked to the account you want.',
     };
 
     const sectionOptions: Record<string, string> = {
@@ -125,9 +127,19 @@ class GeneralEditor extends BaseEditor {
           <span class="studio-version">v${CARD_VERSION}</span>
         </div>
 
-        <div class="studio-panel">
-          <div class="studio-section-title">${ui.essentials}</div>
-
+        <div class="studio-panel studio-fold">
+          <button
+            type="button"
+            class="studio-fold-button"
+            aria-expanded=${this.showEssentials ? 'true' : 'false'}
+            @click=${() => { this.showEssentials = !this.showEssentials; }}
+          >
+            <ha-icon icon="mdi:tune-vertical"></ha-icon>
+            <span class="studio-fold-text"><strong>${ui.essentials}</strong></span>
+            <ha-icon icon=${this.showEssentials ? 'mdi:chevron-up' : 'mdi:chevron-down'}></ha-icon>
+          </button>
+          ${this.showEssentials ? html`
+          <div class="studio-fold-body">
           <label class="studio-field">
             <span class="studio-label">${ui.language}</span>
             <span class="studio-select-container">
@@ -153,6 +165,7 @@ class GeneralEditor extends BaseEditor {
               .config=${this.config}
               .hass=${this.hass}
             ></crm-editor-form>
+            <div class="studio-hint">${ui.accountHint}</div>
           </div>
 
           <label class="studio-field">
@@ -192,6 +205,8 @@ class GeneralEditor extends BaseEditor {
               />
             </label>
           </div>
+          </div>
+          ` : nothing}
         </div>
 
         <div class="studio-panel studio-fold">
@@ -293,6 +308,7 @@ class GeneralEditor extends BaseEditor {
       .studio-select option { background: var(--card-background-color, #202029); color: var(--primary-text-color); }
       .studio-entity { margin: 1px 0 13px; }
       .studio-entity crm-editor-form { display: block; min-width: 0; }
+      .studio-hint { font-size: 11px; color: var(--secondary-text-color); line-height: 1.4; margin: -7px 0 12px; }
       .studio-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .studio-grid .studio-field { margin-bottom: 0; }
       .studio-fold { padding: 0; overflow: hidden; }
