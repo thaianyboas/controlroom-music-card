@@ -1359,7 +1359,7 @@ export class Card extends AlertUpdatesBase {
 
       // ControlRoom: altura compacta na prévia do editor.
       // Mantém o tamanho original para playlists e outras seções.
-      if (this.section == Section.PLAYER && this.config.height != 'fill') {
+      if ((this.section == Section.PLAYER || this.section == Section.PLAYLIST_FAVORITES || this.section == Section.DEVICES) && this.config.height != 'fill') {
         styleInfo['height'] = 'auto';
         styleInfo['min-height'] = '0';
       }
@@ -1429,7 +1429,7 @@ export class Card extends AlertUpdatesBase {
 
     // ControlRoom: compact player, footer immediately after the player surface.
     // Explicit 'fill' mode remains full-height by user choice.
-    if (this.section == Section.PLAYER && this.config.height != 'fill') {
+    if ((this.section == Section.PLAYER || this.section == Section.PLAYLIST_FAVORITES || this.section == Section.DEVICES) && this.config.height != 'fill') {
       styleInfo['height'] = 'auto';
       styleInfo['min-height'] = '0';
     }
@@ -1494,7 +1494,7 @@ export class Card extends AlertUpdatesBase {
 
     // ControlRoom: allow the horizontal player to take only the space it needs.
     // Keep the other browser sections scrollable and at their configured height.
-    if (this.section == Section.PLAYER && this.config.height != 'fill') {
+    if ((this.section == Section.PLAYER || this.section == Section.PLAYLIST_FAVORITES || this.section == Section.DEVICES) && this.config.height != 'fill') {
       styleInfo['flex'] = '0 0 auto';
       styleInfo['height'] = 'auto';
       styleInfo['min-height'] = '0';

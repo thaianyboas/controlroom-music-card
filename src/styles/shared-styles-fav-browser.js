@@ -13,7 +13,7 @@ export const sharedStylesFavBrowser = css`
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
     min-height: 0;
   }
 
@@ -79,7 +79,7 @@ export const sharedStylesFavBrowser = css`
   .media-browser-content {
     margin: 0.5rem;
     flex: 0 1 auto;
-    height: var(--crm-browser-list-height, 230px);
+    height: auto;
     max-height: var(--crm-browser-list-height, 230px);
     min-height: 0;
     overflow-y: auto;
