@@ -41,6 +41,7 @@ import { EditorConfigAreaSelectedEvent } from '../events/editor-config-area-sele
 class CardEditor extends BaseEditor {
 
   @state() private configArea = ConfigArea.GENERAL;
+  @state() private expandedGroup: string | null = 'general';
 
   /**
    * Invoked on each update to perform rendering tasks. 
@@ -106,47 +107,48 @@ class CardEditor extends BaseEditor {
         </div>
         <nav class="crm-settings-nav" aria-label=${labels.choose}>
           ${groups.map((group) => {
-            const active = group.areas.includes(this.configArea);
+            const expanded = this.expandedGroup === group.id;
             return html`
-              <div class="crm-settings-group">
+              <section class="crm-settings-group">
                 <button
                   type="button"
-                  class="crm-settings-category ${active ? 'active' : ''}"
-                  aria-expanded=${active && group.areas.length > 1 ? 'true' : 'false'}
-                  @click=${() => {
-                    if (!active) this.onConfigSectionClick(group.areas[0]);
-                  }}
+                  class="crm-settings-category ${expanded ? 'active' : ''}"
+                  aria-expanded=${expanded ? 'true' : 'false'}
+                  @click=${() => this.toggleGroup(group.id, group.areas[0])}
                 >
                   <ha-icon icon=${group.icon}></ha-icon>
                   <span>${group.title}</span>
-                  <ha-icon class="crm-settings-chevron" icon=${active && group.areas.length > 1 ? 'mdi:chevron-down' : 'mdi:chevron-right'}></ha-icon>
+                  <ha-icon class="crm-settings-chevron" icon=${expanded ? 'mdi:chevron-down' : 'mdi:chevron-right'}></ha-icon>
                 </button>
-                ${active && group.areas.length > 1 ? html`
-                  <div class="crm-settings-subnav">
-                    ${group.areas.map((area) => html`
-                      <button
-                        type="button"
-                        class="crm-settings-subitem ${this.configArea === area ? 'selected' : ''}"
-                        aria-current=${this.configArea === area ? 'page' : 'false'}
-                        @click=${() => this.onConfigSectionClick(area)}
-                      >
-                        ${translate(
-                          `editor.${String(area).toLowerCase().replace(/[^a-z]/g, '')}`,
-                          this.config.language ?? 'auto',
-                          this.hass.locale?.language || this.hass.language
-                        )}
-                      </button>
-                    `)}
+                ${expanded ? html`
+                  <div class="crm-settings-panel">
+                    ${group.areas.length > 1 ? html`
+                      <div class="crm-settings-subnav">
+                        ${group.areas.map((area) => html`
+                          <button
+                            type="button"
+                            class="crm-settings-subitem ${this.configArea === area ? 'selected' : ''}"
+                            aria-current=${this.configArea === area ? 'page' : 'false'}
+                            @click=${() => this.onConfigSectionClick(area)}
+                          >
+                            ${translate(
+                              `editor.${String(area).toLowerCase().replace(/[^a-z]/g, '')}`,
+                              this.config.language ?? 'auto',
+                              this.hass.locale?.language || this.hass.language
+                            )}
+                          </button>
+                        `)}
+                      </div>
+                    ` : ''}
+                    <div class="crm-card-editor">
+                      ${this.subEditor()}
+                    </div>
                   </div>
                 ` : ''}
-              </div>
+              </section>
             `;
           })}
         </nav>
-        <div class="crm-settings-divider"></div>
-        <div class="crm-card-editor">
-          ${this.subEditor()}
-        </div>
       </div>
     `;
   }
@@ -171,42 +173,42 @@ class CardEditor extends BaseEditor {
       :host { display: block; min-width: 0; }
       .crm-settings-shell { min-width: 0; color: var(--primary-text-color); }
       .crm-settings-heading {
-        display: flex; align-items: center; gap: 12px;
-        padding: 10px 4px 16px;
+        display: flex; align-items: center; gap: 10px;
+        padding: 6px 4px 12px;
       }
-      .crm-settings-heading > ha-icon { color: var(--primary-color); --mdc-icon-size: 28px; }
-      .crm-settings-brand { font-size: 16px; font-weight: 650; letter-spacing: -0.02em; }
-      .crm-settings-caption { margin-top: 3px; font-size: 12px; color: var(--secondary-text-color); }
-      .crm-settings-nav { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+      .crm-settings-heading > ha-icon { color: var(--primary-color); --mdc-icon-size: 24px; }
+      .crm-settings-brand { font-size: 15px; font-weight: 650; letter-spacing: -0.02em; }
+      .crm-settings-caption { margin-top: 2px; font-size: 11px; color: var(--secondary-text-color); }
+      .crm-settings-nav { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+      .crm-settings-group { min-width: 0; }
       .crm-settings-category, .crm-settings-subitem {
         width: 100%; box-sizing: border-box; border: 0; font: inherit;
         text-align: left; cursor: pointer; color: var(--primary-text-color);
         background: transparent; transition: background 150ms ease, color 150ms ease;
       }
       .crm-settings-category {
-        display: flex; align-items: center; gap: 12px;
-        min-height: 46px; padding: 10px 12px; border-radius: 12px;
-        font-size: 14px; font-weight: 500;
+        display: flex; align-items: center; gap: 10px;
+        min-height: 42px; padding: 8px 10px; border-radius: 11px;
+        font-size: 13px; font-weight: 500;
       }
-      .crm-settings-category > ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }
+      .crm-settings-category > ha-icon { --mdc-icon-size: 19px; color: var(--secondary-text-color); }
       .crm-settings-category > span { flex: 1; }
-      .crm-settings-category .crm-settings-chevron { --mdc-icon-size: 18px; opacity: 0.6; }
-      .crm-settings-category:hover, .crm-settings-subitem:hover {
-        background: var(--secondary-background-color);
-      }
-      .crm-settings-category.active {
-        background: var(--secondary-background-color);
-        font-weight: 600;
-      }
+      .crm-settings-category .crm-settings-chevron { --mdc-icon-size: 17px; opacity: 0.65; }
+      .crm-settings-category:hover, .crm-settings-subitem:hover { background: var(--secondary-background-color); }
+      .crm-settings-category.active { background: var(--secondary-background-color); font-weight: 600; }
       .crm-settings-category.active > ha-icon:first-child { color: var(--primary-color); }
-      .crm-settings-subnav {
-        margin: 4px 0 8px 22px; padding-left: 14px;
+      .crm-settings-panel {
+        min-width: 0; margin: 4px 0 12px 12px; padding: 4px 0 2px 12px;
         border-left: 1px solid var(--divider-color);
-        display: flex; flex-direction: column; gap: 2px;
+      }
+      .crm-settings-subnav {
+        display: flex; flex-wrap: wrap; gap: 5px;
+        margin: 0 8px 12px 0;
       }
       .crm-settings-subitem {
-        min-height: 36px; padding: 8px 12px; border-radius: 9px;
-        font-size: 13px; color: var(--secondary-text-color);
+        width: auto; min-height: 30px; padding: 6px 10px;
+        border-radius: 9px; font-size: 12px;
+        color: var(--secondary-text-color);
       }
       .crm-settings-subitem.selected {
         background: var(--secondary-background-color);
@@ -215,7 +217,6 @@ class CardEditor extends BaseEditor {
       .crm-settings-category:focus-visible, .crm-settings-subitem:focus-visible {
         outline: 2px solid var(--primary-color); outline-offset: 2px;
       }
-      .crm-settings-divider { height: 1px; background: var(--divider-color); margin: 16px 0; }
       .crm-card-editor {
         min-width: 0;
         --ha-form-style-integer-margin-bottom: 0.5rem;
@@ -224,9 +225,35 @@ class CardEditor extends BaseEditor {
         --ha-form-style-selector-boolean-min-height: 28px;
         --ha-form-style-string-margin-bottom: 0.5rem;
       }
+      @media (max-width: 450px) {
+        .crm-settings-panel { margin-left: 5px; padding-left: 9px; }
+      }
     `;
   }
 
+  private groupForArea(area: ConfigArea): string {
+    if ([ConfigArea.PLAYLIST_FAVORITES, ConfigArea.ALBUM_FAVORITES,
+      ConfigArea.ARTIST_FAVORITES, ConfigArea.TRACK_FAVORITES,
+      ConfigArea.AUDIOBOOK_FAVORITES, ConfigArea.EPISODE_FAVORITES,
+      ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER].includes(area)) return 'library';
+    if ([ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER,
+      ConfigArea.SEARCH_MEDIA_BROWSER].includes(area)) return 'advanced';
+    if (area === ConfigArea.DESIGN) return 'design';
+    if (area === ConfigArea.PLAYER) return 'player';
+    if (area === ConfigArea.DEVICE_BROWSER) return 'devices';
+    return 'general';
+  }
+
+  private toggleGroup(id: string, firstArea: ConfigArea): void {
+    if (this.expandedGroup === id) {
+      this.expandedGroup = null;
+      return;
+    }
+    this.expandedGroup = id;
+    if (this.groupForArea(this.configArea) !== id) {
+      this.onConfigSectionClick(firstArea);
+    }
+  }
 
   private subEditor() {
 
@@ -321,6 +348,7 @@ class CardEditor extends BaseEditor {
 
     // show the config area and set the section references.
     this.configArea = configArea;
+    this.expandedGroup = this.groupForArea(configArea);
     this.section = sectionNew;
     this.store.section = sectionNew;
 
@@ -403,6 +431,7 @@ class CardEditor extends BaseEditor {
       }
     }
     this.configArea = configArea;
+    this.expandedGroup = this.groupForArea(configArea);
     Store.selectedConfigArea = this.configArea;
     super.requestUpdate();
 
@@ -425,6 +454,7 @@ class CardEditor extends BaseEditor {
 
     // select the configuration area.
     this.configArea = configArea;
+    this.expandedGroup = this.groupForArea(configArea);
 
     // store selected ConfigArea.
     Store.selectedConfigArea = this.configArea;
