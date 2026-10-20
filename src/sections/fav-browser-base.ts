@@ -132,7 +132,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
    * Setting properties inside this method will *not* trigger the element to update.
   */
   /** Translate UI text using the existing ControlRoom dictionaries, with a safe fallback. */
-  private uiText(key: string, de: string, pt: string, en: string): string {
+  protected uiText(key: string, de: string, pt: string, en: string): string {
     const haLanguage = (this.hass as any)?.locale?.language || this.hass?.language;
     const translated = translate(key, 'auto', haLanguage);
     if (translated !== key) return translated;
@@ -916,7 +916,15 @@ export class FavBrowserBase extends AlertUpdatesBase {
     // we will also truncate the list of items if neccessary, to keep the ui
     // responsive while editing the card.
     if (this.isCardInEditPreview) {
-      const infoMsg = truncateMediaList(this.mediaList, this.EDITOR_LIMIT_TOTAL_MAX);
+      const originalInfoMsg = truncateMediaList(this.mediaList, this.EDITOR_LIMIT_TOTAL_MAX);
+      const infoMsg = originalInfoMsg
+        ? this.uiText(
+            "search.previewLimit",
+            `In der Kartenvorschau werden maximal ${this.EDITOR_LIMIT_TOTAL_MAX} Einträge angezeigt.`,
+            `A prévia do cartão mostra no máximo ${this.EDITOR_LIMIT_TOTAL_MAX} itens.`,
+            `The card preview shows a maximum of ${this.EDITOR_LIMIT_TOTAL_MAX} items.`
+          )
+        : undefined;
       if (!(this.mediaType in Store.hasCardEditLoadedMediaList)) {
         this.alertInfo = infoMsg;
       } else {

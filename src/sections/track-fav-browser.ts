@@ -38,7 +38,7 @@ export class TrackFavBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.TRACK_FAVORITES);
-    this.filterCriteriaPlaceholder = "filter by track name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.track", "Nach Songnamen filtern", "Filtrar por nome da música", "Filter by track name");
 
   }
 

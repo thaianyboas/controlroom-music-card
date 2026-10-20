@@ -31,7 +31,7 @@ export class AudiobookFavBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.AUDIOBOOK_FAVORITES);
-    this.filterCriteriaPlaceholder = "filter by audiobook name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.audiobook", "Nach Hörbuchnamen filtern", "Filtrar por nome do audiolivro", "Filter by audiobook name");
 
   }
 

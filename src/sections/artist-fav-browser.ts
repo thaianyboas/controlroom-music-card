@@ -31,7 +31,7 @@ export class ArtistFavBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.ARTIST_FAVORITES);
-    this.filterCriteriaPlaceholder = "filter by artist name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.artist", "Nach Künstlernamen filtern", "Filtrar por nome do artista", "Filter by artist name");
 
   }
 

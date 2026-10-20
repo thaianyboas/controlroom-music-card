@@ -32,7 +32,7 @@ export class ShowFavBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.SHOW_FAVORITES);
-    this.filterCriteriaPlaceholder = "filter by show name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.show", "Nach Podcastnamen filtern", "Filtrar por nome do podcast", "Filter by show name");
 
   }
 

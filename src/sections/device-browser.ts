@@ -74,6 +74,26 @@ export class DeviceBrowser extends FavBrowserBase {
   /** True to refresh device list from real-time data; False to refresh from internal cache. */
   private refreshDeviceList?: boolean;
 
+  private friendlyState(state: string): string {
+    const language = resolveLanguage(
+      'auto',
+      this.store.hass?.locale?.language || this.store.hass?.language
+    );
+
+    const labels: Record<string, Record<'de' | 'pt' | 'en', string>> = {
+      idle: { de: 'Bereit', pt: 'Disponível', en: 'Ready' },
+      playing: { de: 'Wiedergabe läuft', pt: 'Reproduzindo', en: 'Playing' },
+      paused: { de: 'Pausiert', pt: 'Pausado', en: 'Paused' },
+      off: { de: 'Ausgeschaltet', pt: 'Desligado', en: 'Off' },
+      standby: { de: 'Bereitschaft', pt: 'Em espera', en: 'Standby' },
+      unavailable: { de: 'Nicht verfügbar', pt: 'Indisponível', en: 'Unavailable' },
+      unknown: { de: 'Unbekannt', pt: 'Desconhecido', en: 'Unknown' },
+      on: { de: 'Eingeschaltet', pt: 'Ligado', en: 'On' }
+    };
+
+    return labels[state]?.[language] || state;
+  }
+
   private deviceText(key: DeviceTextKey): string {
     const language = resolveLanguage('auto', this.store.hass?.locale?.language || this.store.hass?.language);
     return deviceTexts[language][key];
@@ -167,7 +187,7 @@ export class DeviceBrowser extends FavBrowserBase {
             <input type="checkbox"
               .checked=${this.isVisible(this.spotifyKey(item), true)}
               @change=${(ev: Event) => this.toggleVisibility(this.spotifyKey(item), (ev.target as HTMLInputElement).checked)}>
-            <span><strong>${item.Name}</strong><small>${item.Id || 'Spotify Connect'}</small></span>
+            <span><strong>${item.Name}</strong><small>Spotify Connect</small></span>
           </label>
         `)}
         <div class="crm-settings-subtitle">Home Assistant · media_player</div>
@@ -176,7 +196,7 @@ export class DeviceBrowser extends FavBrowserBase {
             <input type="checkbox"
               .checked=${this.isVisible(this.haKey(item.id), false)}
               @change=${(ev: Event) => this.toggleVisibility(this.haKey(item.id), (ev.target as HTMLInputElement).checked)}>
-            <span><strong>${item.name}</strong><small>${item.id} · ${item.state}</small></span>
+            <span><strong>${item.name}</strong><small>${this.friendlyState(item.state)}</small></span>
           </label>
         `)}
         <button class="crm-settings-done" @click=${() => this.showDeviceSettings = false}>${this.deviceText('done')}</button>

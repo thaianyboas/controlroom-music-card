@@ -32,7 +32,7 @@ export class EpisodeFavBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.EPISODE_FAVORITES);
-    this.filterCriteriaPlaceholder = "filter by episode name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.episode", "Nach Episodennamen filtern", "Filtrar por nome do episódio", "Filter by episode name");
 
   }
 

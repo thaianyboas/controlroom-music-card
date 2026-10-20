@@ -38,7 +38,7 @@ export class RecentBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.RECENTS);
-    this.filterCriteriaPlaceholder = "filter by name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.recent", "Nach Namen filtern", "Filtrar por nome", "Filter by name");
 
   }
 

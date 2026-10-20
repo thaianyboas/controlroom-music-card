@@ -55,7 +55,7 @@ export class CategoryBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.CATEGORYS);
-    this.filterCriteriaPlaceholder = "filter by category name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.category", "Nach Kategorienamen filtern", "Filtrar por nome da categoria", "Filter by category name");
 
   }
 

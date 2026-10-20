@@ -39,7 +39,7 @@ export class UserPresetBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.USERPRESETS);
-    this.filterCriteriaPlaceholder = "filter by preset name";
+    this.filterCriteriaPlaceholder = this.uiText("search.filter.preset", "Nach Preset-Namen filtern", "Filtrar por nome do preset", "Filter by preset name");
 
   }
 
