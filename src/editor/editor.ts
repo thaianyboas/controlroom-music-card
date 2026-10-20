@@ -16,6 +16,8 @@ import {
 import './editor-form';
 import './general-editor';
 import './design-editor';
+import './advanced-editor';
+import './navigation-settings-editor';
 import './player-editor';
 import './album-fav-browser-editor';
 import './artist-fav-browser-editor';
@@ -72,8 +74,8 @@ class CardEditor extends BaseEditor {
 
     const lang = resolveLanguage(this.config.language ?? 'auto', this.hass.locale?.language || this.hass.language);
     const labels = {
-      pt: { general: 'Geral', design: 'Aparência', player: 'Reprodutor', devices: 'Dispositivos', library: 'Biblioteca', advanced: 'Avançado', settings: 'Configurações do cartão', choose: 'Escolha uma seção' },
-      de: { general: 'Allgemein', design: 'Darstellung', player: 'Player', devices: 'Geräte', library: 'Bibliothek', advanced: 'Erweitert', settings: 'Karteneinstellungen', choose: 'Bereich auswählen' },
+      pt: { general: 'Geral', design: 'Aparência', player: 'Reprodutor', navigation: 'Navegação', devices: 'Dispositivos', library: 'Biblioteca', advanced: 'Avançado', settings: 'Configurações do cartão', choose: 'Escolha uma seção' },
+      de: { general: 'Allgemein', design: 'Darstellung', player: 'Player', navigation: 'Navigation', devices: 'Geräte', library: 'Bibliothek', advanced: 'Erweitert', settings: 'Karteneinstellungen', choose: 'Bereich auswählen' },
       en: { general: 'General', design: 'Appearance', player: 'Player', devices: 'Devices', library: 'Library', advanced: 'Advanced', settings: 'Card settings', choose: 'Choose a section' },
     }[lang];
 
@@ -127,17 +129,20 @@ class CardEditor extends BaseEditor {
       ConfigArea.AUDIOBOOK_FAVORITES, ConfigArea.EPISODE_FAVORITES,
       ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER,
     ];
-    const advancedAreas = [
-      ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER,
+    const navigationAreas = [
+      ConfigArea.USERPRESET_BROWSER,
+      ConfigArea.RECENT_BROWSER,
       ConfigArea.SEARCH_MEDIA_BROWSER,
     ];
+
     const groups = [
       { id: 'general', title: labels.general, icon: 'mdi:cog-outline', areas: [ConfigArea.GENERAL] },
-      { id: 'design', title: labels.design, icon: 'mdi:palette-swatch-outline', areas: [ConfigArea.DESIGN] },
+      { id: 'design', title: labels.design, icon: 'mdi:palette-outline', areas: [ConfigArea.DESIGN] },
       { id: 'player', title: labels.player, icon: 'mdi:play-circle-outline', areas: [ConfigArea.PLAYER] },
-      { id: 'devices', title: labels.devices, icon: 'mdi:speaker-wireless', areas: [ConfigArea.DEVICE_BROWSER] },
+      { id: 'navigation', title: labels.navigation, icon: 'mdi:compass-outline', areas: navigationAreas },
       { id: 'library', title: labels.library, icon: 'mdi:bookshelf', areas: libraryAreas },
-      { id: 'advanced', title: labels.advanced, icon: 'mdi:cog-outline', areas: advancedAreas },
+      { id: 'devices', title: labels.devices, icon: 'mdi:speaker-wireless', areas: [ConfigArea.DEVICE_BROWSER] },
+      { id: 'advanced', title: labels.advanced, icon: 'mdi:tune-variant', areas: [] },
     ];
 
     return html`
@@ -149,46 +154,55 @@ class CardEditor extends BaseEditor {
             <div class="crm-settings-caption">${labels.settings}</div>
           </div>
         </div>
-        <nav class="crm-settings-nav" aria-label=${labels.choose}>
-          ${groups.map((group) => {
-            const expanded = this.expandedGroup === group.id;
-            return html`
-              <section class="crm-settings-group">
-                <button
-                  type="button"
-                  class="crm-settings-category ${expanded ? 'active' : ''}"
-                  aria-expanded=${expanded ? 'true' : 'false'}
-                  @click=${() => this.toggleGroup(group.id, group.areas[0])}
-                >
-                  <ha-icon icon=${group.icon}></ha-icon>
-                  <span>${group.title}</span>
-                  <ha-icon class="crm-settings-chevron" icon=${expanded ? 'mdi:chevron-down' : 'mdi:chevron-right'}></ha-icon>
-                </button>
-                ${expanded ? html`
-                  <div class="crm-settings-panel">
-                    ${group.areas.length > 1 ? html`
-                      <div class="crm-settings-subnav">
-                        ${group.areas.map((area) => html`
-                          <button
-                            type="button"
-                            class="crm-settings-subitem ${this.configArea === area ? 'selected' : ''}"
-                            aria-current=${this.configArea === area ? 'page' : 'false'}
-                            @click=${() => this.onConfigSectionClick(area)}
-                          >
-                            ${areaLabels[area] ?? String(area)}
-                          </button>
-                        `)}
-                      </div>
-                    ` : ''}
-                    <div class="crm-card-editor">
-                      ${this.subEditor()}
-                    </div>
-                  </div>
-                ` : ''}
-              </section>
-            `;
-          })}
+        <nav class="crm-settings-grid" aria-label=${labels.choose}>
+          ${groups.map((group) => html`
+            <button
+              type="button"
+              class="crm-settings-tile ${this.expandedGroup === group.id ? 'active' : ''}"
+              aria-pressed=${this.expandedGroup === group.id ? 'true' : 'false'}
+              @click=${() => this.toggleGroup(group.id, group.areas[0])}
+            >
+              <ha-icon class="crm-tile-icon" icon=${group.icon}></ha-icon>
+              <span>${group.title}</span>
+              <ha-icon class="crm-tile-arrow" icon="mdi:chevron-right"></ha-icon>
+            </button>
+          `)}
         </nav>
+
+        ${groups.map((group) => this.expandedGroup === group.id ? html`
+          <section class="crm-settings-panel">
+            <div class="crm-panel-heading">
+              <ha-icon icon=${group.icon}></ha-icon>
+              <span>${group.title}</span>
+            </div>
+            ${group.areas.length > 1 ? html`
+              <div class="crm-settings-subnav">
+                ${group.areas.map((area) => html`
+                  <button
+                    type="button"
+                    class="crm-settings-subitem ${this.configArea === area ? 'selected' : ''}"
+                    aria-current=${this.configArea === area ? 'page' : 'false'}
+                    @click=${() => this.onConfigSectionClick(area)}
+                  >
+                    ${areaLabels[area] ?? String(area)}
+                  </button>
+                `)}
+              </div>
+            ` : ''}
+            ${group.id === 'navigation' ? html`
+              <crm-navigation-settings-editor
+                .config=${this.config}
+                .hass=${this.hass}
+              ></crm-navigation-settings-editor>
+            ` : ''}
+            <div class="crm-card-editor">
+              ${group.areas.length ? this.subEditor() : html`
+                <crm-advanced-editor .config=${this.config} .hass=${this.hass}></crm-advanced-editor>
+              `}
+            </div>
+          </section>
+        ` : '')}
+
       </div>
     `;
   }
@@ -219,43 +233,110 @@ class CardEditor extends BaseEditor {
       .crm-settings-heading > ha-icon { color: var(--primary-color); --mdc-icon-size: 24px; }
       .crm-settings-brand { font-size: 15px; font-weight: 650; letter-spacing: -0.02em; }
       .crm-settings-caption { margin-top: 2px; font-size: 11px; color: var(--secondary-text-color); }
-      .crm-settings-nav { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-      .crm-settings-group { min-width: 0; }
-      .crm-settings-category, .crm-settings-subitem {
-        width: 100%; box-sizing: border-box; border: 0; font: inherit;
-        text-align: left; cursor: pointer; color: var(--primary-text-color);
-        background: transparent; transition: background 150ms ease, color 150ms ease;
+
+      .crm-settings-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 14px;
       }
-      .crm-settings-category {
-        display: flex; align-items: center; gap: 10px;
-        min-height: 42px; padding: 8px 10px; border-radius: 11px;
-        font-size: 13px; font-weight: 500;
+      .crm-settings-tile {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+        min-height: 58px;
+        padding: 12px;
+        border: 1px solid var(--divider-color);
+        border-radius: 13px;
+        background: var(--card-background-color, transparent);
+        color: var(--primary-text-color);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 550;
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 150ms ease, background 150ms ease;
       }
-      .crm-settings-category > ha-icon { --mdc-icon-size: 19px; color: var(--secondary-text-color); }
-      .crm-settings-category > span { flex: 1; }
-      .crm-settings-category .crm-settings-chevron { --mdc-icon-size: 17px; opacity: 0.65; }
-      .crm-settings-category:hover, .crm-settings-subitem:hover { background: var(--secondary-background-color); }
-      .crm-settings-category.active { background: var(--secondary-background-color); font-weight: 600; }
-      .crm-settings-category.active > ha-icon:first-child { color: var(--primary-color); }
-      .crm-settings-panel {
-        min-width: 0; margin: 4px 0 12px 12px; padding: 4px 0 2px 12px;
-        border-left: 1px solid var(--divider-color);
+      .crm-settings-tile > span {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
-      .crm-settings-subnav {
-        display: flex; flex-wrap: wrap; gap: 5px;
-        margin: 0 8px 12px 0;
-      }
-      .crm-settings-subitem {
-        width: auto; min-height: 30px; padding: 6px 10px;
-        border-radius: 9px; font-size: 12px;
+      .crm-settings-tile .crm-tile-icon {
+        --mdc-icon-size: 21px;
         color: var(--secondary-text-color);
       }
-      .crm-settings-subitem.selected {
-        background: var(--secondary-background-color);
-        color: var(--primary-color); font-weight: 600;
+      .crm-settings-tile .crm-tile-arrow {
+        --mdc-icon-size: 15px;
+        color: var(--secondary-text-color);
       }
-      .crm-settings-category:focus-visible, .crm-settings-subitem:focus-visible {
-        outline: 2px solid var(--primary-color); outline-offset: 2px;
+      .crm-settings-tile.active {
+        border-color: #34d399;
+        background: color-mix(in srgb, #34d399 9%, transparent);
+      }
+      .crm-settings-tile.active .crm-tile-icon {
+        color: #34d399;
+      }
+      .crm-settings-tile:hover {
+        border-color: #34d399;
+      }
+      .crm-settings-tile:focus-visible,
+      .crm-settings-subitem:focus-visible {
+        outline: 2px solid #34d399;
+        outline-offset: 2px;
+      }
+      .crm-settings-panel {
+        min-width: 0;
+        padding: 15px;
+        border: 1px solid var(--divider-color);
+        border-radius: 15px;
+      }
+      .crm-panel-heading {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 14px;
+        font-size: 14px;
+        font-weight: 650;
+      }
+      .crm-panel-heading ha-icon {
+        --mdc-icon-size: 19px;
+        color: #34d399;
+      }
+      .crm-settings-subnav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .crm-settings-subitem {
+        padding: 7px 10px;
+        border: 1px solid var(--divider-color);
+        border-radius: 9px;
+        background: transparent;
+        color: var(--secondary-text-color);
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .crm-settings-subitem.selected {
+        border-color: #34d399;
+        color: var(--primary-text-color);
+        background: color-mix(in srgb, #34d399 9%, transparent);
+      }
+      .crm-empty-panel {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 4px;
+        color: var(--secondary-text-color);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .crm-empty-panel ha-icon {
+        --mdc-icon-size: 22px;
+        color: #34d399;
       }
       .crm-card-editor {
         min-width: 0;
@@ -264,9 +345,6 @@ class CardEditor extends BaseEditor {
         --ha-form-style-selector-margin-bottom: 0.5rem;
         --ha-form-style-selector-boolean-min-height: 28px;
         --ha-form-style-string-margin-bottom: 0.5rem;
-      }
-      @media (max-width: 450px) {
-        .crm-settings-panel { margin-left: 5px; padding-left: 9px; }
       }
     `;
   }
@@ -277,7 +355,7 @@ class CardEditor extends BaseEditor {
       ConfigArea.AUDIOBOOK_FAVORITES, ConfigArea.EPISODE_FAVORITES,
       ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER].includes(area)) return 'library';
     if ([ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER,
-      ConfigArea.SEARCH_MEDIA_BROWSER].includes(area)) return 'advanced';
+      ConfigArea.SEARCH_MEDIA_BROWSER].includes(area)) return 'navigation';
     if (area === ConfigArea.DESIGN) return 'design';
     if (area === ConfigArea.PLAYER) return 'player';
     if (area === ConfigArea.DEVICE_BROWSER) return 'devices';
@@ -285,11 +363,9 @@ class CardEditor extends BaseEditor {
   }
 
   private toggleGroup(id: string, firstArea: ConfigArea): void {
-    if (this.expandedGroup === id) {
-      this.expandedGroup = null;
-      return;
-    }
+    if (this.expandedGroup === id) return;
     this.expandedGroup = id;
+    if (id === 'advanced') return;
     if (this.groupForArea(this.configArea) !== id) {
       this.onConfigSectionClick(firstArea);
     }

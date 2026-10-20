@@ -15,8 +15,6 @@ type Language = 'auto' | 'pt' | 'de' | 'en';
 
 class GeneralEditor extends BaseEditor {
   @state() private showEssentials = true;
-  @state() private showSections = false;
-  @state() private showAdvanced = false;
 
   private updateField(name: string, value: unknown): void {
     this.configChanged({ ...this.config, [name]: value });
@@ -30,26 +28,6 @@ class GeneralEditor extends BaseEditor {
   private onTextChange(event: Event): void {
     const input = event.currentTarget as HTMLInputElement;
     this.updateField(input.name, input.value);
-  }
-
-  private onDefaultSectionChange(event: Event): void {
-    this.updateField('sectionDefault', (event.currentTarget as HTMLSelectElement).value);
-  }
-
-  private onSectionChange(event: Event): void {
-    const input = event.currentTarget as HTMLInputElement;
-    const selected: Section[] = Array.isArray(this.config.sections)
-      ? [...this.config.sections]
-      : [];
-    const section = input.value as Section;
-    const next = input.checked
-      ? [...new Set([...selected, section])]
-      : selected.filter((value: Section) => value !== section);
-    this.updateField('sections', next);
-  }
-
-  private onTouchChange(event: Event): void {
-    this.updateField('touchSupportDisabled', (event.currentTarget as HTMLInputElement).checked);
   }
 
   protected render(): TemplateResult {
@@ -83,25 +61,6 @@ class GeneralEditor extends BaseEditor {
       accountHint: pt ? 'Escolha a entidade SpotifyPlus vinculada à conta desejada.' : de ? 'Wähle die SpotifyPlus-Entität des gewünschten Kontos.' : 'Choose the SpotifyPlus entity linked to the account you want.',
     };
 
-    const sectionOptions: Record<string, string> = {
-      player: t('editor.player'),
-      albumfavorites: g('albumFavorites'),
-      artistfavorites: g('artistFavorites'),
-      audiobookfavorites: g('audiobookFavorites'),
-      categorys: t('editor.categorys'),
-      devices: t('editor.devices'),
-      episodefavorites: g('episodeFavorites'),
-      playlistfavorites: g('playlistFavorites'),
-      recents: t('editor.recents'),
-      searchmedia: g('searchMedia'),
-      showfavorites: g('showFavorites'),
-      trackfavorites: g('trackFavorites'),
-      userpresets: g('userPresets'),
-    };
-
-    const selectedSections = Array.isArray(this.config.sections)
-      ? this.config.sections
-      : [];
     const entitySchema = [{
       name: 'entity',
       label: ui.entity,
@@ -180,107 +139,10 @@ class GeneralEditor extends BaseEditor {
             />
           </label>
 
-          <div class="studio-section-title studio-dimensions">${ui.dimensions}</div>
-          <div class="studio-grid">
-            <label class="studio-field">
-              <span class="studio-label">${ui.width}</span>
-              <input
-                class="studio-input"
-                type="text"
-                name="width"
-                .value=${String(this.config.width ?? '')}
-                placeholder="35.15"
-                @change=${this.onTextChange}
-              />
-            </label>
-            <label class="studio-field">
-              <span class="studio-label">${ui.height}</span>
-              <input
-                class="studio-input"
-                type="text"
-                name="height"
-                .value=${String(this.config.height ?? '')}
-                placeholder="35.15"
-                @change=${this.onTextChange}
-              />
-            </label>
-          </div>
           </div>
           ` : nothing}
         </div>
 
-        <div class="studio-panel studio-fold">
-          <button
-            type="button"
-            class="studio-fold-button"
-            aria-expanded=${this.showSections ? 'true' : 'false'}
-            @click=${() => { this.showSections = !this.showSections; }}
-          >
-            <ha-icon icon="mdi:view-grid-outline"></ha-icon>
-            <span class="studio-fold-text">
-              <strong>${ui.sections}</strong>
-              <small>${ui.sectionsHint}</small>
-            </span>
-            <ha-icon icon=${this.showSections ? 'mdi:chevron-up' : 'mdi:chevron-down'}></ha-icon>
-          </button>
-          ${this.showSections ? html`
-            <div class="studio-fold-body">
-              <div class="studio-check-grid">
-                ${Object.entries(sectionOptions).map(([value, label]) => html`
-                  <label class="studio-check">
-                    <input
-                      type="checkbox"
-                      .value=${value}
-                      .checked=${selectedSections.includes(value as Section)}
-                      @change=${this.onSectionChange}
-                    />
-                    <span>${label}</span>
-                  </label>
-                `)}
-              </div>
-            </div>
-          ` : nothing}
-        </div>
-
-        <div class="studio-panel studio-fold">
-          <button
-            type="button"
-            class="studio-fold-button"
-            aria-expanded=${this.showAdvanced ? 'true' : 'false'}
-            @click=${() => { this.showAdvanced = !this.showAdvanced; }}
-          >
-            <ha-icon icon="mdi:tune-variant"></ha-icon>
-            <span class="studio-fold-text"><strong>${ui.advanced}</strong></span>
-            <ha-icon icon=${this.showAdvanced ? 'mdi:chevron-up' : 'mdi:chevron-down'}></ha-icon>
-          </button>
-          ${this.showAdvanced ? html`
-            <div class="studio-fold-body">
-              <label class="studio-field">
-                <span class="studio-label">${ui.sectionDefault}</span>
-                <span class="studio-select-container">
-                  <select
-                    class="studio-input studio-select"
-                    .value=${String(this.config.sectionDefault ?? '')}
-                    @change=${this.onDefaultSectionChange}
-                  >
-                    <option value="">—</option>
-                    ${Object.entries(sectionOptions).map(([value, label]) =>
-                      html`<option value=${value}>${label}</option>`)}
-                  </select>
-                  <ha-icon icon="mdi:chevron-down"></ha-icon>
-                </span>
-              </label>
-              <label class="studio-switch-row">
-                <span>${ui.touch}</span>
-                <input
-                  type="checkbox"
-                  .checked=${Boolean(this.config.touchSupportDisabled)}
-                  @change=${this.onTouchChange}
-                />
-              </label>
-            </div>
-          ` : nothing}
-        </div>
       </div>
     `;
   }

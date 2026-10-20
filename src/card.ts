@@ -1359,14 +1359,14 @@ export class Card extends AlertUpdatesBase {
 
       // ControlRoom: altura compacta na prévia do editor.
       // Mantém o tamanho original para playlists e outras seções.
-      if ((this.section == Section.PLAYER || this.section == Section.PLAYLIST_FAVORITES || this.section == Section.DEVICES) && this.config.height != 'fill') {
+      if (this.getHeightMode() !== 'fill') {
         styleInfo['height'] = 'auto';
         styleInfo['min-height'] = '0';
       }
 
       // adjust css styling for minimized player format.
       if (this.config.playerMinimizeOnIdle && (this.section == Section.PLAYER) && this.store.player.isPoweredOffOrIdle()) {
-        if (this.config.height != 'fill') {
+        if (this.getHeightMode() !== 'fill') {
           styleInfo['height'] = `unset !important`;
           styleInfo['min-height'] = `unset !important`;
         }
@@ -1419,8 +1419,12 @@ export class Card extends AlertUpdatesBase {
     // - if 'fill', then use 100% of the vertical space.
     // - if number value specified, then use as height (in rem units).
     // - if no value specified, then use default.
-    if (this.config.height == 'fill') {
-      styleInfo['height'] = 'calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height))';
+    if (this.getHeightMode() === 'fill') {
+      if (isNumber(String(this.config.height))) {
+        styleInfo['height'] = String(this.config.height) + 'rem';
+      } else {
+        styleInfo['height'] = 'calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height))';
+      }
     } else if (isNumber(String(this.config.height))) {
       styleInfo['height'] = String(this.config.height) + 'rem';
     } else {
@@ -1429,14 +1433,14 @@ export class Card extends AlertUpdatesBase {
 
     // ControlRoom: compact player, footer immediately after the player surface.
     // Explicit 'fill' mode remains full-height by user choice.
-    if ((this.section == Section.PLAYER || this.section == Section.PLAYLIST_FAVORITES || this.section == Section.DEVICES) && this.config.height != 'fill') {
+    if (this.getHeightMode() !== 'fill') {
       styleInfo['height'] = 'auto';
       styleInfo['min-height'] = '0';
     }
 
     // adjust css styling for minimized player format.
     if (this.config.playerMinimizeOnIdle && (this.section == Section.PLAYER) && this.store.player.isPoweredOffOrIdle()) {
-      if (this.config.height != 'fill') {
+      if (this.getHeightMode() !== 'fill') {
         styleInfo['height'] = `unset !important`;
         styleInfo['min-height'] = `unset !important`;
       }
@@ -1487,14 +1491,29 @@ export class Card extends AlertUpdatesBase {
   /**
    * Style the card content element.
    */
+  private getHeightMode(): 'compact' | 'auto' | 'fill' {
+    if (this.config.heightMode) {
+      return this.config.heightMode;
+    }
+
+    // Preserve the existing full-height configuration.
+    return this.config.height === 'fill' ? 'fill' : 'compact';
+  }
+
   private styleCardContent() {
 
     // build style info object.
     const styleInfo: StyleInfo = <StyleInfo>{};
 
+    const heightMode = this.getHeightMode();
+
+    styleInfo['--crm-browser-list-height'] =
+      heightMode === 'compact' ? '230px' :
+      heightMode === 'auto' ? '600px' : '100%';
+
     // ControlRoom: allow the horizontal player to take only the space it needs.
     // Keep the other browser sections scrollable and at their configured height.
-    if ((this.section == Section.PLAYER || this.section == Section.PLAYLIST_FAVORITES || this.section == Section.DEVICES) && this.config.height != 'fill') {
+    if (this.getHeightMode() !== 'fill') {
       styleInfo['flex'] = '0 0 auto';
       styleInfo['height'] = 'auto';
       styleInfo['min-height'] = '0';
@@ -1503,7 +1522,7 @@ export class Card extends AlertUpdatesBase {
 
     // adjust css styling for minimized player format.
     if (this.config.playerMinimizeOnIdle && (this.section == Section.PLAYER) && this.store.player.isPoweredOffOrIdle()) {
-      if (this.config.height != 'fill') {
+      if (this.getHeightMode() !== 'fill') {
         styleInfo['height'] = `unset !important`;
       }
     }

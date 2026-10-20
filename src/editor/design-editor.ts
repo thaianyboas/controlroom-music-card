@@ -127,6 +127,18 @@ class DesignEditor extends BaseEditor {
       iconColor: pt ? 'Cor dos ícones' : de ? 'Symbolfarbe' : 'Icon color',
       iconAuto: pt ? 'Automática' : de ? 'Automatisch' : 'Automatic',
       iconCustom: pt ? 'Personalizada' : de ? 'Benutzerdefiniert' : 'Custom',
+      dimensions: pt ? 'Dimensões personalizadas' : de ? 'Benutzerdefinierte Abmessungen' : 'Custom dimensions',
+      width: pt ? 'Largura' : de ? 'Breite' : 'Width',
+      height: pt ? 'Altura' : de ? 'Höhe' : 'Height',
+      dimensionsHint: pt ? 'Deixe vazio para usar o tamanho padrão.' : de ? 'Leer lassen, um die Standardgröße zu verwenden.' : 'Leave empty to use the default size.',
+      heightTitle: pt ? 'Altura do cartão' : de ? 'Kartenhöhe' : 'Card height',
+      heightHint: pt ? 'Escolha como o cartão ocupa o espaço vertical' : de ? 'Lege fest, wie die Karte den vertikalen Platz nutzt' : 'Choose how the card uses vertical space',
+      compact: pt ? 'Compacto' : de ? 'Kompakt' : 'Compact',
+      compactHint: pt ? 'Menor altura, com rolagem interna' : de ? 'Kleine Höhe mit internem Scrollen' : 'Short height with internal scrolling',
+      automatic: pt ? 'Automático' : de ? 'Automatisch' : 'Automatic',
+      automaticHint: pt ? 'Cresce conforme o conteúdo' : de ? 'Wächst mit dem Inhalt' : 'Grows with the content',
+      fill: pt ? 'Preencher' : de ? 'Ausfüllen' : 'Fill',
+      fillHint: pt ? 'Ocupa a altura disponível' : de ? 'Nutzt die verfügbare Höhe' : 'Uses the available height',
       shape: pt ? 'Formato' : de ? 'Form' : 'Shape',
       preview: pt ? 'Prévia das cores' : de ? 'Farbvorschau' : 'Color preview',
       previewTitle: pt ? 'Minha música' : de ? 'Meine Musik' : 'My music',
@@ -137,6 +149,7 @@ class DesignEditor extends BaseEditor {
 
     const radius = this.getValue('crmBorderRadius');
     const selected = this.getTheme();
+
 
     const haDark = this.hass?.themes?.darkMode !== false;
     const useDark = selected === 'dark' ||
@@ -181,6 +194,81 @@ class DesignEditor extends BaseEditor {
             ${this.themeChoice('dark', ui.dark, ui.darkHint, selected)}
             ${this.themeChoice('auto', ui.auto, ui.autoHint, selected)}
             ${this.themeChoice('custom', ui.custom, ui.customHint, selected)}
+          </div>
+        </div>
+
+        <div class="studio-panel">
+          <div class="panel-title">${ui.heightTitle}</div>
+          <div class="height-mode-visual">
+            ${([
+              ['compact', ui.compact],
+              ['auto', ui.automatic],
+              ['fill', ui.fill],
+            ] as const).map(([mode, label]) => html`
+              <button
+                type="button"
+                class="height-visual-option ${(
+                  this.config.heightMode ??
+                  (this.config.height === 'fill' ? 'fill' : 'compact')
+                ) === mode ? 'selected' : ''}"
+                aria-pressed=${String((
+                  this.config.heightMode ??
+                  (this.config.height === 'fill' ? 'fill' : 'compact')
+                ) === mode)}
+                @click=${() => this.configChanged({
+                  ...this.config,
+                  heightMode: mode,
+                })}
+              >
+                <span class="height-visual-art ${mode}">
+                  ${mode === 'compact' ? html`
+                    <span class="art-row accent"></span>
+                    <span class="art-row"></span>
+                    <span class="art-line"></span>
+                  ` : mode === 'auto' ? html`
+                    <span class="art-row"></span>
+                    <span class="art-row"></span>
+                    <span class="art-row"></span>
+                  ` : html`
+                    <span class="art-fill">
+                      <ha-icon icon="mdi:arrow-expand-vertical"></ha-icon>
+                    </span>
+                  `}
+                </span>
+                <span class="height-visual-label">${label}</span>
+              </button>
+            `)}
+          </div>
+        </div>
+
+        <div class="studio-panel">
+          <div class="panel-title">${ui.dimensions}</div>
+          <div class="panel-hint">${ui.dimensionsHint}</div>
+
+          <div class="dimensions-grid">
+            <label class="dimension-field">
+              <span class="field-label">${ui.width}</span>
+              <input
+                class="studio-input"
+                type="text"
+                name="width"
+                .value=${String(this.config.width ?? '')}
+                placeholder="35.15"
+                @change=${this.onTextChange}
+              />
+            </label>
+
+            <label class="dimension-field">
+              <span class="field-label">${ui.height}</span>
+              <input
+                class="studio-input"
+                type="text"
+                name="height"
+                .value=${String(this.config.height ?? '')}
+                placeholder="35.15"
+                @change=${this.onTextChange}
+              />
+            </label>
           </div>
         </div>
 
@@ -241,6 +329,21 @@ class DesignEditor extends BaseEditor {
   static get styles() {
     return css`
       :host { display: block; min-width: 0; }
+      .dimensions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .dimension-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+      }
+      @media (max-width: 340px) {
+        .dimensions-grid { grid-template-columns: 1fr; }
+      }
+
       * { box-sizing: border-box; }
       .studio { display: grid; gap: 11px; min-width: 0; color: var(--primary-text-color); }
       .studio-heading { padding: 3px 2px 5px; }
@@ -252,6 +355,87 @@ class DesignEditor extends BaseEditor {
       .panel-hint { margin: 4px 0 15px; }
       .field-hint { margin-top: 7px; }
       .theme-list { display: grid; gap: 9px; }
+
+      .height-mode-visual {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .height-visual-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-width: 0;
+        min-height: 172px;
+        padding: 12px 7px 10px;
+        border: 1px solid var(--divider-color);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--primary-text-color);
+        font: inherit;
+        cursor: pointer;
+      }
+      .height-visual-option.selected {
+        border: 2px solid #34d399;
+        padding: 11px 6px 9px;
+      }
+      .height-visual-option:focus-visible {
+        outline: 2px solid #34d399;
+        outline-offset: 2px;
+      }
+      .height-visual-art {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        max-width: 105px;
+        height: 83px;
+        padding: 10px;
+        border: 3px solid currentColor;
+        border-radius: 9px;
+      }
+      .height-visual-art.compact {
+        height: 65px;
+        margin-top: 18px;
+      }
+      .height-visual-art.fill {
+        height: 95px;
+        margin-top: -6px;
+      }
+      .art-row {
+        display: block;
+        height: 13px;
+        border-radius: 3px;
+        background: #d1d1d1;
+      }
+      .art-row.accent {
+        background: #8bdcb8;
+      }
+      .art-line {
+        display: block;
+        border-top: 1px solid #aaa;
+      }
+      .art-fill {
+        display: grid;
+        place-items: center;
+        flex: 1;
+        border-radius: 4px;
+        background: #e3e3e3;
+        color: #34d399;
+      }
+      .art-fill ha-icon {
+        --mdc-icon-size: 40px;
+      }
+      .height-visual-label {
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+
       .theme-option { display: flex; align-items: center; width: 100%; min-width: 0; gap: 12px; padding: 12px; border: 2px solid transparent; border-radius: 14px; background: var(--secondary-background-color, rgba(128,128,128,.1)); color: var(--primary-text-color); text-align: left; font: inherit; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
       .theme-option:hover { background: var(--divider-color, rgba(128,128,128,.16)); }
       .theme-option.selected { border-color: var(--primary-color, #34d399); }

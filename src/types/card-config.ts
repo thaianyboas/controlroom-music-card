@@ -81,6 +81,14 @@ export interface CardConfig extends LovelaceCardConfig {
   height?: string | number;
 
   /**
+   * Controls how the card uses vertical space.
+   * compact: short scrollable lists.
+   * auto: grows with content up to a larger limit.
+   * fill: uses the available card height.
+   */
+  heightMode?: 'compact' | 'auto' | 'fill';
+
+  /**
    * Card content section margin value.
    * Default is 0.0rem.
    */
