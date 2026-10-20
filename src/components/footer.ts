@@ -139,21 +139,21 @@ export class Footer extends LitElement {
   static get styles() {
     return css`
       :host > ha-icon-button {
-        color: #e5f5ee;
+        color: var(--crm-text, #e5f5ee);
         --primary-color: var(--crm-accent, #40d99a);
         --mdc-theme-primary: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
-        --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.14);
+        --ha-icon-button-selected-background-color: color-mix(in srgb, var(--crm-accent, #40d99a) 14%, transparent);
         border-radius: 50%;
       }
 
       :host > ha-icon-button[selected] {
         color: var(--crm-accent, #40d99a) !important;
-        background-color: rgba(64, 217, 154, 0.12);
+        background-color: color-mix(in srgb, var(--crm-accent, #40d99a) 12%, transparent);
         --primary-color: var(--crm-accent, #40d99a);
         --mdc-theme-primary: var(--crm-accent, #40d99a);
         --ha-icon-button-selected-color: var(--crm-accent, #40d99a);
-        --ha-icon-button-selected-background-color: rgba(64, 217, 154, 0.12);
+        --ha-icon-button-selected-background-color: color-mix(in srgb, var(--crm-accent, #40d99a) 12%, transparent);
       }
 
       :host > ha-icon-button[hide] {
