@@ -68,7 +68,7 @@ class AlbumFavBrowserEditor extends BaseEditor {
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:album-play"></ha-icon></span>
+            <span class="studio-icon"><ha-icon icon="mdi:album"></ha-icon></span>
             <div class="studio-heading-copy">
               <strong>${tr('Exibição e reprodução', 'Anzeige und Wiedergabe', 'Display and playback')}</strong>
               <small>${tr('Controle o que aparece e como os álbuns são reproduzidos.', 'Anzeige und Wiedergabe der Alben steuern.', 'Control how albums are displayed and played.')}</small>

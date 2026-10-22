@@ -152,7 +152,7 @@ export class Player extends AlertUpdatesBase {
         position: absolute;
         z-index: -2;
         inset: 0 0 0 36%;
-        background-size: cover;
+        background-size: var(--crm-player-background-size, cover);
         background-position: center;
         background-repeat: no-repeat;
       }

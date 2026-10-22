@@ -1,15 +1,10 @@
 import { css, html, nothing, TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 
-import {
-  CARD_VERSION,
-  DOMAIN_MEDIA_PLAYER,
-  DOMAIN_SPOTIFYPLUS,
-} from '../constants';
+import { CARD_VERSION } from '../constants';
 
 import { BaseEditor } from './base-editor';
 import { translate } from '../localization/i18n';
-import { Section } from '../types/section';
 
 type Language = 'auto' | 'pt' | 'de' | 'en';
 
@@ -48,26 +43,12 @@ class GeneralEditor extends BaseEditor {
       preview: label('Prévia do cartão', 'Kartenvorschau', 'Card preview'),
       previewHint: label('As informações abaixo são apenas uma prévia da configuração.', 'Die Angaben unten zeigen nur eine Vorschau der Einstellungen.', 'The details below are only a configuration preview.'),
       language: g('language'),
-      entity: g('entity'),
+      entity: label('Conta de música', 'Musikkonto', 'Music account'),
       accountHint: label('Escolha a entidade SpotifyPlus vinculada à conta desejada.', 'Wähle die SpotifyPlus-Entität des gewünschten Kontos.', 'Choose the SpotifyPlus entity linked to the account you want.'),
       noEntity: label('Nenhuma conta selecionada', 'Kein Konto ausgewählt', 'No account selected'),
       defaultTitle: 'ControlRoom Music',
     };
 
-    const entitySchema = [{
-      name: 'entity',
-      label: ui.entity,
-      required: true,
-      selector: {
-        entity: {
-          multiple: false,
-          filter: {
-            domain: DOMAIN_MEDIA_PLAYER,
-            integration: DOMAIN_SPOTIFYPLUS,
-          },
-        },
-      },
-    }];
 
     const currentEntity = String(this.config.entity ?? '');
 
@@ -116,13 +97,22 @@ class GeneralEditor extends BaseEditor {
               </label>
 
               <div class="studio-field studio-entity">
-                <crm-editor-form
-                  .schema=${entitySchema}
-                  .section=${Section.PLAYER}
-                  .store=${this.store}
-                  .config=${this.config}
-                  .hass=${this.hass}
-                ></crm-editor-form>
+                <label class="studio-label" for="crm-music-account"><ha-icon icon="mdi:spotify"></ha-icon>${ui.entity}</label>
+                <span class="studio-select-container">
+                  <select id="crm-music-account" class="studio-input studio-select studio-account-select"
+                    .value=${currentEntity || ''}
+                    @change=${(event: Event) => this.updateField('entity', (event.currentTarget as HTMLSelectElement).value)}>
+                    <option value="">${ui.noEntity}</option>
+                    ${Object.values(this.hass.states || {})
+                      .filter(entity => entity.entity_id.startsWith('media_player.') &&
+                        (entity.entity_id === currentEntity ||
+                          entity.entity_id.toLowerCase().includes('spotifyplus') ||
+                          String(entity.attributes?.friendly_name || '').toLowerCase().includes('spotifyplus')))
+                      .sort((a, b) => a.entity_id.localeCompare(b.entity_id))
+                      .map(entity => html`<option value=${entity.entity_id}>${entity.attributes?.friendly_name || entity.entity_id} — ${entity.entity_id}</option>`)}
+                  </select>
+                  <ha-icon icon="mdi:chevron-down"></ha-icon>
+                </span>
                 <div class="studio-hint">${ui.accountHint}</div>
               </div>
 
@@ -186,7 +176,8 @@ class GeneralEditor extends BaseEditor {
       .studio-select { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer; }
       .studio-select-container > ha-icon { position: absolute; right: 11px; top: 11px; --mdc-icon-size: 19px; pointer-events: none; color: var(--secondary-text-color); }
       .studio-select option { background: var(--card-background-color, #202029); color: var(--primary-text-color); }
-      .studio-entity { margin: 1px 0 0; }
+      .studio-entity { margin: 1px 0 0; display: grid; gap: 8px; }
+      .studio-account-select { width: 100%; height: 43px; color: var(--primary-text-color, #17221e) !important; background: var(--card-background-color, #fff) !important; border: 1px solid var(--divider-color, #ccd2d0); border-radius: 11px; font-size: 13px; }
       .studio-entity crm-editor-form {
         display: block;
         min-width: 0;

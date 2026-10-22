@@ -9,7 +9,8 @@ import { css, html, PropertyValues, TemplateResult, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { styleMap, StyleInfo } from 'lit-html/directives/style-map.js';
 import {
-  mdiInformationSlabBoxOutline,
+  mdiHeart,
+  mdiHeartOutline,
   mdiPause,
   mdiPlay,
   mdiPlaylistMusic,
@@ -99,7 +100,7 @@ class PlayerControls extends AlertUpdatesBase {
     return html`
       <div class="player-controls-container" style=${this.styleContainer(idle, isOff)}>
           <div class="icons" hide=${stopped}>
-              <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${mdiInformationSlabBoxOutline} label="More Information" style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${colorActionFavorites ? mdiHeart : mdiHeartOutline} label="Favorites" style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(SHUFFLE_SET)}    hide=${this.hideFeature(SHUFFLE_SET)}    .path=${this.getShuffleIcon()} label="Shuffle" style=${this.styleIcon(colorShuffle)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PREVIOUS_TRACK)} hide=${this.hideFeature(PREVIOUS_TRACK)} .path=${mdiSkipPrevious} label="Previous Track" style=${this.styleIcon()}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(colorPlay, true)}></ha-icon-button>
@@ -401,7 +402,15 @@ class PlayerControls extends AlertUpdatesBase {
         // this is because the `firstUpdated` method will fire every time the configuration 
         // changes (e.g. every keypress) and action status is lost.
         if (this.isCardInEditPreview) {
-          this.alertInfoSet("Action Favorites cannot be displayed while editing card configuration");
+          const selectedLanguage = (this.config.language || 'auto').toLowerCase();
+          const language = selectedLanguage === 'auto'
+            ? (this.store.hass?.locale?.language || this.store.hass?.language || 'en').toLowerCase()
+            : selectedLanguage;
+          this.alertInfoSet(language.startsWith('pt')
+            ? 'Os favoritos não estão disponíveis durante a edição do cartão.'
+            : language.startsWith('de')
+              ? 'Favoriten sind während der Kartenbearbeitung nicht verfügbar.'
+              : 'Favorites are unavailable while editing the card.');
           return true;
         }
 
