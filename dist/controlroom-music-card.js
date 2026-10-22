@@ -7880,6 +7880,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       }
 
       .toggle-row {
+        position: relative;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -7893,9 +7894,15 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
       .toggle-input {
         position: absolute;
-        width: 1px;
-        height: 1px;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 39px;
+        height: 23px;
+        margin: 0;
         opacity: 0;
+        cursor: pointer;
+        z-index: 1;
       }
 
       .toggle-track {
