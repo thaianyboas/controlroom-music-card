@@ -8567,17 +8567,17 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       @media (max-width: 340px) {
         .studio-panel { padding: 10px; }
       }
-    `}});const Do=_e(de+":editor");class Uo extends Eo{constructor(){super(...arguments),this.configArea=Kt.GENERAL,this.expandedGroup="general",this.onFooterShowSection=e=>{const t=ai(e.detail);this.configArea=t,this.expandedGroup=this.groupForArea(t),Rs.selectedConfigArea=this.configArea}}render(){if(!this.hass)return B``;if(!this.config)return B``;super.createStore();const e=je(this.config.language??"auto",this.hass.locale?.language||this.hass.language),t={pt:{general:"Geral",design:"Aparência",player:"Reprodutor",navigation:"Navegação",devices:"Dispositivos",library:"Biblioteca",advanced:"Avançado",settings:"Configurações do cartão",choose:"Escolha uma seção"},de:{general:"Allgemein",design:"Darstellung",player:"Player",navigation:"Navigation",devices:"Geräte",library:"Bibliothek",advanced:"Erweitert",settings:"Karteneinstellungen",choose:"Bereich auswählen"},en:{general:"General",design:"Appearance",player:"Player",devices:"Devices",library:"Library",advanced:"Advanced",settings:"Card settings",choose:"Choose a section"}}[e],i={pt:{[Kt.PLAYLIST_FAVORITES]:"Playlists favoritas",[Kt.ALBUM_FAVORITES]:"Álbuns favoritos",[Kt.ARTIST_FAVORITES]:"Artistas favoritos",[Kt.TRACK_FAVORITES]:"Músicas favoritas",[Kt.AUDIOBOOK_FAVORITES]:"Audiolivros favoritos",[Kt.EPISODE_FAVORITES]:"Episódios favoritos",[Kt.SHOW_FAVORITES]:"Podcasts favoritos",[Kt.CATEGORY_BROWSER]:"Categorias",[Kt.USERPRESET_BROWSER]:"Presets personalizados",[Kt.RECENT_BROWSER]:"Reproduzidos recentemente",[Kt.SEARCH_MEDIA_BROWSER]:"Pesquisa de mídia"},de:{[Kt.PLAYLIST_FAVORITES]:"Lieblingsplaylists",[Kt.ALBUM_FAVORITES]:"Lieblingsalben",[Kt.ARTIST_FAVORITES]:"Lieblingskünstler",[Kt.TRACK_FAVORITES]:"Lieblingssongs",[Kt.AUDIOBOOK_FAVORITES]:"Lieblingshörbücher",[Kt.EPISODE_FAVORITES]:"Lieblingsepisoden",[Kt.SHOW_FAVORITES]:"Lieblingssendungen",[Kt.CATEGORY_BROWSER]:"Kategorien",[Kt.USERPRESET_BROWSER]:"Benutzer-Presets",[Kt.RECENT_BROWSER]:"Zuletzt gespielt",[Kt.SEARCH_MEDIA_BROWSER]:"Mediensuche"},en:{[Kt.PLAYLIST_FAVORITES]:"Favorite playlists",[Kt.ALBUM_FAVORITES]:"Favorite albums",[Kt.ARTIST_FAVORITES]:"Favorite artists",[Kt.TRACK_FAVORITES]:"Favorite tracks",[Kt.AUDIOBOOK_FAVORITES]:"Favorite audiobooks",[Kt.EPISODE_FAVORITES]:"Favorite episodes",[Kt.SHOW_FAVORITES]:"Favorite shows",[Kt.CATEGORY_BROWSER]:"Categories",[Kt.USERPRESET_BROWSER]:"User presets",[Kt.RECENT_BROWSER]:"Recently played",[Kt.SEARCH_MEDIA_BROWSER]:"Media search"}},s=i[e]??i.en,r=[Kt.PLAYLIST_FAVORITES,Kt.ALBUM_FAVORITES,Kt.ARTIST_FAVORITES,Kt.TRACK_FAVORITES,Kt.AUDIOBOOK_FAVORITES,Kt.EPISODE_FAVORITES,Kt.SHOW_FAVORITES,Kt.CATEGORY_BROWSER],o=[Kt.USERPRESET_BROWSER,Kt.RECENT_BROWSER,Kt.SEARCH_MEDIA_BROWSER],a=[{id:"general",title:t.general,icon:"mdi:cog-outline",areas:[Kt.GENERAL]},{id:"design",title:t.design,icon:"mdi:palette-outline",areas:[Kt.DESIGN]},{id:"player",title:t.player,icon:"mdi:play-circle-outline",areas:[Kt.PLAYER]},{id:"navigation",title:t.navigation,icon:"mdi:compass-outline",areas:o},{id:"library",title:t.library,icon:"mdi:bookshelf",areas:r},{id:"devices",title:t.devices,icon:"mdi:speaker-wireless",areas:[Kt.DEVICE_BROWSER]},{id:"advanced",title:t.advanced,icon:"mdi:tune-variant",areas:[]}];return B`
-      <div class="crm-settings-shell">
+    `}});const Do=_e(de+":editor");class Uo extends Eo{constructor(){super(...arguments),this.configArea=Kt.GENERAL,this.expandedGroup="general",this.onFooterShowSection=e=>{const t=ai(e.detail);this.configArea=t,this.expandedGroup=this.groupForArea(t),Rs.selectedConfigArea=this.configArea}}render(){if(!this.hass)return B``;if(!this.config)return B``;super.createStore();const e=this.config.crmTheme,t="light"===e||"dark"===e||"custom"===e||"auto"===e?e:"dark",i=(e,t)=>"string"==typeof e&&/^#[0-9a-fA-F]{6}$/.test(e)?e:t,s="custom"===t?{"--card-background-color":i(this.config.crmBackground,"#101b19"),"--ha-card-background":i(this.config.crmBackground,"#101b19"),"--secondary-background-color":i(this.config.crmBackground,"#101b19"),"--primary-text-color":i(this.config.crmText,"#f0fdf4"),"--secondary-text-color":i(this.config.crmText,"#f0fdf4"),"--primary-color":i(this.config.crmAccent,"#34d399"),"--crm-editor-accent":i(this.config.crmAccent,"#34d399")}:{},r=je(this.config.language??"auto",this.hass.locale?.language||this.hass.language),o={pt:{general:"Geral",design:"Aparência",player:"Reprodutor",navigation:"Navegação",devices:"Dispositivos",library:"Biblioteca",advanced:"Avançado",settings:"Configurações do cartão",choose:"Escolha uma seção"},de:{general:"Allgemein",design:"Darstellung",player:"Player",navigation:"Navigation",devices:"Geräte",library:"Bibliothek",advanced:"Erweitert",settings:"Karteneinstellungen",choose:"Bereich auswählen"},en:{general:"General",design:"Appearance",player:"Player",devices:"Devices",library:"Library",advanced:"Advanced",settings:"Card settings",choose:"Choose a section"}}[r],a={pt:{[Kt.PLAYLIST_FAVORITES]:"Playlists favoritas",[Kt.ALBUM_FAVORITES]:"Álbuns favoritos",[Kt.ARTIST_FAVORITES]:"Artistas favoritos",[Kt.TRACK_FAVORITES]:"Músicas favoritas",[Kt.AUDIOBOOK_FAVORITES]:"Audiolivros favoritos",[Kt.EPISODE_FAVORITES]:"Episódios favoritos",[Kt.SHOW_FAVORITES]:"Podcasts favoritos",[Kt.CATEGORY_BROWSER]:"Categorias",[Kt.USERPRESET_BROWSER]:"Presets personalizados",[Kt.RECENT_BROWSER]:"Reproduzidos recentemente",[Kt.SEARCH_MEDIA_BROWSER]:"Pesquisa de mídia"},de:{[Kt.PLAYLIST_FAVORITES]:"Lieblingsplaylists",[Kt.ALBUM_FAVORITES]:"Lieblingsalben",[Kt.ARTIST_FAVORITES]:"Lieblingskünstler",[Kt.TRACK_FAVORITES]:"Lieblingssongs",[Kt.AUDIOBOOK_FAVORITES]:"Lieblingshörbücher",[Kt.EPISODE_FAVORITES]:"Lieblingsepisoden",[Kt.SHOW_FAVORITES]:"Lieblingssendungen",[Kt.CATEGORY_BROWSER]:"Kategorien",[Kt.USERPRESET_BROWSER]:"Benutzer-Presets",[Kt.RECENT_BROWSER]:"Zuletzt gespielt",[Kt.SEARCH_MEDIA_BROWSER]:"Mediensuche"},en:{[Kt.PLAYLIST_FAVORITES]:"Favorite playlists",[Kt.ALBUM_FAVORITES]:"Favorite albums",[Kt.ARTIST_FAVORITES]:"Favorite artists",[Kt.TRACK_FAVORITES]:"Favorite tracks",[Kt.AUDIOBOOK_FAVORITES]:"Favorite audiobooks",[Kt.EPISODE_FAVORITES]:"Favorite episodes",[Kt.SHOW_FAVORITES]:"Favorite shows",[Kt.CATEGORY_BROWSER]:"Categories",[Kt.USERPRESET_BROWSER]:"User presets",[Kt.RECENT_BROWSER]:"Recently played",[Kt.SEARCH_MEDIA_BROWSER]:"Media search"}},n=a[r]??a.en,l=[Kt.PLAYLIST_FAVORITES,Kt.ALBUM_FAVORITES,Kt.ARTIST_FAVORITES,Kt.TRACK_FAVORITES,Kt.AUDIOBOOK_FAVORITES,Kt.EPISODE_FAVORITES,Kt.SHOW_FAVORITES,Kt.CATEGORY_BROWSER],d=[Kt.USERPRESET_BROWSER,Kt.RECENT_BROWSER,Kt.SEARCH_MEDIA_BROWSER],c=[{id:"general",title:o.general,icon:"mdi:cog-outline",areas:[Kt.GENERAL]},{id:"design",title:o.design,icon:"mdi:palette-outline",areas:[Kt.DESIGN]},{id:"player",title:o.player,icon:"mdi:play-circle-outline",areas:[Kt.PLAYER]},{id:"navigation",title:o.navigation,icon:"mdi:compass-outline",areas:d},{id:"library",title:o.library,icon:"mdi:bookshelf",areas:l},{id:"devices",title:o.devices,icon:"mdi:speaker-wireless",areas:[Kt.DEVICE_BROWSER]},{id:"advanced",title:o.advanced,icon:"mdi:tune-variant",areas:[]}];return B`
+      <div class="crm-settings-shell" data-theme=${t} style=${Me(s)}>
         <div class="crm-settings-heading">
           <ha-icon icon="mdi:music-circle-outline"></ha-icon>
           <div>
             <div class="crm-settings-brand">ControlRoom</div>
-            <div class="crm-settings-caption">${t.settings}</div>
+            <div class="crm-settings-caption">${o.settings}</div>
           </div>
         </div>
-        <nav class="crm-settings-grid" aria-label=${t.choose}>
-          ${a.map(e=>B`
+        <nav class="crm-settings-grid" aria-label=${o.choose}>
+          ${c.map(e=>B`
             <button
               type="button"
               class="crm-settings-tile ${this.expandedGroup===e.id?"active":""}"
@@ -8591,7 +8591,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           `)}
         </nav>
 
-        ${a.map(e=>this.expandedGroup===e.id?B`
+        ${c.map(e=>this.expandedGroup===e.id?B`
           <section class="crm-settings-panel">
             <div class="crm-panel-heading">
               <ha-icon icon=${e.icon}></ha-icon>
@@ -8606,7 +8606,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
                     aria-current=${this.configArea===e?"page":"false"}
                     @click=${()=>this.onConfigSectionClick(e)}
                   >
-                    ${s[e]??String(e)}
+                    ${n[e]??String(e)}
                   </button>
                 `)}
               </div>
@@ -8628,7 +8628,40 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       </div>
     `}static get styles(){return a`
       :host { display: block; min-width: 0; }
-      .crm-settings-shell { min-width: 0; color: var(--primary-text-color); }
+      .crm-settings-shell {
+        min-width: 0;
+        padding: 12px;
+        border-radius: 16px;
+        background: var(--card-background-color, transparent);
+        color: var(--primary-text-color);
+        color-scheme: normal;
+        transition: background-color 150ms ease, color 150ms ease;
+      }
+      .crm-settings-shell[data-theme="light"] {
+        color-scheme: light;
+        --card-background-color: #ffffff;
+        --ha-card-background: #ffffff;
+        --secondary-background-color: #f2f5f4;
+        --primary-text-color: #17221e;
+        --secondary-text-color: #52645c;
+        --divider-color: #dce5e0;
+        --primary-color: #159568;
+        --crm-editor-accent: #159568;
+      }
+      .crm-settings-shell[data-theme="dark"] {
+        color-scheme: dark;
+        --card-background-color: #101b19;
+        --ha-card-background: #101b19;
+        --secondary-background-color: #1b2a26;
+        --primary-text-color: #f0fdf4;
+        --secondary-text-color: #a9c2b6;
+        --divider-color: #34483f;
+        --primary-color: #34d399;
+        --crm-editor-accent: #34d399;
+      }
+      .crm-settings-shell[data-theme="custom"] {
+        --divider-color: color-mix(in srgb, var(--primary-text-color) 22%, transparent);
+      }
       .crm-settings-heading {
         display: flex; align-items: center; gap: 10px;
         padding: 6px 4px 12px;
@@ -8675,18 +8708,18 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         color: var(--secondary-text-color);
       }
       .crm-settings-tile.active {
-        border-color: #34d399;
-        background: color-mix(in srgb, #34d399 9%, transparent);
+        border-color: var(--crm-editor-accent, #34d399);
+        background: color-mix(in srgb, var(--crm-editor-accent, #34d399) 9%, transparent);
       }
       .crm-settings-tile.active .crm-tile-icon {
-        color: #34d399;
+        color: var(--crm-editor-accent, #34d399);
       }
       .crm-settings-tile:hover {
-        border-color: #34d399;
+        border-color: var(--crm-editor-accent, #34d399);
       }
       .crm-settings-tile:focus-visible,
       .crm-settings-subitem:focus-visible {
-        outline: 2px solid #34d399;
+        outline: 2px solid var(--crm-editor-accent, #34d399);
         outline-offset: 2px;
       }
       .crm-settings-panel {
@@ -8705,7 +8738,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       }
       .crm-panel-heading ha-icon {
         --mdc-icon-size: 19px;
-        color: #34d399;
+        color: var(--crm-editor-accent, #34d399);
       }
       .crm-settings-subnav {
         display: flex;
@@ -8724,9 +8757,9 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         cursor: pointer;
       }
       .crm-settings-subitem.selected {
-        border-color: #34d399;
+        border-color: var(--crm-editor-accent, #34d399);
         color: var(--primary-text-color);
-        background: color-mix(in srgb, #34d399 9%, transparent);
+        background: color-mix(in srgb, var(--crm-editor-accent, #34d399) 9%, transparent);
       }
       .crm-empty-panel {
         display: flex;
@@ -8739,7 +8772,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       }
       .crm-empty-panel ha-icon {
         --mdc-icon-size: 22px;
-        color: #34d399;
+        color: var(--crm-editor-accent, #34d399);
       }
       .crm-card-editor {
         min-width: 0;
