@@ -81,6 +81,47 @@ import { ShowFavBrowser } from './sections/show-fav-browser';
 import { TrackFavBrowser } from './sections/track-fav-browser';
 import { formatTitleInfo, removeSpecialChars } from './utils/media-browser-utils';
 
+// ControlRoom Music: WCAG contrast helpers for configurable theme colors.
+// Keep user-selected colors whenever they meet the requested contrast threshold.
+const crmParseHexColor = (value: unknown): [number, number, number] | null => {
+  if (typeof value !== 'string') return null;
+  const hex = value.trim();
+  const short = /^#([0-9a-f]{3})$/i.exec(hex);
+  const long = /^#([0-9a-f]{6})$/i.exec(hex);
+  const normalized = short
+    ? short[1].split('').map((digit) => digit + digit).join('')
+    : long?.[1];
+  if (!normalized) return null;
+  return [0, 2, 4].map((offset) => parseInt(normalized.slice(offset, offset + 2), 16)) as [number, number, number];
+};
+
+const crmLuminance = (color: [number, number, number]): number => {
+  const channels = color.map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+  });
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+};
+
+const crmContrastRatio = (foreground: string, background: string): number | null => {
+  const fg = crmParseHexColor(foreground);
+  const bg = crmParseHexColor(background);
+  if (!fg || !bg) return null;
+  const a = crmLuminance(fg);
+  const b = crmLuminance(bg);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+};
+
+const crmReadableColor = (preferred: string, backgrounds: string[], minimum = 4.5): string => {
+  const validBackgrounds = backgrounds.filter((color) => crmParseHexColor(color) !== null);
+  if (validBackgrounds.length === 0) return preferred;
+  const minimumRatio = (foreground: string): number =>
+    Math.min(...validBackgrounds.map((background) => crmContrastRatio(foreground, background) ?? 0));
+  if (crmParseHexColor(preferred) && minimumRatio(preferred) >= minimum) return preferred;
+  const alternatives = ['#ffffff', '#000000'];
+  return alternatives.sort((a, b) => minimumRatio(b) - minimumRatio(a))[0];
+};
+
 const HEADER_HEIGHT = 2;
 const FOOTER_HEIGHT = 4;
 const CARD_DEFAULT_HEIGHT = '35.15rem';
@@ -1222,7 +1263,7 @@ export class Card extends AlertUpdatesBase {
   // build style info object.
   const styleInfo: StyleInfo = <StyleInfo>{};
 
-  // ControlRoom Music - Appearance
+  // ControlRoom Music - Appearance and automatic WCAG contrast.
   const selectedTheme = this.config?.crmTheme ?? 'dark';
   const darkMode = selectedTheme === 'dark' ||
     (selectedTheme === 'auto' && this.hass?.themes?.darkMode !== false);
@@ -1242,60 +1283,26 @@ export class Card extends AlertUpdatesBase {
       };
 
   const custom = selectedTheme === 'custom';
+  const background = custom ? (this.config?.crmBackground || palette.background) : palette.background;
+  const secondary = custom ? (this.config?.crmBackground || palette.secondary) : palette.secondary;
+  const backgrounds = [background, secondary];
+  const preferredText = custom ? (this.config?.crmText || palette.text) : palette.text;
+  const preferredAccent = custom ? (this.config?.crmAccent || palette.accent) : palette.accent;
 
-  styleInfo['--crm-background'] =
-    custom ? (this.config?.crmBackground || palette.background) : palette.background;
+  styleInfo['--crm-background'] = background;
+  styleInfo['--crm-background-secondary'] = secondary;
+  styleInfo['--crm-text'] = crmReadableColor(preferredText, backgrounds, 4.5);
+  styleInfo['--crm-accent'] = crmReadableColor(preferredAccent, backgrounds, 4.5);
 
-  styleInfo['--crm-background-secondary'] =
-    custom ? (this.config?.crmBackground || palette.secondary) : palette.secondary;
-
-  styleInfo['--crm-accent'] =
-    custom ? (this.config?.crmAccent || palette.accent) : palette.accent;
-
-  styleInfo['--crm-text'] =
-    custom ? (this.config?.crmText || palette.text) : palette.text;
-
-  // ControlRoom Music - cor automática dos ícones
-  const iconBackground = custom
-    ? (this.config?.crmBackground || palette.background)
-    : palette.background;
-
-  const hexMatch = /^#([0-9a-f]{6})$/i.exec(iconBackground.trim());
-  let iconDarkBackground = darkMode;
-
-  if (hexMatch) {
-    const hex = hexMatch[1];
-    const rgb = [0, 2, 4].map((offset) =>
-      parseInt(hex.slice(offset, offset + 2), 16) / 255
-    );
-    const linear = rgb.map((value) =>
-      value <= 0.04045
-        ? value / 12.92
-        : Math.pow((value + 0.055) / 1.055, 2.4)
-    );
-    const luminance =
-      linear[0] * 0.2126 +
-      linear[1] * 0.7152 +
-      linear[2] * 0.0722;
-
-    iconDarkBackground = luminance < 0.179;
-  }
-
-  const automaticIconColor = selectedTheme === 'dark'
-    ? '#e5f5ee'
-    : selectedTheme === 'light'
-      ? '#183329'
-      : iconDarkBackground ? '#e5f5ee' : '#183329';
-
-  const manualIconColor = this.config?.crmIconColor;
-  const validManualColor =
-    typeof manualIconColor === 'string' &&
-    /^#[0-9a-f]{6}$/i.test(manualIconColor);
-
-  styleInfo['--crm-icon-color'] =
-    custom && this.config?.crmIconMode === 'custom' && validManualColor
-      ? manualIconColor
-      : automaticIconColor;
+  // Expose accessible defaults for nested sections without overwriting their explicit settings.
+  styleInfo['--crm-text-secondary'] = crmReadableColor(preferredText, backgrounds, 4.5);
+  styleInfo['--crm-icon-color'] = crmReadableColor(
+    custom && this.config?.crmIconMode === 'custom' && crmParseHexColor(this.config?.crmIconColor)
+      ? this.config.crmIconColor!
+      : (darkMode ? '#e5f5ee' : '#183329'),
+    backgrounds,
+    3,
+  );
 
   if (this.config?.crmBorderRadius) {
     styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;

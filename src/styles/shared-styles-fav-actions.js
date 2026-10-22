@@ -25,7 +25,7 @@ export const sharedStylesFavActions = css`
     overflow-x: clip;
     scrollbar-color: var(--primary-text-color) var(--secondary-background-color);
     scrollbar-width: inherit;
-    color: white;
+    color: var(--crm-text, var(--primary-text-color));
   }
 
   /* style actions 3 dots ("...") <ha-dropdown> dropdown menu */

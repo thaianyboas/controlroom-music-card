@@ -1,15 +1,14 @@
+
 import { css } from 'lit';
 
 /**
  * Shared styles for favorites browsers.
- *
- * See the following link for more information:
- * https://codepen.io/neoky/pen/mGpaKN
+ * ControlRoom Music - Adaptive theme colors.
  */
 export const sharedStylesFavBrowser = css`
 
   .media-browser-section {
-    color: var(--secondary-text-color);
+    color: var(--crm-text, var(--primary-text-color));
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -26,8 +25,10 @@ export const sharedStylesFavBrowser = css`
     font-weight: bold;
     font-size: var(--spc-media-browser-section-title-font-size, 1.0rem);
     line-height: var(--spc-media-browser-section-title-font-size, 1.0rem);
-    color: var(--spc-media-browser-section-title-color, var(--secondary-text-color, #ffffff));
-    color: var(--spc-media-browser-section-title-color);
+    color: var(
+      --spc-media-browser-section-title-color,
+      var(--crm-text, var(--primary-text-color))
+    );
   }
 
   .media-browser-section-subtitle {
@@ -39,7 +40,11 @@ export const sharedStylesFavBrowser = css`
     font-weight: normal;
     font-size: var(--spc-media-browser-section-subtitle-font-size, 0.85rem);
     line-height: var(--spc-media-browser-section-subtitle-font-size, 0.85rem);
-    color: var(--spc-media-browser-section-subtitle-color, var(--secondary-text-color, #ffffff));
+    color: var(
+      --spc-media-browser-section-subtitle-color,
+      var(--crm-text, var(--primary-text-color))
+    );
+    opacity: 0.78;
   }
 
   .media-browser-controls {
@@ -69,13 +74,12 @@ export const sharedStylesFavBrowser = css`
     padding-left: 0.5rem;
     width: 100%;
     align-self: center;
-    color: var(--dark-primary-color);
+    color: var(--crm-text, var(--primary-text-color));
+    opacity: 0.65;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* Compact list: roughly two rows of cover art, with internal scrolling.
-     Adjust this variable if your cover sizes differ. */
   .media-browser-content {
     margin: 0.5rem;
     flex: 0 1 auto;
@@ -84,7 +88,9 @@ export const sharedStylesFavBrowser = css`
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    scrollbar-color: var(--primary-text-color) var(--secondary-background-color);
+    scrollbar-color:
+      var(--crm-text, var(--primary-text-color))
+      var(--crm-background-secondary, var(--secondary-background-color));
     scrollbar-width: auto;
   }
 
@@ -100,6 +106,7 @@ export const sharedStylesFavBrowser = css`
   ha-alert {
     display: block;
     margin-bottom: 0.25rem;
+    color: var(--crm-text, var(--primary-text-color));
   }
 
   *[hide] {

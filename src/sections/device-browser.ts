@@ -210,17 +210,17 @@ export class DeviceBrowser extends FavBrowserBase {
       css`
         .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:#40d99a; cursor:pointer; }
         .crm-settings-button ha-svg-icon { width:23px; height:23px; }
-        .crm-device-settings { padding: 12px; color:#f0f8f2; max-width:100%; box-sizing:border-box; overflow:auto; }
+        .crm-device-settings { padding: 12px; color:var(--crm-text, var(--primary-text-color)); max-width:100%; box-sizing:border-box; overflow:auto; }
         .crm-settings-title { font-weight:700; margin-bottom:6px; }
-        .crm-settings-hint { font-size:12px; color:#a8baaf; margin-bottom:14px; }
+        .crm-settings-hint { font-size:12px; color:var(--crm-text, var(--secondary-text-color)); opacity:.75; margin-bottom:14px; }
         .crm-settings-subtitle { color:#40d99a; font-weight:600; margin:14px 0 8px; }
-        .crm-device-option { display:flex; align-items:center; gap:12px; padding:9px 4px; cursor:pointer; border-bottom:1px solid #23372d; min-width:0; }
+        .crm-device-option { display:flex; align-items:center; gap:12px; padding:9px 4px; cursor:pointer; border-bottom:1px solid color-mix(in srgb, var(--crm-text, #f0fdf4) 18%, transparent); min-width:0; }
         .crm-device-option input { accent-color:#40d99a; width:18px; height:18px; flex-shrink:0; }
         .crm-device-option span { min-width:0; display:flex; flex-direction:column; gap:3px; }
         .crm-device-option strong { font-size:13px; font-weight:500; overflow-wrap:anywhere; }
-        .crm-device-option small { font-size:11px; color:#a8baaf; overflow-wrap:anywhere; }
+        .crm-device-option small { font-size:11px; color:var(--crm-text, var(--secondary-text-color)); opacity:.75; overflow-wrap:anywhere; }
         .crm-settings-done { margin-top:16px; padding:10px 18px; border:0; border-radius:8px; background:#40d99a; color:#102019; font-weight:700; cursor:pointer; }
-        .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:#f0f8f2; border:0; text-align:left; cursor:pointer; }
+        .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:var(--crm-text, var(--primary-text-color)); border:0; text-align:left; cursor:pointer; }
         .crm-ha-device ha-svg-icon { color:#40d99a; width:22px; height:22px; flex-shrink:0; }
         .crm-ha-device-text { min-width:0; display:flex; flex-direction:column; gap:3px; }
         .crm-ha-device-text strong { font-size:14px; font-weight:500; }
