@@ -67,6 +67,38 @@ class PlayerControls extends AlertUpdatesBase {
   protected spotifyPlusService!: SpotifyPlusService;
 
 
+  /** Resolve the card language, following Home Assistant when set to auto. */
+  private getControlLanguage(): 'de' | 'pt' | 'en' {
+    const selected = String(this.config?.language || 'auto').toLowerCase();
+    const language = selected === 'auto'
+      ? String(this.store.hass?.locale?.language || this.store.hass?.language || 'en').toLowerCase()
+      : selected;
+    return language.startsWith('de') ? 'de' : language.startsWith('pt') ? 'pt' : 'en';
+  }
+
+  /** Labels used by Home Assistant icon-button tooltips and accessibility. */
+  private controlLabel(key: string): string {
+    const labels: Record<string, Record<'de' | 'pt' | 'en', string>> = {
+      favorites: { de: 'Favoriten', pt: 'Favoritos', en: 'Favorites' },
+      shuffle: { de: 'Zufallswiedergabe', pt: 'Reprodução aleatória', en: 'Shuffle' },
+      previous: { de: 'Vorheriger Titel', pt: 'Faixa anterior', en: 'Previous Track' },
+      play: { de: 'Wiedergabe starten', pt: 'Reproduzir', en: 'Play' },
+      pause: { de: 'Pausieren', pt: 'Pausar', en: 'Pause' },
+      next: { de: 'Nächster Titel', pt: 'Próxima faixa', en: 'Next Track' },
+      repeat: { de: 'Wiederholen', pt: 'Repetir', en: 'Repeat' },
+      queue: { de: 'Wiedergabewarteschlange', pt: 'Fila de reprodução', en: 'Play Queue' },
+      turnOn: { de: 'Einschalten', pt: 'Ligar', en: 'Turn On' },
+      turnOff: { de: 'Ausschalten', pt: 'Desligar', en: 'Turn Off' },
+      devices: { de: 'Geräte', pt: 'Dispositivos', en: 'Devices' },
+      queuePreview: {
+        de: 'Die Wiedergabewarteschlange ist während der Kartenbearbeitung nicht verfügbar.',
+        pt: 'A fila de reprodução não está disponível durante a edição do cartão.',
+        en: 'The play queue is unavailable while editing the card.'
+      }
+    };
+    return labels[key]?.[this.getControlLanguage()] || labels[key]?.en || key;
+  }
+
   /**
    * Invoked on each update to perform rendering tasks. 
    * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
@@ -100,23 +132,23 @@ class PlayerControls extends AlertUpdatesBase {
     return html`
       <div class="player-controls-container" style=${this.styleContainer(idle, isOff)}>
           <div class="icons" hide=${stopped}>
-              <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${colorActionFavorites ? mdiHeart : mdiHeartOutline} label="Favorites" style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(SHUFFLE_SET)}    hide=${this.hideFeature(SHUFFLE_SET)}    .path=${this.getShuffleIcon()} label="Shuffle" style=${this.styleIcon(colorShuffle)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PREVIOUS_TRACK)} hide=${this.hideFeature(PREVIOUS_TRACK)} .path=${mdiSkipPrevious} label="Previous Track" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(colorPlay, true)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PAUSE)}          hide=${this.hideFeature(PAUSE)}          .path=${mdiPause} label="Pause" class="play-pause" style=${this.styleIcon(false, true)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(NEXT_TRACK)}     hide=${this.hideFeature(NEXT_TRACK)}     .path=${mdiSkipNext} label="Next Track" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(REPEAT_SET)}     hide=${this.hideFeature(REPEAT_SET)}     .path=${this.getRepeatIcon()} label="Repeat" style=${this.styleIcon(colorRepeat)} ></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY_QUEUE)}     hide=${this.hideFeature(PLAY_QUEUE)}     .path=${mdiPlaylistMusic} label="Play Queue Information" style=${this.styleIcon(colorQueueItems)} ></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${colorActionFavorites ? mdiHeart : mdiHeartOutline} label=${this.controlLabel('favorites')} style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(SHUFFLE_SET)}    hide=${this.hideFeature(SHUFFLE_SET)}    .path=${this.getShuffleIcon()} label=${this.controlLabel('shuffle')} style=${this.styleIcon(colorShuffle)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PREVIOUS_TRACK)} hide=${this.hideFeature(PREVIOUS_TRACK)} .path=${mdiSkipPrevious} label=${this.controlLabel('previous')} style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label=${this.controlLabel('play')} class="play-pause" style=${this.styleIcon(colorPlay, true)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PAUSE)}          hide=${this.hideFeature(PAUSE)}          .path=${mdiPause} label=${this.controlLabel('pause')} class="play-pause" style=${this.styleIcon(false, true)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(NEXT_TRACK)}     hide=${this.hideFeature(NEXT_TRACK)}     .path=${mdiSkipNext} label=${this.controlLabel('next')} style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(REPEAT_SET)}     hide=${this.hideFeature(REPEAT_SET)}     .path=${this.getRepeatIcon()} label=${this.controlLabel('repeat')} style=${this.styleIcon(colorRepeat)} ></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY_QUEUE)}     hide=${this.hideFeature(PLAY_QUEUE)}     .path=${mdiPlaylistMusic} label=${this.controlLabel('queue')} style=${this.styleIcon(colorQueueItems)} ></ha-icon-button>
           </div>
           <div class="iconsPower" hide=${isOff}>
-              <ha-icon-button @click=${() => this.onClickAction(TURN_ON)}        hide=${this.hideFeature(TURN_ON)}        .path=${mdiPower} label="Turn On" style=${this.styleIcon(colorPower)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(DEVICES)}        hide=${this.hideFeature(DEVICES)}        .path=${mdiSpeaker} label="Devices" style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(TURN_ON)}        hide=${this.hideFeature(TURN_ON)}        .path=${mdiPower} label=${this.controlLabel('turnOn')} style=${this.styleIcon(colorPower)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(DEVICES)}        hide=${this.hideFeature(DEVICES)}        .path=${mdiSpeaker} label=${this.controlLabel('devices')} style=${this.styleIcon()}></ha-icon-button>
           </div>
           <div class="iconsPower" hide=${idle}>
-              <ha-icon-button @click=${() => this.onClickAction(TURN_OFF)}       hide=${this.hideFeature(TURN_OFF)}       .path=${mdiPower} label="Turn Off" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(true, true)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(DEVICES)}        hide=${this.hideFeature(DEVICES)}        .path=${mdiSpeaker} label="Devices" style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(TURN_OFF)}       hide=${this.hideFeature(TURN_OFF)}       .path=${mdiPower} label=${this.controlLabel('turnOff')} style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label=${this.controlLabel('play')} class="play-pause" style=${this.styleIcon(true, true)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(DEVICES)}        hide=${this.hideFeature(DEVICES)}        .path=${mdiSpeaker} label=${this.controlLabel('devices')} style=${this.styleIcon()}></ha-icon-button>
           </div>
       </div>
       <div class="player-volume-container" style=${this.styleContainer(idle, isOff)}>
@@ -402,10 +434,7 @@ class PlayerControls extends AlertUpdatesBase {
         // this is because the `firstUpdated` method will fire every time the configuration 
         // changes (e.g. every keypress) and action status is lost.
         if (this.isCardInEditPreview) {
-          const selectedLanguage = (this.config.language || 'auto').toLowerCase();
-          const language = selectedLanguage === 'auto'
-            ? (this.store.hass?.locale?.language || this.store.hass?.language || 'en').toLowerCase()
-            : selectedLanguage;
+          const language = this.getControlLanguage();
           this.alertInfoSet(language.startsWith('pt')
             ? 'Os favoritos não estão disponíveis durante a edição do cartão.'
             : language.startsWith('de')
@@ -449,7 +478,7 @@ class PlayerControls extends AlertUpdatesBase {
         // this is because the `firstUpdated` method will fire every time the configuration 
         // changes (e.g. every keypress) and action status is lost.
         if (this.isCardInEditPreview) {
-          this.alertInfoSet("Queue items cannot be displayed while editing card configuration");
+          this.alertInfoSet(this.controlLabel('queuePreview'));
           return true;
         }
 
