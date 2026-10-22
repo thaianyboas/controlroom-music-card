@@ -1,4 +1,3 @@
-
 import { css, html, nothing, TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 
@@ -58,12 +57,6 @@ class SourceSettingsEditor extends BaseEditor {
       pt ? ptText : de ? deText : enText;
 
     return {
-      identification: label('Identificação', 'Bezeichnungen', 'Identification'),
-      identificationHint: label(
-        'Personalize os nomes exibidos no cartão',
-        'Passe die angezeigten Namen an',
-        'Customize the displayed names',
-      ),
       layout: label('Organização', 'Anordnung', 'Layout'),
       layoutHint: label(
         'Defina o dispositivo padrão e a disposição',
@@ -125,8 +118,6 @@ class SourceSettingsEditor extends BaseEditor {
         'Das konfigurierte Gerät ist nicht in der aktuellen Liste.',
         'The configured device is not in the current list.',
       ),
-      preview: label('Prévia da seção', 'Bereichsvorschau', 'Section preview'),
-      defaultLabel: label('Padrão', 'Standard', 'Default'),
       noDefault: label(
         'Nenhum dispositivo padrão definido',
         'Kein Standardgerät festgelegt',
@@ -383,23 +374,6 @@ class SourceSettingsEditor extends BaseEditor {
 
     const labels = this.getLabels();
 
-    const identificationSchema = [
-      {
-        name: 'deviceBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'deviceBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
-    ];
-
     const layoutSchema = [
       {
         name: 'deviceDefaultId',
@@ -451,37 +425,6 @@ class SourceSettingsEditor extends BaseEditor {
     return html`
       <div class="studio-devices">
         <p class="studio-description">${t('description')}</p>
-        <div class="device-preview" aria-label=${labels.preview}>
-          <span class="device-preview-icon"><ha-icon icon="mdi:speaker-multiple"></ha-icon></span>
-          <span class="device-preview-copy">
-            <small>${labels.preview}</small>
-            <strong>${this.config.deviceBrowserTitle || t('title')}</strong>
-            ${this.config.deviceBrowserSubTitle
-              ? html`<small>${this.config.deviceBrowserSubTitle}</small>`
-              : nothing}
-          </span>
-          <span class="device-preview-tag">${labels.defaultLabel}</span>
-        </div>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon">
-              <ha-icon icon="mdi:form-textbox"></ha-icon>
-            </span>
-            <div class="studio-heading-copy">
-              <strong>${labels.identification}</strong>
-              <small>${labels.identificationHint}</small>
-            </div>
-          </div>
-
-          <crm-editor-form
-            .schema=${identificationSchema}
-            .section=${Section.DEVICES}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-          ></crm-editor-form>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -609,38 +552,6 @@ class SourceSettingsEditor extends BaseEditor {
         color: var(--secondary-text-color);
         font-size: 11px;
         line-height: 1.35;
-      }
-
-      .device-preview {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        min-width: 0;
-        padding: 13px 14px;
-        border: 1px solid color-mix(in srgb, var(--primary-color, #1db954) 32%, var(--divider-color, #888));
-        border-radius: 14px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 7%, var(--card-background-color, transparent));
-      }
-      .device-preview-icon {
-        display: grid;
-        place-items: center;
-        flex: 0 0 39px;
-        height: 39px;
-        border-radius: 12px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 15%, transparent);
-        color: var(--primary-color, #1db954);
-      }
-      .device-preview-copy { display: grid; gap: 3px; min-width: 0; flex: 1; }
-      .device-preview-copy strong { color: var(--primary-text-color); font-size: 13px; overflow-wrap: anywhere; }
-      .device-preview-copy small { color: var(--secondary-text-color); font-size: 10px; }
-      .device-preview-tag {
-        flex-shrink: 0;
-        padding: 5px 8px;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 13%, transparent);
-        color: var(--primary-color, #1db954);
-        font-size: 10px;
-        font-weight: 650;
       }
       .device-selector {
         display: grid;

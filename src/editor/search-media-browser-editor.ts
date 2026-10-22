@@ -48,23 +48,6 @@ class SearchMediaBrowserEditor extends BaseEditor {
       options: Object.fromEntries(types.map(type => [type.value, type.label])),
     }];
 
-    const identitySchema = [
-      {
-        name: 'searchMediaBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'searchMediaBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
-    ];
-
     const useGlobalSchema = [{
       name: 'searchMediaBrowserUseDisplaySettings',
       label: t('useDisplaySettings'),
@@ -103,23 +86,6 @@ class SearchMediaBrowserEditor extends BaseEditor {
     return html`
       <div class="studio-search">
         <p class="studio-description">${t('description')}</p>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
-              <small>${tr('Personalize o título e o subtítulo da pesquisa.', 'Titel und Untertitel der Suche anpassen.', 'Customize the search title and subtitle.')}</small>
-            </div>
-          </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.SEARCH_MEDIA}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-          ></crm-editor-form>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">

@@ -24,11 +24,6 @@ class AlbumFavBrowserEditor extends BaseEditor {
     const tr = (ptText: string, deText: string, enText: string) =>
       pt ? ptText : de ? deText : enText;
 
-    const identitySchema = [
-      { name: 'albumFavBrowserTitle', label: t('title'), help: t('titleHelp'), required: false, type: 'string' },
-      { name: 'albumFavBrowserSubTitle', label: t('subtitle'), help: t('subtitleHelp'), required: false, type: 'string' },
-    ];
-
     const layoutSchema = [
       {
         name: 'albumFavBrowserItemsLimit', label: t('itemsLimit'), help: t('itemsLimitHelp'),
@@ -49,38 +44,9 @@ class AlbumFavBrowserEditor extends BaseEditor {
       { name: 'albumFavBrowserItemsRefreshOnEntry', label: t('refreshOnEntry'), required: false, selector: { boolean: {} } },
     ];
 
-    const title = String(this.config.albumFavBrowserTitle || tr('Álbuns favoritos', 'Lieblingsalben', 'Favorite albums'));
-    const subtitle = String(this.config.albumFavBrowserSubTitle || tr('Sua biblioteca de música', 'Deine Musikbibliothek', 'Your music library'));
-
     return html`
       <div class="studio-albums">
         <p class="studio-description">${t('description')}</p>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
-              <small>${tr('Personalize o título e o subtítulo da biblioteca.', 'Titel und Untertitel der Bibliothek anpassen.', 'Customize the library title and subtitle.')}</small>
-            </div>
-          </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.ALBUM_FAVORITES}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-            @value-changed=${this.onValueChanged}
-          ></crm-editor-form>
-          <div class="preview-label">${tr('PRÉVIA', 'VORSCHAU', 'PREVIEW')}</div>
-          <div class="preview">
-            <span class="preview-icon"><ha-icon icon="mdi:album"></ha-icon></span>
-            <div class="preview-copy">
-              <strong>${title}</strong>
-              <small>${subtitle}</small>
-            </div>
-          </div>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -170,25 +136,6 @@ class AlbumFavBrowserEditor extends BaseEditor {
       .studio-heading-copy strong { color: var(--primary-text-color); font-size: 13px; font-weight: 650; }
       .studio-heading-copy small { color: var(--secondary-text-color); font-size: 11px; line-height: 1.4; }
       crm-editor-form { display: block; min-width: 0; }
-      .preview-label {
-        margin: 18px 0 8px; font-size: 10px; font-weight: 700;
-        letter-spacing: .09em; color: var(--secondary-text-color);
-      }
-      .preview {
-        display: flex; align-items: center; gap: 12px; padding: 12px;
-        border-radius: 11px; border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        background: var(--secondary-background-color, rgba(128,128,128,.08));
-      }
-      .preview-icon {
-        display: flex; align-items: center; justify-content: center;
-        width: 40px; height: 40px; flex: 0 0 40px; border-radius: 9px;
-        background: color-mix(in srgb, var(--studio-accent) 13%, transparent);
-        color: var(--studio-accent);
-      }
-      .preview-icon ha-icon { --mdc-icon-size: 22px; }
-      .preview-copy { display: grid; gap: 4px; min-width: 0; }
-      .preview-copy strong { font-size: 12px; color: var(--primary-text-color); overflow-wrap: anywhere; }
-      .preview-copy small { font-size: 11px; color: var(--secondary-text-color); overflow-wrap: anywhere; }
       .group-label {
         display: flex; align-items: center; gap: 7px;
         margin: 3px 0 10px; font-size: 11px; font-weight: 650;

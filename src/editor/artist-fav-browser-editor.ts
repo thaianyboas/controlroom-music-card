@@ -24,11 +24,6 @@ class ArtistFavBrowserEditor extends BaseEditor {
     const tr = (ptText: string, deText: string, enText: string) =>
       pt ? ptText : de ? deText : enText;
 
-    const identitySchema = [
-      { name: 'artistFavBrowserTitle', label: t('title'), help: t('titleHelp'), required: false, type: 'string' },
-      { name: 'artistFavBrowserSubTitle', label: t('subtitle'), help: t('subtitleHelp'), required: false, type: 'string' },
-    ];
-
     const layoutSchema = [
       { name: 'artistFavBrowserItemsLimit', label: t('itemsLimit'), help: t('itemsLimitHelp'), required: false, type: 'integer', default: 200, valueMin: 1, valueMax: 1000 },
       { name: 'artistFavBrowserItemsPerRow', label: t('itemsPerRow'), help: t('itemsPerRowHelp'), required: true, type: 'integer', default: EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW, valueMin: 1, valueMax: 12 },
@@ -57,9 +52,6 @@ class ArtistFavBrowserEditor extends BaseEditor {
       ></crm-editor-form>
     `;
 
-    const previewTitle = String(this.config.artistFavBrowserTitle || tr('Artistas favoritos', 'Lieblingskünstler', 'Favorite artists'));
-    const previewSubtitle = String(this.config.artistFavBrowserSubTitle || tr('Sua biblioteca de artistas', 'Deine Künstlerbibliothek', 'Your artist library'));
-
     return html`
       <div class="studio-artists">
         <div class="intro">
@@ -69,25 +61,6 @@ class ArtistFavBrowserEditor extends BaseEditor {
             <small>${t('description')}</small>
           </div>
         </div>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
-              <small>${tr('Título e subtítulo da biblioteca', 'Titel und Untertitel der Bibliothek', 'Library title and subtitle')}</small>
-            </div>
-          </div>
-          ${form(identitySchema)}
-          <div class="preview-label">${tr('Prévia da seção', 'Bereichsvorschau', 'Section preview')}</div>
-          <div class="preview">
-            <ha-icon icon="mdi:account-music"></ha-icon>
-            <div class="preview-copy">
-              <strong>${previewTitle}</strong>
-              <small>${previewSubtitle}</small>
-            </div>
-          </div>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -144,12 +117,6 @@ class ArtistFavBrowserEditor extends BaseEditor {
       .studio-heading-copy strong { color: var(--primary-text-color); font-size: 13px; font-weight: 650; }
       .studio-heading-copy small { color: var(--secondary-text-color); font-size: 11px; line-height: 1.4; }
       crm-editor-form { display: block; min-width: 0; }
-      .preview-label { margin: 16px 0 8px; color: var(--secondary-text-color); font-size: 11px; font-weight: 600; }
-      .preview { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 12px; border: 1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius: 11px; background: var(--secondary-background-color, rgba(128,128,128,.08)); }
-      .preview > ha-icon { color: var(--studio-accent); --mdc-icon-size: 23px; }
-      .preview-copy { display: grid; gap: 3px; min-width: 0; }
-      .preview-copy strong { color: var(--primary-text-color); font-size: 12px; overflow-wrap: anywhere; }
-      .preview-copy small { color: var(--secondary-text-color); font-size: 11px; overflow-wrap: anywhere; }
       .subsection { padding: 0 0 14px; margin-bottom: 14px; border-bottom: 1px solid var(--divider-color, rgba(128,128,128,.16)); }
       .subsection.last { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
       .subsection-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; color: var(--secondary-text-color); }

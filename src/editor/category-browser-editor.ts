@@ -19,23 +19,6 @@ class CategoryBrowserEditor extends BaseEditor {
     const t = (key: string): string =>
       translate(`editor.categoryBrowserSettings.${key}`, language, hassLanguage);
 
-    const identitySchema = [
-      {
-        name: 'categoryBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'categoryBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
-    ];
-
     const layoutSchema = [
       {
         name: 'categoryBrowserItemsPerRow',
@@ -74,11 +57,6 @@ class CategoryBrowserEditor extends BaseEditor {
       },
     ];
 
-    const title = String(this.config.categoryBrowserTitle ||
-      tr('Categorias', 'Kategorien', 'Categories'));
-    const subtitle = String(this.config.categoryBrowserSubTitle ||
-      tr('Explore por categoria', 'Nach Kategorien entdecken', 'Explore by category'));
-
     return html`
       <div class="studio-categories">
         <div class="studio-intro">
@@ -88,32 +66,6 @@ class CategoryBrowserEditor extends BaseEditor {
             <small>${t('description')}</small>
           </div>
         </div>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
-              <small>${tr('Título e subtítulo da biblioteca', 'Titel und Untertitel der Bibliothek', 'Library title and subtitle')}</small>
-            </div>
-          </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.CATEGORYS}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-            @value-changed=${this.onValueChanged}
-          ></crm-editor-form>
-          <div class="preview-label">${tr('Prévia da identificação', 'Vorschau der Bezeichnungen', 'Identification preview')}</div>
-          <div class="preview" aria-label=${tr('Prévia', 'Vorschau', 'Preview')}>
-            <span class="preview-icon"><ha-icon icon="mdi:shape-outline"></ha-icon></span>
-            <div class="preview-copy">
-              <strong>${title}</strong>
-              <small>${subtitle}</small>
-            </div>
-          </div>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -211,25 +163,6 @@ class CategoryBrowserEditor extends BaseEditor {
       .studio-heading-copy strong { color: var(--primary-text-color); font-size: 13px; font-weight: 650; }
       .studio-heading-copy small { color: var(--secondary-text-color); font-size: 11px; line-height: 1.4; }
       crm-editor-form { display: block; min-width: 0; }
-      .preview-label {
-        margin: 17px 0 8px; color: var(--secondary-text-color);
-        font-size: 10px; font-weight: 650; letter-spacing: .035em;
-      }
-      .preview {
-        display: flex; align-items: center; gap: 11px; padding: 12px;
-        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        border-radius: 11px; background: var(--secondary-background-color, rgba(128,128,128,.08));
-      }
-      .preview-icon {
-        display: grid; place-items: center; flex: 0 0 38px; height: 38px;
-        border-radius: 10px; background: var(--card-background-color, transparent);
-        color: var(--studio-accent);
-      }
-      .preview-icon ha-icon { --mdc-icon-size: 21px; }
-      .preview-copy { display: grid; gap: 4px; min-width: 0; }
-      .preview-copy strong, .preview-copy small { overflow-wrap: anywhere; }
-      .preview-copy strong { color: var(--primary-text-color); font-size: 12px; }
-      .preview-copy small { color: var(--secondary-text-color); font-size: 11px; }
       .subsection-heading {
         display: flex; align-items: center; gap: 8px; margin: 2px 0 11px;
         color: var(--primary-text-color); font-size: 12px; font-weight: 650;

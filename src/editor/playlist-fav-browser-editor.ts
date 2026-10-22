@@ -37,28 +37,6 @@ class PlaylistFavBrowserEditor extends BaseEditor {
     this.configChanged(updated);
   }
 
-  private textField(
-    name: keyof CardConfig,
-    label: string,
-    placeholder: string,
-  ): TemplateResult {
-    return html`
-      <label class="field">
-        <span class="field-label">${label}</span>
-        <input
-          class="text-input"
-          type="text"
-          .value=${String(this.value(name, ''))}
-          placeholder=${placeholder}
-          @change=${(event: Event) => {
-          const input = event.currentTarget as HTMLInputElement;
-          this.updateField(name, input.value);
-        }}
-        />
-      </label>
-    `;
-  }
-
   private numberField(
     name: keyof CardConfig,
     label: string,
@@ -172,9 +150,6 @@ class PlaylistFavBrowserEditor extends BaseEditor {
   }
 
   protected render(): TemplateResult {
-    const title = String(this.value('playlistFavBrowserTitle', '')).trim();
-    const subtitle = String(this.value('playlistFavBrowserSubTitle', '')).trim();
-
     return html`
       <div class="studio">
 
@@ -197,39 +172,6 @@ class PlaylistFavBrowserEditor extends BaseEditor {
             </span>
           </div>
         </div>
-
-        <section class="settings-section">
-          <div class="section-heading">
-            <ha-icon icon="mdi:format-text"></ha-icon>
-            <strong>
-              ${this.tr('Identificação', 'Bezeichnungen', 'Labels')}
-            </strong>
-          </div>
-
-          <div class="fields">
-            ${this.textField(
-              'playlistFavBrowserTitle',
-              this.tr('Título da seção', 'Bereichstitel', 'Section title'),
-              this.tr('Playlists favoritas', 'Lieblingsplaylists', 'Favorite playlists'),
-            )}
-
-            ${this.textField(
-              'playlistFavBrowserSubTitle',
-              this.tr('Subtítulo', 'Untertitel', 'Subtitle'),
-              this.tr('Opcional', 'Optional', 'Optional'),
-            )}
-          </div>
-          <div class="identity-preview">
-            <span class="preview-eyebrow">${this.tr('Prévia do cabeçalho', 'Vorschau der Überschrift', 'Header preview')}</span>
-            <div class="preview-heading">
-              <ha-icon icon="mdi:playlist-music"></ha-icon>
-              <div class="preview-copy">
-                <strong>${title || this.tr('Playlists favoritas', 'Lieblingsplaylists', 'Favorite playlists')}</strong>
-                ${subtitle ? html`<small>${subtitle}</small>` : html`<small class="preview-placeholder">${this.tr('Sem subtítulo', 'Ohne Untertitel', 'No subtitle')}</small>`}
-              </div>
-            </div>
-          </div>
-        </section>
 
         <section class="settings-section">
           <div class="section-heading">
@@ -421,47 +363,20 @@ class PlaylistFavBrowserEditor extends BaseEditor {
         gap: 13px;
       }
 
-      .field {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-        min-width: 0;
-      }
-
-      .field-label {
-        color: var(--secondary-text-color);
-        font-size: 11px;
-        font-weight: 550;
-      }
-
-      .text-input,
       .number-input {
         width: 100%;
         min-width: 0;
         height: 38px;
         padding: 0 12px;
-        border: 1px solid var(
-          --divider-color,
-          rgba(128,128,128,.22)
-        );
+        border: 1px solid var(--divider-color, rgba(128,128,128,.22));
         border-radius: 9px;
         outline: none;
-        background: var(
-          --secondary-background-color,
-          rgba(127,127,127,.08)
-        );
+        background: var(--secondary-background-color, rgba(127,127,127,.08));
         color: var(--primary-text-color);
         font: inherit;
         font-size: 12px;
         transition: border-color .15s, background .15s;
       }
-
-      .text-input::placeholder {
-        color: var(--secondary-text-color);
-        opacity: .7;
-      }
-
-      .text-input:focus,
       .number-input:focus {
         border-color: var(--studio-accent);
         background: var(--card-background-color, transparent);
@@ -531,20 +446,6 @@ class PlaylistFavBrowserEditor extends BaseEditor {
         font-size: 10px;
       }
 
-      .identity-preview {
-        margin-top: 15px;
-        padding: 12px;
-        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        border-radius: 12px;
-        background: var(--secondary-background-color, rgba(128,128,128,.07));
-      }
-      .preview-eyebrow { display: block; margin-bottom: 11px; font-size: 10px; color: var(--secondary-text-color); }
-      .preview-heading { display: flex; align-items: center; gap: 11px; min-width: 0; }
-      .preview-heading > ha-icon { flex-shrink: 0; --mdc-icon-size: 23px; color: var(--studio-accent); }
-      .preview-copy { display: grid; gap: 4px; min-width: 0; }
-      .preview-copy strong { font-size: 13px; overflow-wrap: anywhere; }
-      .preview-copy small { font-size: 11px; color: var(--secondary-text-color); overflow-wrap: anywhere; }
-      .preview-placeholder { opacity: .65; font-style: italic; }
       .display-group + .display-group { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--divider-color, rgba(128,128,128,.17)); }
       .group-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--secondary-text-color); font-size: 11px; font-weight: 650; }
       .group-heading ha-icon { --mdc-icon-size: 16px; color: var(--studio-accent); }

@@ -25,11 +25,6 @@ class UserPresetSettingsEditor extends BaseEditor {
       pt ? ptText : de ? deText : enText;
 
     const labels = {
-      identity: tr('Identificação', 'Bezeichnungen', 'Identification'),
-      identityHint: tr('Personalize o título e o subtítulo desta seção', 'Titel und Untertitel dieses Bereichs anpassen', 'Customize this section title and subtitle'),
-      preview: tr('Prévia da seção', 'Bereichsvorschau', 'Section preview'),
-      previewTitle: tr('Meus presets', 'Meine Presets', 'My presets'),
-      previewSubtitle: tr('Seus atalhos de reprodução', 'Deine Wiedergabe-Shortcuts', 'Your playback shortcuts'),
       source: tr('Fonte dos presets', 'Preset-Quelle', 'Preset source'),
       sourceHint: tr('Informe o arquivo que contém seus presets personalizados', 'Datei mit deinen benutzerdefinierten Presets angeben', 'Specify the file containing your custom presets'),
       layout: tr('Organização', 'Anordnung', 'Layout'),
@@ -38,23 +33,6 @@ class UserPresetSettingsEditor extends BaseEditor {
       visibilityHint: tr('Escolha quais informações aparecem nos itens', 'Sichtbare Informationen der Elemente auswählen', 'Choose which item details are visible'),
       documentation: tr('Ajuda e documentação', 'Hilfe und Dokumentation', 'Help and documentation'),
     };
-
-    const identitySchema = [
-      {
-        name: 'userPresetBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'userPresetBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
-    ];
 
     const sourceSchema = [
       {
@@ -95,36 +73,9 @@ class UserPresetSettingsEditor extends BaseEditor {
       },
     ];
 
-    const previewTitle = this.config.userPresetBrowserTitle || labels.previewTitle;
-    const previewSubtitle = this.config.userPresetBrowserSubTitle || labels.previewSubtitle;
-
     return html`
       <div class="studio-presets">
         <p class="studio-description">${t('description')}</p>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${labels.identity}</strong>
-              <small>${labels.identityHint}</small>
-            </div>
-          </div>
-          <div class="identity-preview" aria-label=${labels.preview}>
-            <span class="preview-icon"><ha-icon icon="mdi:playlist-star"></ha-icon></span>
-            <span class="preview-copy">
-              <strong>${previewTitle}</strong>
-              <small>${previewSubtitle}</small>
-            </span>
-          </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.USERPRESETS}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-          ></crm-editor-form>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -245,41 +196,6 @@ class UserPresetSettingsEditor extends BaseEditor {
         font-size: 11px;
         line-height: 1.35;
       }
-      .identity-preview {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 13px;
-        margin-bottom: 14px;
-        border: 1px solid color-mix(in srgb, var(--primary-color, #1db954) 25%, var(--divider-color, #888));
-        border-radius: 12px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 6%, var(--card-background-color, transparent));
-        min-width: 0;
-      }
-      .preview-icon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex: 0 0 43px;
-        width: 43px;
-        height: 43px;
-        border-radius: 12px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 15%, transparent);
-        color: var(--primary-color, #1db954);
-      }
-      .preview-icon ha-icon { --mdc-icon-size: 24px; }
-      .preview-copy { display: grid; gap: 4px; min-width: 0; }
-      .preview-copy strong {
-        font-size: 13px;
-        font-weight: 650;
-        color: var(--primary-text-color);
-        overflow-wrap: anywhere;
-      }
-      .preview-copy small {
-        font-size: 11px;
-        color: var(--secondary-text-color);
-        overflow-wrap: anywhere;
-      }
       .documentation-panel {
         padding: 13px 14px;
         border: 1px solid var(--divider-color, rgba(128,128,128,.2));
@@ -311,7 +227,6 @@ class UserPresetSettingsEditor extends BaseEditor {
       crm-editor-form { display: block; min-width: 0; }
       @media (max-width: 340px) {
         .studio-panel { padding: 10px; }
-        .identity-preview { padding: 10px; }
       }
     `;
   }

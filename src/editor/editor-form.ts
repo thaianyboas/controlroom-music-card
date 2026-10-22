@@ -42,6 +42,12 @@ class Form extends BaseEditor {
         --ha-form-style-selector-margin-bottom: 4px;
         --ha-form-style-selector-boolean-min-height: 32px;
         --ha-form-style-string-margin-bottom: 4px;
+
+        /* Inherit the ControlRoom palette rather than HA's global theme. */
+        --crm-form-accent: var(--crm-editor-accent, var(--primary-color, #159568));
+        --crm-form-text: var(--primary-text-color, #17221e);
+        --crm-form-muted: var(--secondary-text-color, #52635b);
+        --crm-form-surface: var(--secondary-background-color, transparent);
       }
 
       ha-form {
@@ -58,6 +64,46 @@ class Form extends BaseEditor {
         --mdc-text-field-outlined-idle-border-color: transparent;
         --mdc-text-field-outlined-hover-border-color: var(--divider-color);
         --ha-textfield-border-width: 1px;
+
+        /* MDC (older HA controls) */
+        --mdc-theme-primary: var(--crm-form-accent);
+        --mdc-theme-on-surface: var(--crm-form-text);
+        --mdc-theme-text-primary-on-background: var(--crm-form-text);
+        --mdc-theme-text-secondary-on-background: var(--crm-form-muted);
+        --mdc-text-field-ink-color: var(--crm-form-text);
+        --mdc-text-field-label-ink-color: var(--crm-form-muted);
+        --mdc-text-field-fill-color: var(--crm-form-surface);
+        --mdc-select-ink-color: var(--crm-form-text);
+        --mdc-select-label-ink-color: var(--crm-form-muted);
+        --mdc-select-fill-color: var(--crm-form-surface);
+        --mdc-checkbox-checked-color: var(--crm-form-accent);
+        --mdc-switch-selected-track-color: var(--crm-form-accent);
+        --mdc-switch-selected-handle-color: var(--crm-form-accent);
+        --mdc-radio-checked-color: var(--crm-form-accent);
+
+        /* Home Assistant selectors and switches */
+        --ha-selector-text-color: var(--crm-form-text);
+        --ha-selector-label-color: var(--crm-form-muted);
+        --switch-checked-color: var(--crm-form-accent);
+        --switch-checked-track-color: var(--crm-form-accent);
+        --switch-checked-button-color: var(--crm-form-accent);
+        --ha-switch-checked-color: var(--crm-form-accent);
+        --ha-switch-checked-track-color: var(--crm-form-accent);
+        --ha-switch-checked-button-color: var(--crm-form-accent);
+        --ha-control-color: var(--crm-form-accent);
+        --ha-control-checked-color: var(--crm-form-accent);
+        --ha-textfield-ink-color: var(--crm-form-text);
+        --ha-textfield-label-color: var(--crm-form-muted);
+        --ha-textfield-focus-color: var(--crm-form-accent);
+        --ha-select-ink-color: var(--crm-form-text);
+        --ha-select-label-color: var(--crm-form-muted);
+        --ha-select-focus-color: var(--crm-form-accent);
+
+        /* Material Web (newer HA controls) */
+        --md-sys-color-primary: var(--crm-form-accent);
+        --md-sys-color-on-surface: var(--crm-form-text);
+        --md-sys-color-on-surface-variant: var(--crm-form-muted);
+        --md-sys-color-surface-container-highest: var(--crm-form-surface);
       }
     `;
   }
@@ -127,7 +173,13 @@ class Form extends BaseEditor {
         ha-form-select,
         ha-form-multi_select,
         ha-selector {
-          color: var(--primary-text-color);
+          color: var(--crm-form-text, var(--primary-text-color));
+          --primary-color: var(--crm-form-accent, #159568);
+          --success-color: var(--crm-form-accent, #159568);
+          --mdc-theme-primary: var(--crm-form-accent, #159568);
+          --mdc-theme-on-surface: var(--crm-form-text, var(--primary-text-color));
+          --mdc-theme-text-primary-on-background: var(--crm-form-text, var(--primary-text-color));
+          --mdc-theme-text-secondary-on-background: var(--crm-form-muted, var(--secondary-text-color));
           --mdc-menu-item-height: 36px;
           --mdc-text-field-fill-color:
             var(--secondary-background-color, rgba(127,127,127,.06));
@@ -136,6 +188,18 @@ class Form extends BaseEditor {
           --mdc-text-field-outlined-idle-border-color: transparent;
           --mdc-text-field-outlined-hover-border-color: var(--divider-color);
           --ha-textfield-border-width: 1px;
+          --mdc-select-ink-color: var(--crm-form-text, var(--primary-text-color));
+          --mdc-select-label-ink-color: var(--crm-form-muted, var(--secondary-text-color));
+          --mdc-checkbox-checked-color: var(--crm-form-accent, #159568);
+          --switch-checked-color: var(--crm-form-accent, #159568);
+          --switch-checked-track-color: var(--crm-form-accent, #159568);
+          --ha-switch-checked-color: var(--crm-form-accent, #159568);
+          --ha-switch-checked-track-color: var(--crm-form-accent, #159568);
+          --ha-control-color: var(--crm-form-accent, #159568);
+          --ha-control-checked-color: var(--crm-form-accent, #159568);
+          --md-sys-color-primary: var(--crm-form-accent, #159568);
+          --md-sys-color-on-surface: var(--crm-form-text, var(--primary-text-color));
+          --md-sys-color-on-surface-variant: var(--crm-form-muted, var(--secondary-text-color));
         }
       `;
 

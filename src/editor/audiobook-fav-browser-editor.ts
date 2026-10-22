@@ -23,10 +23,6 @@ class AudiobookFavBrowserEditor extends BaseEditor {
     const de = language.toLowerCase().startsWith('de');
     const tr = (p: string, d: string, e: string): string => pt ? p : de ? d : e;
 
-    const identitySchema = [
-      { name: 'audiobookFavBrowserTitle', label: t('title'), help: t('titleHelp'), required: false, type: 'string' },
-      { name: 'audiobookFavBrowserSubTitle', label: t('subtitle'), help: t('subtitleHelp'), required: false, type: 'string' },
-    ];
     const layoutSchema = [
       { name: 'audiobookFavBrowserItemsLimit', label: t('itemsLimit'), help: t('itemsLimitHelp'), required: false, type: 'integer', default: 200, valueMin: 1, valueMax: 1000 },
       { name: 'audiobookFavBrowserItemsPerRow', label: t('itemsPerRow'), help: t('itemsPerRowHelp'), required: true, type: 'integer', default: EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW, valueMin: 1, valueMax: 12 },
@@ -51,9 +47,6 @@ class AudiobookFavBrowserEditor extends BaseEditor {
       ></crm-editor-form>
     `;
 
-    const previewTitle = String(this.config.audiobookFavBrowserTitle || tr('Audiolivros favoritos', 'Lieblingshörbücher', 'Favorite audiobooks'));
-    const previewSubtitle = String(this.config.audiobookFavBrowserSubTitle || tr('Sua biblioteca de audiolivros', 'Deine Hörbuchbibliothek', 'Your audiobook library'));
-
     return html`
       <div class="studio-audiobooks">
         <div class="intro">
@@ -63,27 +56,6 @@ class AudiobookFavBrowserEditor extends BaseEditor {
             <small>${t('description')}</small>
           </div>
         </div>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
-              <small>${tr('Personalize o título e o subtítulo.', 'Titel und Untertitel anpassen.', 'Customize the title and subtitle.')}</small>
-            </div>
-          </div>
-          ${form(identitySchema)}
-          <div class="preview">
-            <div class="eyebrow"><ha-icon icon="mdi:eye-outline"></ha-icon>${tr('Prévia da seção', 'Bereichsvorschau', 'Section preview')}</div>
-            <div class="preview-content">
-              <ha-icon icon="mdi:book-open-variant"></ha-icon>
-              <div>
-                <strong>${previewTitle}</strong>
-                <small>${previewSubtitle}</small>
-              </div>
-            </div>
-          </div>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -136,14 +108,6 @@ class AudiobookFavBrowserEditor extends BaseEditor {
       .studio-heading-copy strong { font-size: 13px; font-weight: 650; }
       .studio-heading-copy small { font-size: 11px; line-height: 1.45; color: var(--secondary-text-color); }
       crm-editor-form { display: block; min-width: 0; }
-      .preview { margin-top: 15px; padding: 12px; border: 1px solid var(--divider-color, rgba(128,128,128,.18)); border-radius: 11px; background: var(--secondary-background-color, rgba(128,128,128,.07)); }
-      .eyebrow { display: flex; align-items: center; gap: 6px; margin-bottom: 11px; color: var(--secondary-text-color); font-size: 10px; font-weight: 600; }
-      .eyebrow ha-icon { --mdc-icon-size: 15px; }
-      .preview-content { display: flex; align-items: center; gap: 11px; min-width: 0; }
-      .preview-content > ha-icon { --mdc-icon-size: 22px; color: var(--success-color, #27b881); }
-      .preview-content > div { display: grid; gap: 4px; min-width: 0; }
-      .preview-content strong { font-size: 12px; overflow-wrap: anywhere; }
-      .preview-content small { font-size: 11px; color: var(--secondary-text-color); overflow-wrap: anywhere; }
       .subgroup + .subgroup { margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--divider-color, rgba(128,128,128,.16)); }
       .subgroup-title { display: flex; align-items: center; gap: 7px; margin-bottom: 11px; font-size: 11px; font-weight: 650; color: var(--secondary-text-color); }
       .subgroup-title ha-icon { --mdc-icon-size: 16px; color: var(--success-color, #27b881); }

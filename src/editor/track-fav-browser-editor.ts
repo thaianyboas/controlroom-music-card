@@ -24,23 +24,6 @@ class TrackFavBrowserEditor extends BaseEditor {
     const tr = (ptText: string, deText: string, enText: string): string =>
       pt ? ptText : de ? deText : enText;
 
-    const identitySchema = [
-      {
-        name: 'trackFavBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'trackFavBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
-    ];
-
     const layoutSchema = [
       {
         name: 'trackFavBrowserItemsLimit',
@@ -104,40 +87,9 @@ class TrackFavBrowserEditor extends BaseEditor {
       },
     ];
 
-    const configuredTitle = String(this.config.trackFavBrowserTitle || '').trim();
-    const configuredSubtitle = String(this.config.trackFavBrowserSubTitle || '').trim();
-    const previewTitle = configuredTitle || tr('Músicas favoritas', 'Lieblingssongs', 'Favorite tracks');
-    const previewSubtitle = configuredSubtitle || tr('Sua biblioteca de músicas', 'Deine Musikbibliothek', 'Your music library');
-
     return html`
       <div class="studio-tracks">
         <p class="studio-description">${t('description')}</p>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
-              <small>${tr('Título e subtítulo da biblioteca', 'Titel und Untertitel der Bibliothek', 'Library title and subtitle')}</small>
-            </div>
-          </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.TRACK_FAVORITES}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-            @value-changed=${this.onValueChanged}
-          ></crm-editor-form>
-          <div class="preview-caption">${tr('PRÉVIA DA SEÇÃO', 'BEREICHSVORSCHAU', 'SECTION PREVIEW')}</div>
-          <div class="section-preview">
-            <span class="preview-icon"><ha-icon icon="mdi:music-note"></ha-icon></span>
-            <div class="preview-copy">
-              <strong>${previewTitle}</strong>
-              <small>${previewSubtitle}</small>
-            </div>
-          </div>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -273,40 +225,6 @@ class TrackFavBrowserEditor extends BaseEditor {
         line-height: 1.4;
       }
       crm-editor-form { display: block; min-width: 0; }
-      .preview-caption {
-        margin: 18px 0 8px;
-        color: var(--secondary-text-color);
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: .08em;
-      }
-      .section-preview {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        padding: 13px;
-        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        border-radius: 11px;
-        background: var(--secondary-background-color, rgba(128,128,128,.07));
-      }
-      .preview-icon {
-        display: grid;
-        place-items: center;
-        flex: 0 0 37px;
-        height: 37px;
-        border-radius: 9px;
-        background: color-mix(in srgb, var(--studio-accent) 14%, transparent);
-        color: var(--studio-accent);
-      }
-      .preview-icon ha-icon { --mdc-icon-size: 21px; }
-      .preview-copy { display: grid; gap: 3px; min-width: 0; }
-      .preview-copy strong { font-size: 12px; overflow-wrap: anywhere; }
-      .preview-copy small {
-        color: var(--secondary-text-color);
-        font-size: 11px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-      }
       .setting-group { padding: 4px 0 17px; margin-bottom: 16px; border-bottom: 1px solid var(--divider-color, rgba(128,128,128,.2)); }
       .setting-group.last-group { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
       .group-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; font-weight: 650; }
@@ -314,7 +232,6 @@ class TrackFavBrowserEditor extends BaseEditor {
       .group-description { margin: 0 0 12px 25px; color: var(--secondary-text-color); font-size: 11px; line-height: 1.45; }
       @media (max-width: 340px) {
         .studio-panel { padding: 11px; }
-        .section-preview { padding: 10px; }
       }
     `;
   }

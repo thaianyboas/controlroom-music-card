@@ -25,11 +25,6 @@ class RecentSettingsEditor extends BaseEditor {
       pt ? ptText : de ? deText : enText;
 
     const labels = {
-      identity: tr('Identificação', 'Bezeichnungen', 'Identification'),
-      identityHint: tr('Personalize o título e o subtítulo desta seção', 'Titel und Untertitel dieses Bereichs anpassen', 'Customize the section title and subtitle'),
-      preview: tr('Prévia da seção', 'Bereichsvorschau', 'Section preview'),
-      defaultTitle: tr('Reproduzidos recentemente', 'Zuletzt wiedergegeben', 'Recently played'),
-      defaultSubtitle: tr('Seu histórico recente do Spotify', 'Dein letzter Spotify-Verlauf', 'Your recent Spotify history'),
       layout: tr('Organização', 'Anordnung', 'Layout'),
       layoutHint: tr('Defina a quantidade de itens exibidos por linha', 'Anzahl der Elemente pro Zeile festlegen', 'Set the number of items per row'),
       display: tr('Exibição', 'Anzeige', 'Display'),
@@ -39,23 +34,6 @@ class RecentSettingsEditor extends BaseEditor {
       visibility: tr('Visibilidade', 'Sichtbarkeit', 'Visibility'),
       refreshGroup: tr('Carregamento', 'Ladeverhalten', 'Loading behavior'),
     };
-
-    const identitySchema = [
-      {
-        name: 'recentBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'recentBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
-    ];
 
     const layoutSchema = [
       {
@@ -95,37 +73,9 @@ class RecentSettingsEditor extends BaseEditor {
       },
     ];
 
-    const previewTitle = this.config.recentBrowserTitle || labels.defaultTitle;
-    const previewSubtitle = this.config.recentBrowserSubTitle || labels.defaultSubtitle;
-
     return html`
       <div class="studio-recents">
         <p class="studio-description">${t('description')}</p>
-
-        <section class="studio-panel">
-          <div class="studio-panel-heading">
-            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
-            <div class="studio-heading-copy">
-              <strong>${labels.identity}</strong>
-              <small>${labels.identityHint}</small>
-            </div>
-          </div>
-          <div class="section-preview" aria-label=${labels.preview}>
-            <span class="preview-icon"><ha-icon icon="mdi:history"></ha-icon></span>
-            <div class="preview-copy">
-              <span class="preview-eyebrow">${labels.preview}</span>
-              <strong>${previewTitle}</strong>
-              <small>${previewSubtitle}</small>
-            </div>
-          </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.RECENTS}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-          ></crm-editor-form>
-        </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -237,46 +187,6 @@ class RecentSettingsEditor extends BaseEditor {
         color: var(--secondary-text-color);
         font-size: 11px;
         line-height: 1.4;
-      }
-      .section-preview {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 0;
-        margin-bottom: 14px;
-        padding: 13px;
-        border: 1px solid color-mix(in srgb, var(--primary-color, #1db954) 24%, var(--divider-color, transparent));
-        border-radius: 12px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 6%, var(--card-background-color, transparent));
-      }
-      .preview-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex: 0 0 43px;
-        width: 43px;
-        height: 43px;
-        border-radius: 12px;
-        background: color-mix(in srgb, var(--primary-color, #1db954) 15%, transparent);
-        color: var(--primary-color, #1db954);
-      }
-      .preview-icon ha-icon { --mdc-icon-size: 23px; }
-      .preview-copy { display: grid; gap: 3px; min-width: 0; }
-      .preview-eyebrow {
-        color: var(--primary-color, #1db954);
-        font-size: 10px;
-        font-weight: 650;
-        letter-spacing: .035em;
-      }
-      .preview-copy strong {
-        color: var(--primary-text-color);
-        font-size: 13px;
-        overflow-wrap: anywhere;
-      }
-      .preview-copy small {
-        color: var(--secondary-text-color);
-        font-size: 11px;
-        overflow-wrap: anywhere;
       }
       .studio-subheading {
         display: flex;
