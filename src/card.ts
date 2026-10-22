@@ -1291,18 +1291,18 @@ export class Card extends AlertUpdatesBase {
 
   styleInfo['--crm-background'] = background;
   styleInfo['--crm-background-secondary'] = secondary;
-  styleInfo['--crm-text'] = crmReadableColor(preferredText, backgrounds, 4.5);
-  styleInfo['--crm-accent'] = crmReadableColor(preferredAccent, backgrounds, 4.5);
-
-  // Expose accessible defaults for nested sections without overwriting their explicit settings.
-  styleInfo['--crm-text-secondary'] = crmReadableColor(preferredText, backgrounds, 4.5);
-  styleInfo['--crm-icon-color'] = crmReadableColor(
-    custom && this.config?.crmIconMode === 'custom' && crmParseHexColor(this.config?.crmIconColor)
-      ? this.config.crmIconColor!
-      : (darkMode ? '#e5f5ee' : '#183329'),
-    backgrounds,
-    3,
-  );
+  // Text adapts to the actual background, including a light background in Custom mode.
+  // Preserve user-selected accents: contrast corrections apply to foregrounds, not accents.
+  const readableText = crmReadableColor(preferredText, backgrounds, 4.5);
+  const requestedIcon = custom && this.config?.crmIconMode === 'custom'
+    ? (this.config.crmIconColor || readableText)
+    : readableText;
+  styleInfo['--crm-text'] = readableText;
+  styleInfo['--crm-text-secondary'] = readableText;
+  styleInfo['--crm-icon-color'] = crmReadableColor(requestedIcon, backgrounds, 3);
+  styleInfo['--crm-accent'] = preferredAccent;
+  // The play/pause glyph sits ON the accent, so calculate contrast against that color.
+  styleInfo['--crm-play-icon-contrast'] = crmReadableColor('#102019', [preferredAccent], 4.5);
 
   if (this.config?.crmBorderRadius) {
     styleInfo['--crm-border-radius'] = this.config.crmBorderRadius;

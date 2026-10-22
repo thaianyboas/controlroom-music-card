@@ -118,6 +118,8 @@ class SourceSettingsEditor extends BaseEditor {
         'Das konfigurierte Gerät ist nicht in der aktuellen Liste.',
         'The configured device is not in the current list.',
       ),
+      perRow: label('Dispositivos por linha', 'Geräte pro Zeile', 'Devices per row'),
+      perRowHint: label('Quantidade de dispositivos exibidos em cada linha', 'Anzahl der Geräte in einer Reihe', 'Number of devices displayed in each row'),
       noDefault: label(
         'Nenhum dispositivo padrão definido',
         'Kein Standardgerät festgelegt',
@@ -206,6 +208,13 @@ class SourceSettingsEditor extends BaseEditor {
       ...this.config,
       deviceDefaultId: value,
     });
+  }
+
+  private updateItemsPerRow(event: Event): void {
+    const raw = Number((event.currentTarget as HTMLInputElement).value);
+    if (!Number.isFinite(raw)) return;
+    const value = Math.min(12, Math.max(1, Math.round(raw)));
+    this.configChanged({ ...this.config, deviceBrowserItemsPerRow: value });
   }
 
   private getDeviceIcon(device: ISpotifyConnectDevice): string {
@@ -382,17 +391,12 @@ class SourceSettingsEditor extends BaseEditor {
         required: false,
         type: 'string',
       },
-      {
-        name: 'deviceBrowserItemsPerRow',
-        label: t('itemsPerRow'),
-        help: t('itemsPerRowHelp'),
-        required: true,
-        type: 'integer',
-        default: EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW,
-        valueMin: 1,
-        valueMax: 12,
-      },
     ];
+
+    const configuredPerRow = Number(this.config.deviceBrowserItemsPerRow);
+    const itemsPerRow = Number.isFinite(configuredPerRow) && configuredPerRow >= 1
+      ? Math.min(12, Math.max(1, Math.round(configuredPerRow)))
+      : EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW;
 
     const behaviorSchema = [
       {
@@ -447,6 +451,28 @@ class SourceSettingsEditor extends BaseEditor {
               .config=${this.config}
               .hass=${this.hass}
             ></crm-editor-form>
+          </div>
+          <div class="layout-control">
+            <div class="layout-control-heading">
+              <div class="layout-control-copy">
+                <strong>${labels.perRow}</strong>
+                <small>${labels.perRowHint}</small>
+              </div>
+              <output class="layout-value" for="device-per-row">${itemsPerRow}</output>
+            </div>
+            <input
+              id="device-per-row"
+              class="layout-range"
+              type="range"
+              min="1"
+              max="12"
+              step="1"
+              .value=${String(itemsPerRow)}
+              style=${`--range-progress: ${((itemsPerRow - 1) / 11) * 100}%`}
+              aria-label=${labels.perRow}
+              @input=${this.updateItemsPerRow}
+            />
+            <div class="layout-scale"><span>1</span><span>6</span><span>12</span></div>
           </div>
         </section>
 
@@ -734,6 +760,90 @@ class SourceSettingsEditor extends BaseEditor {
         padding-top: 12px;
         border-top: 1px solid var(--divider-color, rgba(128,128,128,.2));
       }
+
+      .layout-control {
+        margin-top: 13px;
+        padding: 14px;
+        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
+        border-radius: 12px;
+        background: var(--secondary-background-color, rgba(128,128,128,.06));
+        color: var(--primary-text-color);
+      }
+      .layout-control-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 13px;
+      }
+      .layout-control-copy { display: grid; gap: 4px; min-width: 0; }
+      .layout-control-copy strong { font-size: 12px; font-weight: 650; }
+      .layout-control-copy small { font-size: 11px; line-height: 1.4; color: var(--secondary-text-color); }
+      .layout-value {
+        flex: 0 0 auto;
+        min-width: 36px;
+        padding: 7px 9px;
+        border-radius: 9px;
+        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
+        background: var(--card-background-color, transparent);
+        color: var(--primary-text-color);
+        text-align: center;
+        font-size: 15px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .layout-range {
+        display: block;
+        width: 100%;
+        height: 22px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        accent-color: var(--crm-editor-accent, var(--primary-color, #159568));
+      }
+      .layout-range::-webkit-slider-runnable-track {
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(to right,
+          var(--crm-editor-accent, var(--primary-color, #159568)) 0%,
+          var(--crm-editor-accent, var(--primary-color, #159568)) var(--range-progress),
+          var(--divider-color, #a1a1aa) var(--range-progress),
+          var(--divider-color, #a1a1aa) 100%);
+      }
+      .layout-range::-moz-range-track {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--divider-color, #a1a1aa);
+      }
+      .layout-range::-moz-range-progress {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--crm-editor-accent, var(--primary-color, #159568));
+      }
+      .layout-range::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+        margin-top: -6px;
+        border: 3px solid var(--card-background-color, #fff);
+        border-radius: 50%;
+        background: var(--crm-editor-accent, var(--primary-color, #159568));
+        box-shadow: 0 1px 5px rgba(0,0,0,.18);
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      .layout-range::-moz-range-thumb {
+        width: 13px;
+        height: 13px;
+        border: 3px solid var(--card-background-color, #fff);
+        border-radius: 50%;
+        background: var(--crm-editor-accent, var(--primary-color, #159568));
+        box-shadow: 0 1px 5px rgba(0,0,0,.18);
+      }
+      .layout-range:focus-visible { outline: 2px solid var(--crm-editor-accent, var(--primary-color, #159568)); outline-offset: 3px; }
+      .layout-scale { display: flex; justify-content: space-between; color: var(--secondary-text-color); font-size: 10px; margin-top: 2px; }
 
       crm-editor-form {
         display: block;

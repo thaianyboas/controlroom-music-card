@@ -25,11 +25,6 @@ class GeneralEditor extends BaseEditor {
     this.updateField('language', value);
   }
 
-  private onTextChange(event: Event): void {
-    const input = event.currentTarget as HTMLInputElement;
-    this.updateField(input.name, input.value);
-  }
-
   protected render(): TemplateResult {
     super.createStore();
 
@@ -52,8 +47,6 @@ class GeneralEditor extends BaseEditor {
       essentialsHint: label('Idioma, conta e identificação', 'Sprache, Konto und Bezeichnung', 'Language, account and identity'),
       preview: label('Prévia do cartão', 'Kartenvorschau', 'Card preview'),
       previewHint: label('As informações abaixo são apenas uma prévia da configuração.', 'Die Angaben unten zeigen nur eine Vorschau der Einstellungen.', 'The details below are only a configuration preview.'),
-      optional: label('Opcional', 'Optional', 'Optional'),
-      title: g('title'),
       language: g('language'),
       entity: g('entity'),
       accountHint: label('Escolha a entidade SpotifyPlus vinculada à conta desejada.', 'Wähle die SpotifyPlus-Entität des gewünschten Kontos.', 'Choose the SpotifyPlus entity linked to the account you want.'),
@@ -76,7 +69,6 @@ class GeneralEditor extends BaseEditor {
       },
     }];
 
-    const currentTitle = String(this.config.title ?? '').trim();
     const currentEntity = String(this.config.entity ?? '');
 
     return html`
@@ -134,17 +126,6 @@ class GeneralEditor extends BaseEditor {
                 <div class="studio-hint">${ui.accountHint}</div>
               </div>
 
-              <label class="studio-field">
-                <span class="studio-label"><ha-icon icon="mdi:format-title"></ha-icon>${ui.title}</span>
-                <input
-                  class="studio-input"
-                  type="text"
-                  name="title"
-                  .value=${String(this.config.title ?? '')}
-                  placeholder=${ui.optional}
-                  @change=${this.onTextChange}
-                />
-              </label>
             </div>
           ` : nothing}
         </section>
@@ -160,7 +141,7 @@ class GeneralEditor extends BaseEditor {
           <div class="preview-card">
             <span class="preview-mark"><ha-icon icon="mdi:spotify"></ha-icon></span>
             <span class="preview-copy">
-              <strong>${currentTitle || ui.defaultTitle}</strong>
+              <strong>${ui.defaultTitle}</strong>
               <small>${currentEntity || ui.noEntity}</small>
             </span>
             <ha-icon class="preview-music" icon="mdi:music-note"></ha-icon>
@@ -201,8 +182,24 @@ class GeneralEditor extends BaseEditor {
       .studio-select { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer; }
       .studio-select-container > ha-icon { position: absolute; right: 11px; top: 11px; --mdc-icon-size: 19px; pointer-events: none; color: var(--secondary-text-color); }
       .studio-select option { background: var(--card-background-color, #202029); color: var(--primary-text-color); }
-      .studio-entity { margin: 1px 0 16px; }
-      .studio-entity crm-editor-form { display: block; min-width: 0; }
+      .studio-entity { margin: 1px 0 0; }
+      .studio-entity crm-editor-form {
+        display: block;
+        min-width: 0;
+        color: var(--primary-text-color);
+        --mdc-theme-primary: var(--crm-editor-accent, var(--primary-color));
+        --mdc-theme-on-surface: var(--primary-text-color);
+        --mdc-text-field-ink-color: var(--primary-text-color);
+        --mdc-text-field-label-ink-color: var(--secondary-text-color);
+        --mdc-text-field-fill-color: var(--secondary-background-color);
+        --mdc-text-field-outlined-idle-border-color: var(--divider-color);
+        --mdc-text-field-outlined-hover-border-color: var(--primary-color);
+        --ha-textfield-input-color: var(--primary-text-color);
+        --ha-textfield-label-color: var(--secondary-text-color);
+        --input-text-color: var(--primary-text-color);
+        --primary-background-color: var(--card-background-color);
+        --secondary-background-color: var(--secondary-background-color);
+      }
       .studio-hint { font-size: 11px; color: var(--secondary-text-color); line-height: 1.5; margin: -4px 0 0; }
       .preview-panel { padding: 14px; }
       .preview-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 13px; }

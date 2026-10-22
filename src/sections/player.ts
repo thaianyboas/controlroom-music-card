@@ -615,12 +615,12 @@ export class Player extends AlertUpdatesBase {
     styleInfo['--crm-player-controls-icon-color'] = 'var(--crm-text, ' + themeText + ')';
     styleInfo['--crm-player-controls-icon-toggle-color'] = 'var(--crm-accent, ' + themeAccent + ')';
     styleInfo['--crm-player-progress-slider-color'] = 'var(--crm-accent, ' + themeAccent + ')';
-    styleInfo['--crm-player-progress-label-color'] = muted;
+    styleInfo['--crm-player-progress-label-color'] = custom ? 'var(--crm-text)' : muted;
     styleInfo['--crm-player-volume-slider-color'] = 'var(--crm-accent, ' + themeAccent + ')';
-    styleInfo['--crm-player-volume-label-color'] = muted;
+    styleInfo['--crm-player-volume-label-color'] = custom ? 'var(--crm-text)' : muted;
     styleInfo['--crm-player-header-title1-color'] = 'var(--crm-text, ' + themeText + ')';
     styleInfo['--crm-player-header-title2-color'] = 'var(--crm-text, ' + themeText + ')';
-    styleInfo['--crm-player-header-title3-color'] = muted;
+    styleInfo['--crm-player-header-title3-color'] = custom ? 'var(--crm-text)' : muted;
     styleInfo['--crm-player-header-bg-color'] = 'transparent';
     styleInfo['--crm-player-controls-bg-color'] = 'transparent';
     return styleMap(styleInfo);

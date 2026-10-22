@@ -747,26 +747,9 @@ class PlayerControls extends AlertUpdatesBase {
     }
 
     if (isPlayPause) {
-      // Choose a readable glyph color for hex-based custom accents.
-      // For non-hex CSS colors, retain the dark glyph fallback.
-      const theme = this.config.crmTheme ?? 'dark';
-      const accent = theme === 'custom'
-        ? (this.config.crmAccent || '#34d399')
-        : theme === 'light' ? '#16875c' : '#40d99a';
-      const hex = accent.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
-      let foreground = '#102019';
-      if (hex) {
-        const raw = hex[1].length === 3
-          ? hex[1].split('').map((digit) => digit + digit).join('')
-          : hex[1];
-        const rgb = [0, 2, 4].map((offset) => parseInt(raw.slice(offset, offset + 2), 16) / 255);
-        const luminance = rgb.map((channel) => channel <= 0.04045
-          ? channel / 12.92
-          : Math.pow((channel + 0.055) / 1.055, 2.4));
-        const relativeLuminance = 0.2126 * luminance[0] + 0.7152 * luminance[1] + 0.0722 * luminance[2];
-        foreground = relativeLuminance > 0.179 ? '#102019' : '#ffffff';
-      }
-      styleInfo['--crm-play-icon-contrast'] = foreground;
+      // Use the card's contrast-aware color, derived from the actual accent.
+      // Keep this as a CSS variable so it follows theme changes automatically.
+      const foreground = 'var(--crm-play-icon-contrast, #102019)';
       styleInfo['color'] = foreground;
       styleInfo['--mdc-icon-button-icon-color'] = foreground;
       styleInfo['--mdc-icon-button-ink-color'] = foreground;
