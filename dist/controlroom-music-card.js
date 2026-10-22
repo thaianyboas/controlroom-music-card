@@ -4568,7 +4568,17 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       div {
         margin-top: 20px;
       }
-    `}setConfig(e){const t=JSON.parse(JSON.stringify(e));t.sections&&0!==t.sections.length||(t.sections=[Yt.PLAYER],Rs.selectedConfigArea=Kt.GENERAL),this.config=t}configChanged(e=void 0){let t={};e&&(t=ci(this.config,e),this.config={...this.config,...e});const i=oi(Rs.selectedConfigArea);this.section!=i&&(this.section=i,this.store.section=this.section,document.dispatchEvent(To(this.section))),((e,t,i,s)=>{s=s||{},i=null==i?{}:i;const r=new Event(t,{bubbles:void 0===s.bubbles||s.bubbles,cancelable:Boolean(s.cancelable),composed:void 0===s.composed||s.composed});r.detail=i,e.dispatchEvent(r)})(this,"config-changed",{config:this.config}),function(e,t){const i=Xt(e,t);document.dispatchEvent(i)}("crm-dispatch-event-config-updated",t)}dispatchClose(){return super.dispatchEvent(new CustomEvent("closed"))}createStore(){if(this.store)return;const e=oi(Rs.selectedConfigArea);this.config.sections&&0!==this.config.sections.length||(this.config.sections=[Yt.PLAYER],Rs.selectedConfigArea=Kt.GENERAL),this.store=new Rs(this.hass,this.config,this,e),this.player=this.store.player,this.section=this.store.section}SetSection(e){(!this.config.sections||this.config.sections.indexOf(e)>-1)&&(this.section=e,this.store.section=this.section,super.requestUpdate())}}Ce([Ve({attribute:!1})],Eo.prototype,"hass",void 0),Ce([Ve({attribute:!1})],Eo.prototype,"config",void 0),Ce([Ve({attribute:!1})],Eo.prototype,"store",void 0),Ce([Ve({attribute:!0})],Eo.prototype,"section",void 0),Ce([Ve({attribute:!1})],Eo.prototype,"footerBackgroundColor",void 0),Ce([De()],Eo.prototype,"playerImage",void 0),Ce([De()],Eo.prototype,"playerMediaContentId",void 0),Ce([De()],Eo.prototype,"vibrantImage",void 0),Ce([De()],Eo.prototype,"vibrantMediaContentId",void 0);class Po extends Eo{render(){return B`
+    `}setConfig(e){const t=JSON.parse(JSON.stringify(e));t.sections&&0!==t.sections.length||(t.sections=[Yt.PLAYER],Rs.selectedConfigArea=Kt.GENERAL),this.config=t}configChanged(e=void 0){let t={};e&&(t=ci(this.config,e),this.config={...this.config,...e});const i=oi(Rs.selectedConfigArea);this.section!=i&&(this.section=i,this.store.section=this.section,document.dispatchEvent(To(this.section))),((e,t,i,s)=>{s=s||{},i=null==i?{}:i;const r=new Event(t,{bubbles:void 0===s.bubbles||s.bubbles,cancelable:Boolean(s.cancelable),composed:void 0===s.composed||s.composed});r.detail=i,e.dispatchEvent(r)})(this,"config-changed",{config:this.config}),function(e,t){const i=Xt(e,t);document.dispatchEvent(i)}("crm-dispatch-event-config-updated",t)}dispatchClose(){return super.dispatchEvent(new CustomEvent("closed"))}createStore(){if(this.store)return;const e=oi(Rs.selectedConfigArea);this.config.sections&&0!==this.config.sections.length||(this.config.sections=[Yt.PLAYER],Rs.selectedConfigArea=Kt.GENERAL),this.store=new Rs(this.hass,this.config,this,e),this.player=this.store.player,this.section=this.store.section}SetSection(e){(!this.config.sections||this.config.sections.indexOf(e)>-1)&&(this.section=e,this.store.section=this.section,super.requestUpdate())}}Ce([Ve({attribute:!1})],Eo.prototype,"hass",void 0),Ce([Ve({attribute:!1})],Eo.prototype,"config",void 0),Ce([Ve({attribute:!1})],Eo.prototype,"store",void 0),Ce([Ve({attribute:!0})],Eo.prototype,"section",void 0),Ce([Ve({attribute:!1})],Eo.prototype,"footerBackgroundColor",void 0),Ce([De()],Eo.prototype,"playerImage",void 0),Ce([De()],Eo.prototype,"playerMediaContentId",void 0),Ce([De()],Eo.prototype,"vibrantImage",void 0),Ce([De()],Eo.prototype,"vibrantMediaContentId",void 0);class Po extends Eo{get compactIntegerFields(){const e=this.schema;return Array.isArray(e)&&e.length&&e.every(e=>"integer"===e?.type&&"string"==typeof e.name)?e:null}updateInteger(e,t){const i=this.data||this.config;this.configChanged({...i,[e]:t})}render(){const e=this.compactIntegerFields;return e?B`
+      <div class="crm-compact-fields">
+        ${e.map(e=>{const t=this.data||this.config,i=e.valueMin??1,s=e.valueMax??100,r=Number(t[e.name]??e.default??i),o=Number.isFinite(r)?Math.max(i,Math.min(s,r)):i,a=`crm-range-${e.name}`;return B`<div class="crm-compact-field">
+            <div class="crm-compact-heading"><label for=${a}>${e.label||_o({name:e.name})}</label>
+              <output>${o}</output></div>
+            <input id=${a} type="range" min=${i} max=${s} step="1" .value=${String(o)}
+              style=${`--crm-range-percent:${(o-i)/Math.max(1,s-i)*100}%`}
+              @input=${t=>this.updateInteger(e.name,Number(t.currentTarget.value))}
+              aria-label=${e.label||e.name} />
+          </div>`})}
+      </div>`:B`
       <ha-form
         id="elmHaForm"
         .data=${this.data||this.config}
@@ -4596,6 +4606,14 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         --crm-form-muted: var(--secondary-text-color, #52635b);
         --crm-form-surface: var(--secondary-background-color, transparent);
       }
+
+      .crm-compact-fields { display: grid; gap: 16px; width: 100%; min-width: 0; padding: 2px 0; }
+      .crm-compact-field { display: grid; gap: 9px; min-width: 0; }
+      .crm-compact-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .crm-compact-heading label { font-size: 12px; font-weight: 550; line-height: 1.35; color: var(--primary-text-color, #17221e); }
+      .crm-compact-heading output { min-width: 35px; text-align: center; padding: 5px 7px; border-radius: 8px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--primary-text-color, #17221e); background: var(--secondary-background-color, rgba(127,127,127,.1)); border: 1px solid var(--divider-color, rgba(127,127,127,.2)); }
+      .crm-compact-field input[type=range] { display: block; width: 100%; height: 6px; margin: 7px 0; padding: 0; cursor: pointer; accent-color: var(--crm-editor-accent, var(--primary-color, #159568)); }
+      .crm-compact-field input[type=range]:focus-visible { outline: 2px solid var(--crm-editor-accent, var(--primary-color, #159568)); outline-offset: 6px; border-radius: 4px; }
 
       ha-form {
         display: block;
@@ -4679,7 +4697,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
           ${this.showEssentials?B`
             <div class="studio-fold-body">
-              <label class="studio-field">
+              <label class="studio-field studio-language-row">
                 <span class="studio-label"><ha-icon icon="mdi:translate"></ha-icon>${n.language}</span>
                 <span class="studio-select-container">
                   <select
@@ -4751,6 +4769,10 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       .studio-fold-body { padding: 1px 14px 16px; }
       .studio-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin-bottom: 16px; }
       .studio-field:last-child { margin-bottom: 0; }
+      .studio-language-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+      .studio-language-row .studio-select-container { flex: 0 1 190px; width: 190px; min-width: 140px; }
+      .studio-language-row .studio-input { height: 38px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #17221e); }
+      @media (max-width: 340px) { .studio-language-row .studio-select-container { min-width: 125px; } }
       .studio-label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--primary-text-color); }
       .studio-label ha-icon { --mdc-icon-size: 16px; color: var(--secondary-text-color); }
       .studio-input { display: block; width: 100%; min-width: 0; height: 41px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--divider-color, rgba(128,128,128,.25)); background: var(--secondary-background-color, transparent); color: var(--primary-text-color); font: inherit; font-size: 13px; }
@@ -4774,6 +4796,15 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         --ha-textfield-input-color: var(--primary-text-color);
         --ha-textfield-label-color: var(--secondary-text-color);
         --input-text-color: var(--primary-text-color);
+        --md-sys-color-on-surface: var(--primary-text-color);
+        --md-sys-color-on-surface-variant: var(--secondary-text-color);
+        --md-sys-color-surface: var(--card-background-color);
+        --md-sys-color-surface-container: var(--card-background-color);
+        --md-sys-color-surface-container-high: var(--card-background-color);
+        --md-sys-color-surface-container-highest: var(--card-background-color);
+        --mdc-select-ink-color: var(--primary-text-color);
+        --ha-selector-text-color: var(--primary-text-color);
+        --ha-select-ink-color: var(--primary-text-color);
         --primary-background-color: var(--card-background-color);
         --secondary-background-color: var(--secondary-background-color);
       }

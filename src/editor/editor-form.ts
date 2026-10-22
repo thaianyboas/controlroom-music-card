@@ -16,7 +16,38 @@ class Form extends BaseEditor {
 
   @query('#elmHaForm') private _elmHaForm?: LitElement;
 
+  private get compactIntegerFields(): Array<{ name: string; label?: string; default?: number; valueMin?: number; valueMax?: number }> | null {
+    const fields = this.schema;
+    if (!Array.isArray(fields) || !fields.length || !fields.every((field) => field?.type === 'integer' && typeof field.name === 'string')) return null;
+    return fields;
+  }
+
+  private updateInteger(name: string, value: number): void {
+    const config = (this.data || this.config) as CardConfig;
+    this.configChanged({ ...config, [name]: value });
+  }
+
   protected render(): TemplateResult {
+    const integers = this.compactIntegerFields;
+    if (integers) return html`
+      <div class="crm-compact-fields">
+        ${integers.map((field) => {
+          const config = (this.data || this.config) as unknown as Record<string, unknown>;
+          const min = field.valueMin ?? 1;
+          const max = field.valueMax ?? 100;
+          const value = Number(config[field.name] ?? field.default ?? min);
+          const safeValue = Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : min;
+          const id = `crm-range-${field.name}`;
+          return html`<div class="crm-compact-field">
+            <div class="crm-compact-heading"><label for=${id}>${field.label || formatLabel({ name: field.name })}</label>
+              <output>${safeValue}</output></div>
+            <input id=${id} type="range" min=${min} max=${max} step="1" .value=${String(safeValue)}
+              style=${`--crm-range-percent:${(safeValue - min) / Math.max(1, max - min) * 100}%`}
+              @input=${(event: Event) => this.updateInteger(field.name, Number((event.currentTarget as HTMLInputElement).value))}
+              aria-label=${field.label || field.name} />
+          </div>`;
+        })}
+      </div>`;
     return html`
       <ha-form
         id="elmHaForm"
@@ -49,6 +80,14 @@ class Form extends BaseEditor {
         --crm-form-muted: var(--secondary-text-color, #52635b);
         --crm-form-surface: var(--secondary-background-color, transparent);
       }
+
+      .crm-compact-fields { display: grid; gap: 16px; width: 100%; min-width: 0; padding: 2px 0; }
+      .crm-compact-field { display: grid; gap: 9px; min-width: 0; }
+      .crm-compact-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .crm-compact-heading label { font-size: 12px; font-weight: 550; line-height: 1.35; color: var(--primary-text-color, #17221e); }
+      .crm-compact-heading output { min-width: 35px; text-align: center; padding: 5px 7px; border-radius: 8px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--primary-text-color, #17221e); background: var(--secondary-background-color, rgba(127,127,127,.1)); border: 1px solid var(--divider-color, rgba(127,127,127,.2)); }
+      .crm-compact-field input[type=range] { display: block; width: 100%; height: 6px; margin: 7px 0; padding: 0; cursor: pointer; accent-color: var(--crm-editor-accent, var(--primary-color, #159568)); }
+      .crm-compact-field input[type=range]:focus-visible { outline: 2px solid var(--crm-editor-accent, var(--primary-color, #159568)); outline-offset: 6px; border-radius: 4px; }
 
       ha-form {
         display: block;

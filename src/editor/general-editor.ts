@@ -98,7 +98,7 @@ class GeneralEditor extends BaseEditor {
 
           ${this.showEssentials ? html`
             <div class="studio-fold-body">
-              <label class="studio-field">
+              <label class="studio-field studio-language-row">
                 <span class="studio-label"><ha-icon icon="mdi:translate"></ha-icon>${ui.language}</span>
                 <span class="studio-select-container">
                   <select
@@ -174,6 +174,10 @@ class GeneralEditor extends BaseEditor {
       .studio-fold-body { padding: 1px 14px 16px; }
       .studio-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin-bottom: 16px; }
       .studio-field:last-child { margin-bottom: 0; }
+      .studio-language-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+      .studio-language-row .studio-select-container { flex: 0 1 190px; width: 190px; min-width: 140px; }
+      .studio-language-row .studio-input { height: 38px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #17221e); }
+      @media (max-width: 340px) { .studio-language-row .studio-select-container { min-width: 125px; } }
       .studio-label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--primary-text-color); }
       .studio-label ha-icon { --mdc-icon-size: 16px; color: var(--secondary-text-color); }
       .studio-input { display: block; width: 100%; min-width: 0; height: 41px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--divider-color, rgba(128,128,128,.25)); background: var(--secondary-background-color, transparent); color: var(--primary-text-color); font: inherit; font-size: 13px; }
@@ -197,6 +201,15 @@ class GeneralEditor extends BaseEditor {
         --ha-textfield-input-color: var(--primary-text-color);
         --ha-textfield-label-color: var(--secondary-text-color);
         --input-text-color: var(--primary-text-color);
+        --md-sys-color-on-surface: var(--primary-text-color);
+        --md-sys-color-on-surface-variant: var(--secondary-text-color);
+        --md-sys-color-surface: var(--card-background-color);
+        --md-sys-color-surface-container: var(--card-background-color);
+        --md-sys-color-surface-container-high: var(--card-background-color);
+        --md-sys-color-surface-container-highest: var(--card-background-color);
+        --mdc-select-ink-color: var(--primary-text-color);
+        --ha-selector-text-color: var(--primary-text-color);
+        --ha-select-ink-color: var(--primary-text-color);
         --primary-background-color: var(--card-background-color);
         --secondary-background-color: var(--secondary-background-color);
       }
