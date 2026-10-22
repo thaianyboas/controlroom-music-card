@@ -7,6 +7,7 @@ const debuglog = Debug(DEBUG_APP_NAME + ":editor");
 import { css, html, PropertyValues, TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
+import { styleMap } from 'lit/directives/style-map.js';
 
 // our imports.
 import {
@@ -71,6 +72,26 @@ class CardEditor extends BaseEditor {
     //  JSON.stringify(this.section),
     //  JSON.stringify(Store.selectedConfigArea),
     //);
+
+    // Keep the settings surface in sync with the card's selected theme.
+    // CSS custom properties inherit through child editors' shadow roots.
+    const configuredTheme = (this.config as typeof this.config & { crmTheme?: string }).crmTheme;
+    const theme = configuredTheme === 'light' || configuredTheme === 'dark' ||
+      configuredTheme === 'custom' || configuredTheme === 'auto'
+      ? configuredTheme : 'dark';
+
+    const validColor = (value: unknown, fallback: string): string =>
+      typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
+
+    const customStyles: Record<string, string> = theme === 'custom' ? {
+      '--card-background-color': validColor(this.config.crmBackground, '#101b19'),
+      '--ha-card-background': validColor(this.config.crmBackground, '#101b19'),
+      '--secondary-background-color': validColor(this.config.crmBackground, '#101b19'),
+      '--primary-text-color': validColor(this.config.crmText, '#f0fdf4'),
+      '--secondary-text-color': validColor(this.config.crmText, '#f0fdf4'),
+      '--primary-color': validColor(this.config.crmAccent, '#34d399'),
+      '--crm-editor-accent': validColor(this.config.crmAccent, '#34d399'),
+    } : {};
 
     const lang = resolveLanguage(this.config.language ?? 'auto', this.hass.locale?.language || this.hass.language);
     const labels = {
@@ -146,7 +167,7 @@ class CardEditor extends BaseEditor {
     ];
 
     return html`
-      <div class="crm-settings-shell">
+      <div class="crm-settings-shell" data-theme=${theme} style=${styleMap(customStyles)}>
         <div class="crm-settings-heading">
           <ha-icon icon="mdi:music-circle-outline"></ha-icon>
           <div>
@@ -225,7 +246,40 @@ class CardEditor extends BaseEditor {
   static get styles() {
     return css`
       :host { display: block; min-width: 0; }
-      .crm-settings-shell { min-width: 0; color: var(--primary-text-color); }
+      .crm-settings-shell {
+        min-width: 0;
+        padding: 12px;
+        border-radius: 16px;
+        background: var(--card-background-color, transparent);
+        color: var(--primary-text-color);
+        color-scheme: normal;
+        transition: background-color 150ms ease, color 150ms ease;
+      }
+      .crm-settings-shell[data-theme="light"] {
+        color-scheme: light;
+        --card-background-color: #ffffff;
+        --ha-card-background: #ffffff;
+        --secondary-background-color: #f2f5f4;
+        --primary-text-color: #17221e;
+        --secondary-text-color: #52645c;
+        --divider-color: #dce5e0;
+        --primary-color: #159568;
+        --crm-editor-accent: #159568;
+      }
+      .crm-settings-shell[data-theme="dark"] {
+        color-scheme: dark;
+        --card-background-color: #101b19;
+        --ha-card-background: #101b19;
+        --secondary-background-color: #1b2a26;
+        --primary-text-color: #f0fdf4;
+        --secondary-text-color: #a9c2b6;
+        --divider-color: #34483f;
+        --primary-color: #34d399;
+        --crm-editor-accent: #34d399;
+      }
+      .crm-settings-shell[data-theme="custom"] {
+        --divider-color: color-mix(in srgb, var(--primary-text-color) 22%, transparent);
+      }
       .crm-settings-heading {
         display: flex; align-items: center; gap: 10px;
         padding: 6px 4px 12px;
@@ -272,18 +326,18 @@ class CardEditor extends BaseEditor {
         color: var(--secondary-text-color);
       }
       .crm-settings-tile.active {
-        border-color: #34d399;
-        background: color-mix(in srgb, #34d399 9%, transparent);
+        border-color: var(--crm-editor-accent, #34d399);
+        background: color-mix(in srgb, var(--crm-editor-accent, #34d399) 9%, transparent);
       }
       .crm-settings-tile.active .crm-tile-icon {
-        color: #34d399;
+        color: var(--crm-editor-accent, #34d399);
       }
       .crm-settings-tile:hover {
-        border-color: #34d399;
+        border-color: var(--crm-editor-accent, #34d399);
       }
       .crm-settings-tile:focus-visible,
       .crm-settings-subitem:focus-visible {
-        outline: 2px solid #34d399;
+        outline: 2px solid var(--crm-editor-accent, #34d399);
         outline-offset: 2px;
       }
       .crm-settings-panel {
@@ -302,7 +356,7 @@ class CardEditor extends BaseEditor {
       }
       .crm-panel-heading ha-icon {
         --mdc-icon-size: 19px;
-        color: #34d399;
+        color: var(--crm-editor-accent, #34d399);
       }
       .crm-settings-subnav {
         display: flex;
@@ -321,9 +375,9 @@ class CardEditor extends BaseEditor {
         cursor: pointer;
       }
       .crm-settings-subitem.selected {
-        border-color: #34d399;
+        border-color: var(--crm-editor-accent, #34d399);
         color: var(--primary-text-color);
-        background: color-mix(in srgb, #34d399 9%, transparent);
+        background: color-mix(in srgb, var(--crm-editor-accent, #34d399) 9%, transparent);
       }
       .crm-empty-panel {
         display: flex;
@@ -336,7 +390,7 @@ class CardEditor extends BaseEditor {
       }
       .crm-empty-panel ha-icon {
         --mdc-icon-size: 22px;
-        color: #34d399;
+        color: var(--crm-editor-accent, #34d399);
       }
       .crm-card-editor {
         min-width: 0;
