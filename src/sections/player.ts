@@ -36,6 +36,23 @@ export class Player extends AlertUpdatesBase {
   /** MediaPlayer instance created from the configuration entity id. */
   private player!: MediaPlayer;
 
+  /** Text shown when no music is playing, following the card language. */
+  private idleLabels(): { title: string; subtitle: string } {
+    const selected = (this.config.language || 'auto').toLowerCase();
+    const language = selected === 'auto'
+      ? (this.store.hass?.locale?.language || this.store.hass?.language || 'en').toLowerCase()
+      : selected;
+
+    if (language.startsWith('pt')) {
+      return { title: 'Pronto para ouvir música', subtitle: 'Escolha suas músicas favoritas' };
+    }
+    if (language.startsWith('de')) {
+      return { title: 'Bereit für Musik', subtitle: 'Wähle deine Lieblingsmusik' };
+    }
+    return { title: 'Ready for music', subtitle: 'Choose your favorite music' };
+  }
+
+
 
   /**
    * Invoked on each update to perform rendering tasks. 
@@ -52,12 +69,13 @@ export class Player extends AlertUpdatesBase {
       ? this.store.hass.hassUrl(artwork)
       : '/local/Bild%20f%C3%BCr%20Spotify.jpg';
 
+    const idleLabels = this.idleLabels();
     const title = !isOffIdle && this.player.attributes.media_title
       ? this.player.attributes.media_title
-      : 'Bereit für Musik';
+      : idleLabels.title;
     const artist = !isOffIdle && this.player.attributes.media_artist
       ? this.player.attributes.media_artist
-      : 'Wähle deine Lieblingsmusik';
+      : idleLabels.subtitle;
     const source = this.player.attributes.source || 'Wohnung Musik';
 
     return html`
@@ -164,7 +182,7 @@ export class Player extends AlertUpdatesBase {
         display: flex;
         align-items: center;
         gap: 9px;
-        color: var(--crm-player-secondary-text, #d7e9df);
+        color: var(--crm-player-secondary-text, var(--crm-text, #d7e9df));
         font-size: 13px;
         font-weight: 500;
         min-width: 0;
@@ -202,7 +220,7 @@ export class Player extends AlertUpdatesBase {
       }
       .player-artist {
         margin-top: 5px;
-        color: var(--crm-player-secondary-text, #b5c9bd);
+        color: var(--crm-player-secondary-text, var(--crm-text, #b5c9bd));
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -588,19 +606,20 @@ export class Player extends AlertUpdatesBase {
       : dark ? '#40d99a' : '#16875c';
 
     const muted = dark ? '#a6b7af' : '#657a70';
-    styleInfo['--crm-player-secondary-text'] =
-      custom ? themeText : dark ? '#b5c9bd' : '#657a70';
+    styleInfo['--crm-player-secondary-text'] = custom
+      ? 'color-mix(in srgb, var(--crm-text, #f0fdf4) 80%, var(--crm-background, #101b19))'
+      : dark ? '#b5c9bd' : '#657a70';
 
 
-    styleInfo['--crm-player-controls-color'] = themeText;
-    styleInfo['--crm-player-controls-icon-color'] = themeText;
-    styleInfo['--crm-player-controls-icon-toggle-color'] = themeAccent;
-    styleInfo['--crm-player-progress-slider-color'] = themeAccent;
+    styleInfo['--crm-player-controls-color'] = 'var(--crm-text, ' + themeText + ')';
+    styleInfo['--crm-player-controls-icon-color'] = 'var(--crm-text, ' + themeText + ')';
+    styleInfo['--crm-player-controls-icon-toggle-color'] = 'var(--crm-accent, ' + themeAccent + ')';
+    styleInfo['--crm-player-progress-slider-color'] = 'var(--crm-accent, ' + themeAccent + ')';
     styleInfo['--crm-player-progress-label-color'] = muted;
-    styleInfo['--crm-player-volume-slider-color'] = themeAccent;
+    styleInfo['--crm-player-volume-slider-color'] = 'var(--crm-accent, ' + themeAccent + ')';
     styleInfo['--crm-player-volume-label-color'] = muted;
-    styleInfo['--crm-player-header-title1-color'] = themeText;
-    styleInfo['--crm-player-header-title2-color'] = themeText;
+    styleInfo['--crm-player-header-title1-color'] = 'var(--crm-text, ' + themeText + ')';
+    styleInfo['--crm-player-header-title2-color'] = 'var(--crm-text, ' + themeText + ')';
     styleInfo['--crm-player-header-title3-color'] = muted;
     styleInfo['--crm-player-header-bg-color'] = 'transparent';
     styleInfo['--crm-player-controls-bg-color'] = 'transparent';

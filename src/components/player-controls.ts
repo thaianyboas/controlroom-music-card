@@ -102,8 +102,8 @@ class PlayerControls extends AlertUpdatesBase {
               <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${mdiInformationSlabBoxOutline} label="More Information" style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(SHUFFLE_SET)}    hide=${this.hideFeature(SHUFFLE_SET)}    .path=${this.getShuffleIcon()} label="Shuffle" style=${this.styleIcon(colorShuffle)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PREVIOUS_TRACK)} hide=${this.hideFeature(PREVIOUS_TRACK)} .path=${mdiSkipPrevious} label="Previous Track" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(colorPlay)}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PAUSE)}          hide=${this.hideFeature(PAUSE)}          .path=${mdiPause} label="Pause" class="play-pause" style=${this.styleIcon()}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(colorPlay, true)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PAUSE)}          hide=${this.hideFeature(PAUSE)}          .path=${mdiPause} label="Pause" class="play-pause" style=${this.styleIcon(false, true)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(NEXT_TRACK)}     hide=${this.hideFeature(NEXT_TRACK)}     .path=${mdiSkipNext} label="Next Track" style=${this.styleIcon()}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(REPEAT_SET)}     hide=${this.hideFeature(REPEAT_SET)}     .path=${this.getRepeatIcon()} label="Repeat" style=${this.styleIcon(colorRepeat)} ></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PLAY_QUEUE)}     hide=${this.hideFeature(PLAY_QUEUE)}     .path=${mdiPlaylistMusic} label="Play Queue Information" style=${this.styleIcon(colorQueueItems)} ></ha-icon-button>
@@ -114,7 +114,7 @@ class PlayerControls extends AlertUpdatesBase {
           </div>
           <div class="iconsPower" hide=${idle}>
               <ha-icon-button @click=${() => this.onClickAction(TURN_OFF)}       hide=${this.hideFeature(TURN_OFF)}       .path=${mdiPower} label="Turn Off" style=${this.styleIcon()}></ha-icon-button>
-              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(true)}></ha-icon-button>
+              <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label="Play" class="play-pause" style=${this.styleIcon(true, true)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(DEVICES)}        hide=${this.hideFeature(DEVICES)}        .path=${mdiSpeaker} label="Devices" style=${this.styleIcon()}></ha-icon-button>
           </div>
       </div>
@@ -177,7 +177,7 @@ class PlayerControls extends AlertUpdatesBase {
 
       .icons > ha-icon-button:hover,
       .iconsPower > ha-icon-button:hover {
-        background-color: rgba(64, 217, 154, 0.12);
+        background-color: color-mix(in srgb, var(--crm-accent, #40d99a) 12%, transparent);
       }
 
       .icons > ha-icon-button:active,
@@ -188,7 +188,9 @@ class PlayerControls extends AlertUpdatesBase {
       .icons > ha-icon-button.play-pause,
       .iconsPower > ha-icon-button.play-pause {
         background-color: var(--crm-accent, #40d99a);
-        color: #102019 !important;
+        color: var(--crm-play-icon-contrast, #102019) !important;
+        --mdc-icon-button-icon-color: var(--crm-play-icon-contrast, #102019);
+        --mdc-icon-button-ink-color: var(--crm-play-icon-contrast, #102019);
         --ha-icon-button-size: 36px;
         --mdc-icon-size: 22px;
         margin: 0 3px;
@@ -196,7 +198,7 @@ class PlayerControls extends AlertUpdatesBase {
 
       .icons > ha-icon-button.play-pause:hover,
       .iconsPower > ha-icon-button.play-pause:hover {
-        background-color: #67e9b2;
+        filter: brightness(1.08);
       }
 
       .iconsVolume {
@@ -729,7 +731,7 @@ class PlayerControls extends AlertUpdatesBase {
    * 
    * @param isToggled True if the icon is in a toggle state; otherwise false if icon is in a non-toggled state.
    */
-  private styleIcon(isToggled: boolean | undefined | null = null) {
+  private styleIcon(isToggled: boolean | undefined | null = null, isPlayPause = false) {
 
     const styleInfo: StyleInfo = <StyleInfo>{};
 
@@ -740,8 +742,34 @@ class PlayerControls extends AlertUpdatesBase {
 
     // if button is toggled, then use the icon toggle color;
     // otherwise, default to regular icon color.
-    if (isToggled) {
+    if (isToggled && !isPlayPause) {
       styleInfo['color'] = `var(--crm-player-controls-icon-toggle-color, ${PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT})`;
+    }
+
+    if (isPlayPause) {
+      // Choose a readable glyph color for hex-based custom accents.
+      // For non-hex CSS colors, retain the dark glyph fallback.
+      const theme = this.config.crmTheme ?? 'dark';
+      const accent = theme === 'custom'
+        ? (this.config.crmAccent || '#34d399')
+        : theme === 'light' ? '#16875c' : '#40d99a';
+      const hex = accent.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      let foreground = '#102019';
+      if (hex) {
+        const raw = hex[1].length === 3
+          ? hex[1].split('').map((digit) => digit + digit).join('')
+          : hex[1];
+        const rgb = [0, 2, 4].map((offset) => parseInt(raw.slice(offset, offset + 2), 16) / 255);
+        const luminance = rgb.map((channel) => channel <= 0.04045
+          ? channel / 12.92
+          : Math.pow((channel + 0.055) / 1.055, 2.4));
+        const relativeLuminance = 0.2126 * luminance[0] + 0.7152 * luminance[1] + 0.0722 * luminance[2];
+        foreground = relativeLuminance > 0.179 ? '#102019' : '#ffffff';
+      }
+      styleInfo['--crm-play-icon-contrast'] = foreground;
+      styleInfo['color'] = foreground;
+      styleInfo['--mdc-icon-button-icon-color'] = foreground;
+      styleInfo['--mdc-icon-button-ink-color'] = foreground;
     }
 
     return styleMap(styleInfo);

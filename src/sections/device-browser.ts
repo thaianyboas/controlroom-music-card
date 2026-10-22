@@ -76,7 +76,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
   private friendlyState(state: string): string {
     const language = resolveLanguage(
-      'auto',
+      this.config?.language ?? 'auto',
       this.store.hass?.locale?.language || this.store.hass?.language
     );
 
@@ -95,7 +95,7 @@ export class DeviceBrowser extends FavBrowserBase {
   }
 
   private deviceText(key: DeviceTextKey): string {
-    const language = resolveLanguage('auto', this.store.hass?.locale?.language || this.store.hass?.language);
+    const language = resolveLanguage(this.config?.language ?? 'auto', this.store.hass?.locale?.language || this.store.hass?.language);
     return deviceTexts[language][key];
   }
 
@@ -170,7 +170,7 @@ export class DeviceBrowser extends FavBrowserBase {
           <ha-svg-icon .path=${item.id.includes('tv') ? mdiTelevision : item.id.includes('phone') || item.id.includes('iphone') || item.id.includes('handy') ? mdiCellphone : mdiSpeaker}></ha-svg-icon>
           <span class="crm-ha-device-text">
             <strong>${item.name}</strong>
-            <small>Home Assistant · ${item.state}</small>
+            <small>Home Assistant · ${this.friendlyState(item.state)}</small>
           </span>
         </button>
       `);
@@ -208,23 +208,23 @@ export class DeviceBrowser extends FavBrowserBase {
     return [
       ...super.styles,
       css`
-        .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:#40d99a; cursor:pointer; }
+        .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:var(--crm-accent, var(--primary-color, #34d399)); cursor:pointer; }
         .crm-settings-button ha-svg-icon { width:23px; height:23px; }
-        .crm-device-settings { padding: 12px; color:var(--crm-text, var(--primary-text-color)); max-width:100%; box-sizing:border-box; overflow:auto; }
+        .crm-device-settings { padding: 12px; color:var(--crm-text, var(--primary-text-color, #f0fdf4)); max-width:100%; box-sizing:border-box; overflow:auto; }
         .crm-settings-title { font-weight:700; margin-bottom:6px; }
-        .crm-settings-hint { font-size:12px; color:var(--crm-text, var(--secondary-text-color)); opacity:.75; margin-bottom:14px; }
-        .crm-settings-subtitle { color:#40d99a; font-weight:600; margin:14px 0 8px; }
-        .crm-device-option { display:flex; align-items:center; gap:12px; padding:9px 4px; cursor:pointer; border-bottom:1px solid color-mix(in srgb, var(--crm-text, #f0fdf4) 18%, transparent); min-width:0; }
-        .crm-device-option input { accent-color:#40d99a; width:18px; height:18px; flex-shrink:0; }
+        .crm-settings-hint { font-size:12px; color:var(--crm-text-secondary, var(--secondary-text-color, var(--crm-text, #f0fdf4))); opacity:.75; margin-bottom:14px; }
+        .crm-settings-subtitle { color:var(--crm-accent, var(--primary-color, #34d399)); font-weight:600; margin:14px 0 8px; }
+        .crm-device-option { display:flex; align-items:center; gap:12px; padding:9px 4px; cursor:pointer; border-bottom:1px solid color-mix(in srgb, currentColor 18%, transparent); min-width:0; }
+        .crm-device-option input { accent-color:var(--crm-accent, var(--primary-color, #34d399)); width:18px; height:18px; flex-shrink:0; }
         .crm-device-option span { min-width:0; display:flex; flex-direction:column; gap:3px; }
-        .crm-device-option strong { font-size:13px; font-weight:500; overflow-wrap:anywhere; }
-        .crm-device-option small { font-size:11px; color:var(--crm-text, var(--secondary-text-color)); opacity:.75; overflow-wrap:anywhere; }
-        .crm-settings-done { margin-top:16px; padding:10px 18px; border:0; border-radius:8px; background:#40d99a; color:#102019; font-weight:700; cursor:pointer; }
-        .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:var(--crm-text, var(--primary-text-color)); border:0; text-align:left; cursor:pointer; }
-        .crm-ha-device ha-svg-icon { color:#40d99a; width:22px; height:22px; flex-shrink:0; }
+        .crm-device-option strong { color:inherit; font-size:13px; font-weight:500; overflow-wrap:anywhere; }
+        .crm-device-option small { font-size:11px; color:var(--crm-text-secondary, var(--secondary-text-color, var(--crm-text, #f0fdf4))); opacity:.75; overflow-wrap:anywhere; }
+        .crm-settings-done { margin-top:16px; padding:10px 18px; border:0; border-radius:8px; background:var(--crm-accent, var(--primary-color, #34d399)); color:var(--crm-accent-contrast, #102019); font-weight:700; cursor:pointer; }
+        .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:var(--crm-text, var(--primary-text-color, #f0fdf4)); border:0; text-align:left; cursor:pointer; }
+        .crm-ha-device ha-svg-icon { color:var(--crm-accent, var(--primary-color, #34d399)); width:22px; height:22px; flex-shrink:0; }
         .crm-ha-device-text { min-width:0; display:flex; flex-direction:column; gap:3px; }
-        .crm-ha-device-text strong { font-size:14px; font-weight:500; }
-        .crm-ha-device-text small { font-size:11px; }
+        .crm-ha-device-text strong { color:inherit; font-size:14px; font-weight:500; }
+        .crm-ha-device-text small { font-size:11px; color:var(--crm-text-secondary, var(--secondary-text-color, inherit)); }
       `
     ];
   }
@@ -238,7 +238,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super(Section.DEVICES);
-    this.filterCriteriaPlaceholder = deviceTexts.en.filter;
+    this.filterCriteriaPlaceholder = this.deviceText('filter');
 
   }
 

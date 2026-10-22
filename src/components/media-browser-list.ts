@@ -11,38 +11,23 @@ import { MediaBrowserBase } from './media-browser-base';
 import { IMediaBrowserItem } from '../types/media-browser-item';
 import { customEvent, formatStringProperCase } from '../utils/utils';
 
-
 export class MediaBrowserList extends MediaBrowserBase {
 
-  /**
-   * Initializes a new instance of the class.
-   */
   constructor() {
-
-    // invoke base class method.
     super();
   }
 
-
-  /**
-   * Invoked on each update to perform rendering tasks. 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
   protected render(): TemplateResult | void {
-
-    // invoke base class method.
     super.render();
 
-    // render html.
     return html`
-      <mwc-list multi class="list" style=${this.styleMediaBrowser()}">
+      <mwc-list multi class="list" style=${this.styleMediaBrowser()}>
         ${this.buildMediaBrowserItems().map((item, index) => {
           return html`
             ${this.styleMediaBrowserItemBackgroundImage(item.mbi_item.image_url, index)}
             ${(() => {
               if (this.isTouchDevice) {
-                return (html`
+                return html`
                   <mwc-list-item
                     hasMeta
                     class="${this.listItemClass}"
@@ -55,9 +40,9 @@ export class MediaBrowserList extends MediaBrowserBase {
                       () => html`${this.nowPlayingBars}`,
                     )}
                   </mwc-list-item>
-                `);
+                `;
               } else {
-                return (html`
+                return html`
                   <mwc-list-item
                     hasMeta
                     class="${this.listItemClass}"
@@ -71,7 +56,7 @@ export class MediaBrowserList extends MediaBrowserBase {
                       () => html`${this.nowPlayingBars}`,
                     )}
                   </mwc-list-item>
-                `);
+                `;
               }
             })()}
           `;
@@ -80,17 +65,12 @@ export class MediaBrowserList extends MediaBrowserBase {
     `;
   }
 
-
-  /**
-   * Render the media item.
-  */
   protected renderMediaBrowserItem(
     item: IMediaBrowserItem,
     showTitle: boolean = true,
     showSubTitle: boolean = true,
   ) {
-
-    let clsActive = ''
+    let clsActive = '';
     if (item.mbi_item.is_active) {
       clsActive = ' title-active';
     }
@@ -104,15 +84,16 @@ export class MediaBrowserList extends MediaBrowserBase {
     `;
   }
 
-
-  /**
-   * Style definitions used by this card section.
-   * 
-   * --control-button-padding: 0px;   // image with rounded corners
-   */
   static get styles() {
     return [
       css`
+        :host {
+          /* The card's resolved foreground is the safe default for all themes. */
+          --crm-list-foreground: var(--crm-text, var(--primary-text-color, #f0fdf4));
+          --crm-list-secondary: var(--crm-text-secondary, var(--secondary-text-color, var(--crm-list-foreground)));
+          --crm-list-accent: var(--crm-accent, var(--primary-color, #34d399));
+        }
+
         .button {
           --control-button-padding: 0px;
           --icon-width: 94px;
@@ -133,6 +114,8 @@ export class MediaBrowserList extends MediaBrowserBase {
 
         .row {
           display: flex;
+          min-width: 0;
+          color: var(--crm-list-foreground);
         }
 
         .thumbnail {
@@ -147,7 +130,7 @@ export class MediaBrowserList extends MediaBrowserBase {
         }
 
         .title {
-          color: var(--crm-media-browser-items-list-color, var(--crm-media-browser-items-color, var(--primary-text-color, #ffffff)));
+          color: var(--crm-list-foreground);
           font-size: var(--crm-media-browser-items-title-font-size, 1.1rem);
           font-weight: normal;
           padding: 0 0.5rem;
@@ -156,13 +139,16 @@ export class MediaBrowserList extends MediaBrowserBase {
           white-space: nowrap;
           align-self: center;
           flex: 1;
+          min-width: 0;
         }
 
         .title-active {
-          color: var(--crm-media-browser-items-list-color, var(--crm-media-browser-items-color, var(--primary-text-color, #ffffff)));
+          color: var(--crm-list-foreground);
+          font-weight: 600;
         }
 
         .subtitle {
+          color: var(--crm-list-secondary);
           font-size: var(--crm-media-browser-items-subtitle-font-size, 0.8rem);
           font-weight: normal;
           line-height: 120%;
@@ -172,9 +158,6 @@ export class MediaBrowserList extends MediaBrowserBase {
           width: 100%;
         }
 
-        /* *********************************************************** */
-        /* the remaining styles are used for the sound animation icon. */
-        /* *********************************************************** */
         .bars {
           height: 30px;
           left: 50%;
@@ -185,37 +168,24 @@ export class MediaBrowserList extends MediaBrowserBase {
         }
 
         .bar {
-          background: var(--dark-primary-color);
+          background: var(--crm-list-accent);
           bottom: 1px;
           height: 3px;
           position: absolute;
-          width: 3px;      
+          width: 3px;
           animation: sound 0ms -800ms linear infinite alternate;
           display: block;
         }
 
         @keyframes sound {
-          0% {
-            opacity: .35;
-            height: 3px; 
-          }
-          100% {
-            opacity: 1;       
-            height: 1rem;        
-          }
+          0% { opacity: .35; height: 3px; }
+          100% { opacity: 1; height: 1rem; }
         }
 
-        .bar:nth-child(1)  { left: 1px; animation-duration: 474ms; }
-        .bar:nth-child(2)  { left: 5px; animation-duration: 433ms; }
-        .bar:nth-child(3)  { left: 9px; animation-duration: 407ms; }
-        .bar:nth-child(4)  { left: 13px; animation-duration: 458ms; }
-        /*.bar:nth-child(5)  { left: 17px; animation-duration: 400ms; }*/
-        /*.bar:nth-child(6)  { left: 21px; animation-duration: 427ms; }*/
-        /*.bar:nth-child(7)  { left: 25px; animation-duration: 441ms; }*/
-        /*.bar:nth-child(8)  { left: 29px; animation-duration: 419ms; }*/
-        /*.bar:nth-child(9)  { left: 33px; animation-duration: 487ms; }*/
-        /*.bar:nth-child(10) { left: 37px; animation-duration: 442ms; }*/
-
+        .bar:nth-child(1) { left: 1px; animation-duration: 474ms; }
+        .bar:nth-child(2) { left: 5px; animation-duration: 433ms; }
+        .bar:nth-child(3) { left: 9px; animation-duration: 407ms; }
+        .bar:nth-child(4) { left: 13px; animation-duration: 458ms; }
       `,
       listStyle,
     ];

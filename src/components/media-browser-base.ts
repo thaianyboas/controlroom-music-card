@@ -209,20 +209,27 @@ export class MediaBrowserBase extends LitElement {
     const mediaBrowserItemsTitleFontSize = this.config.mediaBrowserItemsTitleFontSize;
     const mediaBrowserItemsSubTitleFontSize = this.config.mediaBrowserItemsSubTitleFontSize;
 
-    // build style info object.
+    // Build the CSS variables for this browser instance.
     const styleInfo: StyleInfo = <StyleInfo>{};
     styleInfo['--items-per-row'] = `${this.itemsPerRow}`;
-    if (mediaBrowserItemsColor)
-      styleInfo['--crm-media-browser-items-color'] = `${mediaBrowserItemsColor}`;
-    if (mediaBrowserItemsListColor)
-      styleInfo['--crm-media-browser-items-list-color'] = `${mediaBrowserItemsListColor}`;
-    // ControlRoom: keep the device icons green even when an old card setting
-    // or the Home Assistant theme specifies blue. Other browser sections
-    // continue to honor the user's configured icon color.
-    if (this.section == Section.DEVICES) {
-      styleInfo['--crm-media-browser-items-svgicon-color'] = '#40d99a';
-    } else if (mediaBrowserItemsSvgIconColor) {
-      styleInfo['--crm-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
+
+    if (this.section === Section.DEVICES) {
+      // Device tiles must follow the ControlRoom theme. Previously saved
+      // browser colors (often white) can be unreadable on light/custom themes.
+      // Keep these values as CSS var() references so theme changes propagate.
+      const deviceText = 'var(--crm-text, var(--primary-text-color, #17221e))';
+      styleInfo['--crm-media-browser-items-color'] = deviceText;
+      styleInfo['--crm-media-browser-items-list-color'] = deviceText;
+      styleInfo['--crm-media-browser-items-svgicon-color'] =
+        'var(--crm-accent, var(--primary-color, #159568))';
+    } else {
+      // Other media sections retain the user's explicit browser colors.
+      if (mediaBrowserItemsColor)
+        styleInfo['--crm-media-browser-items-color'] = `${mediaBrowserItemsColor}`;
+      if (mediaBrowserItemsListColor)
+        styleInfo['--crm-media-browser-items-list-color'] = `${mediaBrowserItemsListColor}`;
+      if (mediaBrowserItemsSvgIconColor)
+        styleInfo['--crm-media-browser-items-svgicon-color'] = `${mediaBrowserItemsSvgIconColor}`;
     }
     if (mediaBrowserItemsTitleFontSize)
       styleInfo['--crm-media-browser-items-title-font-size'] = `${mediaBrowserItemsTitleFontSize}`;
