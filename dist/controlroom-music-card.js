@@ -7565,7 +7565,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           type="text"
           .value=${String(this.value(e,""))}
           placeholder=${i}
-          @change=${t=>{this.updateField(e,t.currentTarget.value)}}
+          @change=${t=>{const i=t.currentTarget.checked;this.updateField(e,i)}}
         />
       </label>
     `}numberField(e,t,i,s,r){return B`

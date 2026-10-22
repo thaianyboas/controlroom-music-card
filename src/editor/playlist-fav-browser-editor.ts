@@ -51,10 +51,10 @@ class PlaylistFavBrowserEditor extends BaseEditor {
           .value=${String(this.value(name, ''))}
           placeholder=${placeholder}
           @change=${(event: Event) => {
-            this.updateField(
-              name,
-              (event.currentTarget as HTMLInputElement).value,
-            );
+            const input = event.currentTarget as HTMLInputElement;
+            const checked = input.checked;
+
+            this.updateField(name, checked);
           }}
         />
       </label>
