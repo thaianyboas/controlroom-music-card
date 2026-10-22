@@ -183,8 +183,8 @@ export abstract class BaseEditor extends LitElement {
     // inform Home assistant dashboard that our configuration has changed.
     fireEvent(this, 'config-changed', { config: this.config });
 
-    // request an update, which will force the card editor to re-render.
-    super.requestUpdate();
+    // The reactive config property already schedules an update.
+    // Avoid requesting an additional render here.
 
     // inform configured component of the changes; we will let them decide whether to
     // re-render the component, refresh media lists, etc.
