@@ -1,12 +1,18 @@
-
 import { css, html, TemplateResult } from 'lit';
-
 import { PLAYER_CONTROLS_ICON_SIZE_DEFAULT } from '../constants';
 import { BaseEditor } from './base-editor';
 import { Section } from '../types/section';
 import { translate } from '../localization/i18n';
 
 class PlayerControlsSettingsEditor extends BaseEditor {
+  private setIconSize(value: string): void {
+    this.configChanged({ ...this.config, playerControlsIconSize: value });
+  }
+
+  private onCustomSizeChange(event: Event): void {
+    const value = (event.currentTarget as HTMLInputElement).value.trim();
+    if (value) this.setIconSize(value);
+  }
   private setVisibility(name: string, visible: boolean): void {
     this.configChanged({
       ...this.config,
@@ -73,16 +79,14 @@ class PlayerControlsSettingsEditor extends BaseEditor {
       },
     ] as const;
 
-    const sizeSchema = [
-      {
-        name: 'playerControlsIconSize',
-        label: t('iconSize'),
-        help: `${t('iconSizeHelp')} "${PLAYER_CONTROLS_ICON_SIZE_DEFAULT}"`,
-        required: false,
-        type: 'string',
-        default: PLAYER_CONTROLS_ICON_SIZE_DEFAULT,
-      },
-    ];
+    // Keep existing CSS sizes intact, including user-defined px/rem values.
+    const configuredSize = String(this.config.playerControlsIconSize ?? PLAYER_CONTROLS_ICON_SIZE_DEFAULT);
+    const sizes = [
+      { id: 'small', value: '24px', icon: 19, label: heading('Pequeno', 'Klein', 'Small') },
+      { id: 'medium', value: '32px', icon: 25, label: heading('Médio', 'Mittel', 'Medium') },
+      { id: 'large', value: '40px', icon: 32, label: heading('Grande', 'Groß', 'Large') },
+    ] as const;
+    const isPreset = sizes.some((size) => size.value === configuredSize);
 
     const visibilitySchema = [
       {
@@ -120,13 +124,43 @@ class PlayerControlsSettingsEditor extends BaseEditor {
             </div>
           </div>
 
-          <crm-editor-form
-            .schema=${sizeSchema}
-            .section=${Section.PLAYER}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-          ></crm-editor-form>
+          <div class="size-choices" role="group" aria-label=${t('iconSize')}>
+            ${sizes.map((size) => html`
+              <button
+                type="button"
+                class="size-choice ${configuredSize === size.value ? 'active' : ''}"
+                aria-pressed=${String(configuredSize === size.value)}
+                @click=${() => this.setIconSize(size.value)}
+              >
+                <span class="size-art" aria-hidden="true">
+                  <ha-icon icon="mdi:skip-previous" style=${`--mdc-icon-size:${Math.round(size.icon * .72)}px`}></ha-icon>
+                  <span class="size-play">
+                    <ha-icon icon="mdi:play" style=${`--mdc-icon-size:${size.icon}px`}></ha-icon>
+                  </span>
+                  <ha-icon icon="mdi:skip-next" style=${`--mdc-icon-size:${Math.round(size.icon * .72)}px`}></ha-icon>
+                </span>
+                <span class="size-name">${size.label}</span>
+                <span class="size-value">${size.value}</span>
+                <ha-icon class="size-check" icon="mdi:check-circle"></ha-icon>
+              </button>
+            `)}
+          </div>
+          <details class="size-custom" ?open=${!isPreset}>
+            <summary>
+              <ha-icon icon="mdi:tune-variant"></ha-icon>
+              ${heading('Tamanho personalizado', 'Benutzerdefinierte Größe', 'Custom size')}
+              ${!isPreset ? html`<span class="custom-value">${configuredSize}</span>` : ''}
+            </summary>
+            <label class="custom-field">
+              <span>${heading('Valor CSS (ex.: 28px ou 1.75rem)', 'CSS-Wert (z. B. 28px oder 1.75rem)', 'CSS value (e.g. 28px or 1.75rem)')}</span>
+              <input
+                type="text"
+                .value=${configuredSize}
+                @change=${this.onCustomSizeChange}
+                @keydown=${(event: KeyboardEvent) => { if (event.key === 'Enter') this.onCustomSizeChange(event); }}
+              />
+            </label>
+          </details>
         </section>
 
         <section class="studio-panel">
@@ -316,6 +350,27 @@ class PlayerControlsSettingsEditor extends BaseEditor {
         line-height: 1.4;
         color: var(--secondary-text-color);
       }
+
+      .size-choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+      .size-choice { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; min-width: 0; min-height: 112px; padding: 12px 4px 10px; border: 1px solid var(--divider-color,rgba(128,128,128,.25)); border-radius: 13px; background: var(--secondary-background-color,rgba(128,128,128,.06)); color: var(--primary-text-color); font: inherit; cursor: pointer; transition: border-color .15s, background-color .15s; }
+      .size-choice:hover { background: var(--divider-color,rgba(128,128,128,.13)); }
+      .size-choice.active { border: 2px solid var(--primary-color,#34d399); padding: 11px 3px 9px; }
+      .size-choice:focus-visible { outline: 2px solid var(--primary-color,#34d399); outline-offset: 2px; }
+      .size-art { display: flex; align-items: center; justify-content: center; gap: 2px; height: 43px; max-width: 100%; color: var(--secondary-text-color); }
+      .size-art > ha-icon { flex-shrink: 1; }
+      .size-play { display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: var(--primary-color,#34d399); color: var(--card-background-color,#102019); }
+      .size-name { font-size: 12px; font-weight: 650; }
+      .size-value { font-size: 10px; color: var(--secondary-text-color); }
+      .size-check { position: absolute; top: 5px; right: 5px; --mdc-icon-size: 14px; color: var(--primary-color,#34d399); opacity: 0; }
+      .size-choice.active .size-check { opacity: 1; }
+      .size-custom { margin-top: 12px; border-top: 1px solid var(--divider-color,rgba(128,128,128,.2)); padding-top: 10px; }
+      .size-custom summary { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--secondary-text-color); cursor: pointer; list-style: none; }
+      .size-custom summary::-webkit-details-marker { display: none; }
+      .size-custom summary > ha-icon { --mdc-icon-size: 17px; }
+      .custom-value { margin-left: auto; font-weight: 650; color: var(--primary-text-color); }
+      .custom-field { display: grid; gap: 7px; margin-top: 12px; font-size: 11px; color: var(--secondary-text-color); }
+      .custom-field input { width: 100%; height: 38px; border: 1px solid var(--divider-color); border-radius: 9px; background: var(--secondary-background-color); color: var(--primary-text-color); padding: 0 11px; font: inherit; font-size: 13px; }
+      .custom-field input:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
       .controls-grid {
         display: grid;

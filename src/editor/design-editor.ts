@@ -144,10 +144,20 @@ class DesignEditor extends BaseEditor {
       previewTitle: pt ? 'Minha música' : de ? 'Meine Musik' : 'My music',
       previewSubtitle: pt ? 'Pronto para tocar' : de ? 'Bereit für Musik' : 'Ready to play',
       reset: pt ? 'Restaurar' : de ? 'Zurücksetzen' : 'Reset',
-      radiusHint: pt ? 'Ex.: 12px, 20px ou 1rem' : de ? 'Z. B. 12px, 20px oder 1rem' : 'E.g. 12px, 20px or 1rem',
+      radiusHint: pt ? 'Arraste para ajustar ou digite um valor CSS, como 1rem.' : de ? 'Mit dem Regler anpassen oder einen CSS-Wert wie 1rem eingeben.' : 'Use the slider or enter a CSS value such as 1rem.',
+      radiusSoft: pt ? 'Suave' : de ? 'Weich' : 'Soft',
+      radiusSquare: pt ? 'Reto' : de ? 'Eckig' : 'Square',
+      customUnit: pt ? 'Valor personalizado' : de ? 'Benutzerdefinierter Wert' : 'Custom value',
+      dimensionStatus: pt ? 'Tamanho definido manualmente' : de ? 'Manuell festgelegte Größe' : 'Manually defined size',
+      dimensionDefault: pt ? 'Tamanho padrão' : de ? 'Standardgröße' : 'Default size',
     };
 
     const radius = this.getValue('crmBorderRadius');
+    const radiusPixels = /^\s*(\d+(?:\.\d+)?)px\s*$/i.exec(radius);
+    const radiusSliderValue = radiusPixels ? Math.min(48, Math.max(0, Number(radiusPixels[1]))) : 20;
+    const hasCustomRadiusUnit = !radiusPixels;
+    const widthValue = String(this.config.width ?? '');
+    const heightValue = String(this.config.height ?? '');
     const selected = this.getTheme();
 
 
@@ -241,33 +251,25 @@ class DesignEditor extends BaseEditor {
           </div>
         </div>
 
-        <div class="studio-panel">
+        <div class="studio-panel dimensions-panel">
           <div class="panel-title">${ui.dimensions}</div>
           <div class="panel-hint">${ui.dimensionsHint}</div>
-
           <div class="dimensions-grid">
-            <label class="dimension-field">
-              <span class="field-label">${ui.width}</span>
-              <input
-                class="studio-input"
-                type="text"
-                name="width"
-                .value=${String(this.config.width ?? '')}
-                placeholder="35.15"
-                @change=${this.onTextChange}
-              />
+            <label class="dimension-tile">
+              <span class="dimension-heading"><ha-icon icon="mdi:arrow-expand-horizontal"></ha-icon><span>${ui.width}</span></span>
+              <span class="dimension-input-wrap">
+                <input class="studio-input dimension-input" type="text" name="width"
+                  .value=${widthValue} placeholder="—" @change=${this.onTextChange} />
+              </span>
+              <span class="dimension-meta">${widthValue.trim() ? ui.dimensionStatus : ui.dimensionDefault}</span>
             </label>
-
-            <label class="dimension-field">
-              <span class="field-label">${ui.height}</span>
-              <input
-                class="studio-input"
-                type="text"
-                name="height"
-                .value=${String(this.config.height ?? '')}
-                placeholder="35.15"
-                @change=${this.onTextChange}
-              />
+            <label class="dimension-tile">
+              <span class="dimension-heading"><ha-icon icon="mdi:arrow-expand-vertical"></ha-icon><span>${ui.height}</span></span>
+              <span class="dimension-input-wrap">
+                <input class="studio-input dimension-input" type="text" name="height"
+                  .value=${heightValue} placeholder="—" @change=${this.onTextChange} />
+              </span>
+              <span class="dimension-meta">${heightValue.trim() ? ui.dimensionStatus : ui.dimensionDefault}</span>
             </label>
           </div>
         </div>
@@ -297,21 +299,33 @@ class DesignEditor extends BaseEditor {
           </div>
         ` : ''}
 
-        <div class="studio-panel">
-          <div class="panel-title">${ui.shape}</div>
-          <div class="color-top">
-            <label class="field-label" for="radius">${t('borderRadius')}</label>
+        <div class="studio-panel shape-panel">
+          <div class="shape-heading">
+            <div class="panel-title">${ui.shape}</div>
             <button class="reset" type="button" @click=${() => this.resetField('crmBorderRadius')}>${ui.reset}</button>
           </div>
-          <input
-            id="radius"
-            class="studio-input"
-            type="text"
-            name="crmBorderRadius"
-            .value=${radius}
-            @change=${this.onTextChange}
-          />
-          <div class="field-hint">${ui.radiusHint}</div>
+          <div class="shape-workspace">
+            <div class="shape-illustration" aria-hidden="true">
+              <div class="shape-sample" style=${`border-radius: ${radius};`}>
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="shape-settings">
+              <div class="shape-value-row">
+                <label class="field-label" for="radius">${t('borderRadius')}</label>
+                <span class="shape-value">${hasCustomRadiusUnit ? ui.customUnit : `${radiusSliderValue}px`}</span>
+              </div>
+              <input class="radius-range" type="range" min="0" max="48" step="1"
+                aria-label=${t('borderRadius')} .value=${String(radiusSliderValue)}
+                @input=${(event: Event) => this.setField('crmBorderRadius', `${(event.currentTarget as HTMLInputElement).value}px`)} />
+              <div class="range-labels"><span>${ui.radiusSquare}</span><span>${ui.radiusSoft}</span></div>
+            </div>
+          </div>
+          <div class="shape-manual">
+            <input id="radius" class="studio-input" type="text" name="crmBorderRadius"
+              .value=${radius} @change=${this.onTextChange} />
+            <div class="field-hint">${ui.radiusHint}</div>
+          </div>
         </div>
 
         <div class="studio-panel">
@@ -334,6 +348,29 @@ class DesignEditor extends BaseEditor {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
       }
+      .dimensions-panel .panel-hint { margin-bottom: 13px; }
+      .dimension-tile { display: flex; flex-direction: column; min-width: 0; gap: 10px; padding: 12px; border: 1px solid var(--divider-color); border-radius: 12px; background: var(--secondary-background-color, rgba(128,128,128,.07)); transition: border-color .15s ease; }
+      .dimension-tile:focus-within { border-color: var(--primary-color, #34d399); }
+      .dimension-heading { display: flex; align-items: center; gap: 7px; color: var(--primary-text-color); font-size: 12px; font-weight: 650; }
+      .dimension-heading ha-icon { --mdc-icon-size: 18px; color: var(--primary-color, #34d399); }
+      .dimension-input-wrap { display: block; }
+      .dimension-input { height: 42px; font-size: 16px; font-weight: 650; font-variant-numeric: tabular-nums; background: var(--card-background-color, var(--ha-card-background)); }
+      .dimension-input::placeholder { color: var(--secondary-text-color); opacity: .65; }
+      .dimension-meta { font-size: 10px; line-height: 1.35; color: var(--secondary-text-color); }
+      .shape-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .shape-workspace { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: 15px; margin-top: 14px; }
+      .shape-illustration { display: grid; place-items: center; height: 84px; border: 1px solid var(--divider-color); border-radius: 13px; background: var(--secondary-background-color, rgba(128,128,128,.07)); }
+      .shape-sample { display: flex; flex-direction: column; gap: 6px; justify-content: center; width: 52px; height: 52px; padding: 11px; border: 2px solid var(--primary-color, #34d399); background: var(--card-background-color, var(--ha-card-background)); transition: border-radius .12s ease; }
+      .shape-sample span { display: block; height: 4px; border-radius: 3px; background: var(--secondary-text-color); opacity: .65; }
+      .shape-sample span:first-child { background: var(--primary-color, #34d399); opacity: 1; }
+      .shape-sample span:last-child { width: 65%; }
+      .shape-settings { min-width: 0; }
+      .shape-value-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 12px; }
+      .shape-value { font-size: 11px; font-weight: 650; color: var(--primary-color, #34d399); text-align: right; }
+      .radius-range { display: block; width: 100%; margin: 0; accent-color: var(--primary-color, #34d399); cursor: pointer; }
+      .range-labels { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 10px; color: var(--secondary-text-color); }
+      .shape-manual { margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--divider-color); }
+      .shape-manual .studio-input { height: 39px; }
       .dimension-field {
         display: flex;
         flex-direction: column;

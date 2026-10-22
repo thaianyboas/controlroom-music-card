@@ -3,7 +3,6 @@ import { css, html, TemplateResult } from 'lit';
 
 import { PLAYER_CONTROLS_BACKGROUND_COLOR_DEFAULT } from '../constants';
 import { BaseEditor } from './base-editor';
-import { Section } from '../types/section';
 import { translate } from '../localization/i18n';
 
 class PlayerVolumeSettingsEditor extends BaseEditor {
@@ -13,6 +12,22 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
 
   private setBackgroundColor(value: string): void {
     this.setField('playerControlsBackgroundColor', value);
+  }
+
+  private setVolumeNumber(name: string, value: string, min: number, max: number): void {
+    if (value.trim() === '') return;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return;
+    this.configChanged({
+      ...this.config,
+      [name]: Math.max(min, Math.min(max, Math.round(parsed))),
+    });
+  }
+
+  private restoreBackground(): void {
+    const next = { ...this.config };
+    delete next.playerControlsBackgroundColor;
+    this.configChanged(next);
   }
 
   protected render(): TemplateResult {
@@ -59,7 +74,13 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
       reset: tr('Restaurar', 'Zurücksetzen', 'Reset'),
       visible: tr('Visível', 'Sichtbar', 'Visible'),
       hidden: tr('Oculto', 'Ausgeblendet', 'Hidden'),
-      preview: tr('Prévia da cor', 'Farbvorschau', 'Color preview'),
+      preview: tr('Prévia dos controles', 'Vorschau der Bedienelemente', 'Controls preview'),
+      max: tr('Volume máximo', 'Maximale Lautstärke', 'Maximum volume'),
+      step: tr('Ajuste por toque', 'Schrittweite', 'Volume step'),
+      customColor: tr('Cor personalizada (CSS)', 'Eigene Farbe (CSS)', 'Custom CSS color'),
+      palette: tr('Cores rápidas', 'Schnellfarben', 'Quick colors'),
+      defaultColor: tr('Cor padrão', 'Standardfarbe', 'Default color'),
+      percent: tr('Limite de saída', 'Ausgabelimit', 'Output limit'),
     };
 
     const backgroundColor = String(
@@ -76,28 +97,10 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
         ? defaultColor
         : '#202020';
 
-    const levelsSchema = [
-      {
-        name: 'playerVolumeMaxValue',
-        label: t('maxVolume'),
-        help: t('maxVolumeHelp'),
-        required: true,
-        type: 'integer',
-        default: 100,
-        valueMin: 10,
-        valueMax: 100,
-      },
-      {
-        name: 'playerVolumeStepValue',
-        label: t('volumeStep'),
-        help: t('volumeStepHelp'),
-        required: true,
-        type: 'integer',
-        default: 10,
-        valueMin: 1,
-        valueMax: 30,
-      },
-    ];
+    const maxValue = Math.max(10, Math.min(100, Number(this.config.playerVolumeMaxValue ?? 100) || 100));
+    const stepValue = Math.max(1, Math.min(30, Number(this.config.playerVolumeStepValue ?? 10) || 10));
+    const quickColors = ['#101b19', '#1c2430', '#28324a', '#173d35', '#2d253b'];
+    const isDefaultBackground = this.config.playerControlsBackgroundColor == null;
 
     const controls = [
       {
@@ -145,68 +148,85 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
             </div>
           </div>
 
-          <crm-editor-form
-            .schema=${levelsSchema}
-            .section=${Section.PLAYER}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-          ></crm-editor-form>
+          <div class="volume-setting">
+            <div class="setting-top">
+              <span class="setting-name">${labels.max}</span>
+              <span class="setting-reading">${maxValue}<small>%</small></span>
+            </div>
+            <div class="slider-row">
+              <ha-icon icon="mdi:volume-medium"></ha-icon>
+              <input class="studio-range" type="range" min="10" max="100" step="1"
+                aria-label=${labels.max} .value=${String(maxValue)}
+                @input=${(event: Event) => this.setVolumeNumber('playerVolumeMaxValue', (event.currentTarget as HTMLInputElement).value, 10, 100)} />
+              <ha-icon icon="mdi:volume-high"></ha-icon>
+            </div>
+            <div class="range-caption"><span>10%</span><span>100%</span></div>
+          </div>
+
+          <div class="volume-setting">
+            <div class="setting-top">
+              <span class="setting-name">${labels.step}</span>
+              <span class="setting-reading">${stepValue}<small>%</small></span>
+            </div>
+            <div class="slider-row">
+              <ha-icon icon="mdi:minus-circle-outline"></ha-icon>
+              <input class="studio-range" type="range" min="1" max="30" step="1"
+                aria-label=${labels.step} .value=${String(stepValue)}
+                @input=${(event: Event) => this.setVolumeNumber('playerVolumeStepValue', (event.currentTarget as HTMLInputElement).value, 1, 30)} />
+              <ha-icon icon="mdi:plus-circle-outline"></ha-icon>
+            </div>
+            <div class="range-caption"><span>1%</span><span>30%</span></div>
+          </div>
         </section>
 
         <section class="studio-panel">
           <div class="studio-heading">
             <ha-icon icon="mdi:palette-outline"></ha-icon>
-            <div class="studio-title">${labels.appearance}</div>
+            <div>
+              <div class="studio-title">${labels.appearance}</div>
+              <div class="studio-hint">${labels.backgroundHelp}</div>
+            </div>
           </div>
-
-          <p class="studio-hint appearance-hint">
-            ${labels.backgroundHelp}
-          </p>
 
           <div class="color-top">
-            <span class="field-label">${t('backgroundColor')}</span>
-
-            <button
-              class="reset"
-              type="button"
-              @click=${() => this.setBackgroundColor(defaultColor)}
-            >
-              ${labels.reset}
-            </button>
+            <span class="field-label">${labels.palette}</span>
+            <button class="reset" type="button" @click=${() => this.restoreBackground()}>${labels.reset}</button>
           </div>
-
-          <div class="color-controls">
-            <label class="color-picker" title=${labels.appearance}>
-              <input
-                type="color"
-                aria-label=${labels.appearance}
-                .value=${pickerColor}
-                @input=${(event: Event) =>
-                  this.setBackgroundColor(
-                    (event.currentTarget as HTMLInputElement).value,
-                  )}
-              />
-            </label>
-
-            <input
-              class="studio-input"
-              type="text"
-              aria-label=${t('backgroundColor')}
-              spellcheck="false"
-              .value=${backgroundColor}
-              @change=${(event: Event) =>
-                this.setBackgroundColor(
-                  (event.currentTarget as HTMLInputElement).value.trim(),
-                )}
-            />
+          <div class="palette-row" role="group" aria-label=${labels.palette}>
+            <button type="button" class="palette-default ${isDefaultBackground ? 'active' : ''}"
+              aria-label=${labels.defaultColor} aria-pressed=${String(isDefaultBackground)}
+              @click=${() => this.restoreBackground()}>
+              <ha-icon icon="mdi:theme-light-dark"></ha-icon>
+            </button>
+            ${quickColors.map((color) => html`
+              <button type="button" class="palette-swatch ${!isDefaultBackground && backgroundColor.toLowerCase() === color ? 'active' : ''}"
+                style=${`--swatch:${color}`} aria-label=${color}
+                aria-pressed=${String(!isDefaultBackground && backgroundColor.toLowerCase() === color)}
+                @click=${() => this.setBackgroundColor(color)}>
+                <ha-icon icon="mdi:check"></ha-icon>
+              </button>
+            `)}
           </div>
 
           <div class="preview-heading">${labels.preview}</div>
-          <div
-            class="color-preview"
-            style=${`background: ${backgroundColor};`}
-          ></div>
+          <div class="volume-preview" style=${`background: ${backgroundColor};`}>
+            <ha-icon icon="mdi:volume-medium"></ha-icon>
+            <span class="preview-track"><span style=${`width:${Math.min(maxValue, 100)}%`}></span></span>
+            <strong>${maxValue}%</strong>
+          </div>
+
+          <details class="advanced-color">
+            <summary><ha-icon icon="mdi:tune-variant"></ha-icon>${labels.customColor}</summary>
+            <div class="color-controls">
+              <label class="color-picker" title=${labels.appearance}>
+                <input type="color" aria-label=${labels.appearance} .value=${pickerColor}
+                  @input=${(event: Event) => this.setBackgroundColor((event.currentTarget as HTMLInputElement).value)} />
+              </label>
+              <input class="studio-input" type="text" aria-label=${t('backgroundColor')}
+                spellcheck="false" .value=${backgroundColor}
+                @change=${(event: Event) => this.setBackgroundColor((event.currentTarget as HTMLInputElement).value.trim())} />
+            </div>
+          </details>
         </section>
 
         <section class="studio-panel">
@@ -421,6 +441,39 @@ class PlayerVolumeSettingsEditor extends BaseEditor {
         border-radius: 9px;
         background: var(--secondary-background-color);
       }
+
+
+      /* Premium volume settings — leaves the existing visibility tiles untouched. */
+      .volume-setting { padding: 13px; border: 1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius: 12px; background: var(--secondary-background-color, rgba(128,128,128,.06)); }
+      .volume-setting + .volume-setting { margin-top: 10px; }
+      .setting-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; }
+      .setting-name { color: var(--primary-text-color); font-size: 12px; font-weight: 600; }
+      .setting-reading { color: var(--primary-color, #34d399); font-size: 22px; font-weight: 750; font-variant-numeric: tabular-nums; }
+      .setting-reading small { font-size: 12px; margin-left: 2px; }
+      .slider-row { display: flex; align-items: center; gap: 10px; }
+      .slider-row ha-icon { flex: 0 0 auto; color: var(--secondary-text-color); --mdc-icon-size: 18px; }
+      .studio-range { flex: 1; min-width: 0; width: 100%; height: 5px; accent-color: var(--primary-color, #34d399); cursor: pointer; }
+      .studio-range:focus-visible { outline: 2px solid var(--primary-color, #34d399); outline-offset: 5px; }
+      .range-caption { display: flex; justify-content: space-between; margin: 8px 27px 0; color: var(--secondary-text-color); font-size: 10px; }
+      .palette-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 12px 0 17px; }
+      .palette-swatch, .palette-default { display: grid; place-items: center; width: 39px; height: 39px; border: 2px solid var(--divider-color, rgba(128,128,128,.3)); border-radius: 12px; cursor: pointer; color: white; }
+      .palette-swatch { background: var(--swatch); }
+      .palette-default { background: var(--secondary-background-color, rgba(128,128,128,.1)); color: var(--primary-text-color); }
+      .palette-swatch.active, .palette-default.active { border-color: var(--primary-color, #34d399); box-shadow: 0 0 0 1px var(--primary-color, #34d399); }
+      .palette-swatch ha-icon { --mdc-icon-size: 17px; opacity: 0; }
+      .palette-swatch.active ha-icon { opacity: 1; }
+      .palette-default ha-icon { --mdc-icon-size: 20px; }
+      .palette-swatch:focus-visible, .palette-default:focus-visible { outline: 2px solid var(--primary-color, #34d399); outline-offset: 3px; }
+      .volume-preview { display: flex; align-items: center; gap: 11px; min-height: 60px; padding: 13px; border: 1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius: 12px; color: #f0fdf4; }
+      .volume-preview > ha-icon { --mdc-icon-size: 23px; flex: 0 0 auto; }
+      .volume-preview strong { min-width: 36px; font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+      .preview-track { display: block; flex: 1; min-width: 0; height: 5px; border-radius: 9px; background: rgba(255,255,255,.25); overflow: hidden; }
+      .preview-track > span { display: block; height: 100%; border-radius: inherit; background: var(--primary-color, #34d399); }
+      .advanced-color { margin-top: 15px; border-top: 1px solid var(--divider-color, rgba(128,128,128,.2)); padding-top: 12px; }
+      .advanced-color summary { display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--secondary-text-color); font-size: 11px; list-style: none; }
+      .advanced-color summary::-webkit-details-marker { display: none; }
+      .advanced-color summary ha-icon { --mdc-icon-size: 17px; }
+      .advanced-color .color-controls { margin-top: 12px; }
 
       .controls-grid {
         display: grid;

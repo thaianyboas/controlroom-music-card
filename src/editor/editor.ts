@@ -139,7 +139,7 @@ class CardEditor extends BaseEditor {
     const labels = {
       pt: { general: 'Geral', design: 'Aparência', player: 'Reprodutor', navigation: 'Navegação', devices: 'Dispositivos', library: 'Biblioteca', advanced: 'Avançado', settings: 'Configurações do cartão', choose: 'Escolha uma seção' },
       de: { general: 'Allgemein', design: 'Darstellung', player: 'Player', navigation: 'Navigation', devices: 'Geräte', library: 'Bibliothek', advanced: 'Erweitert', settings: 'Karteneinstellungen', choose: 'Bereich auswählen' },
-      en: { general: 'General', design: 'Appearance', player: 'Player', devices: 'Devices', library: 'Library', advanced: 'Advanced', settings: 'Card settings', choose: 'Choose a section' },
+      en: { general: 'General', design: 'Appearance', player: 'Player', navigation: 'Navigation', devices: 'Devices', library: 'Library', advanced: 'Advanced', settings: 'Card settings', choose: 'Choose a section' },
     }[lang];
 
     // Explicit labels avoid relying on translation keys generated from enum values.
@@ -297,32 +297,8 @@ class CardEditor extends BaseEditor {
         color-scheme: normal;
         transition: background-color 150ms ease, color 150ms ease;
       }
-      /* Palette values are set inline for all four modes, including Auto. */
-      .crm-settings-shell[data-theme="light"] {
-        color-scheme: light;
-        --card-background-color: #ffffff;
-        --ha-card-background: #ffffff;
-        --secondary-background-color: #f2f5f4;
-        --primary-text-color: #17221e;
-        --secondary-text-color: #52645c;
-        --divider-color: #dce5e0;
-        --primary-color: #159568;
-        --crm-editor-accent: #159568;
-      }
-      .crm-settings-shell[data-theme="dark"] {
-        color-scheme: dark;
-        --card-background-color: #101b19;
-        --ha-card-background: #101b19;
-        --secondary-background-color: #1b2a26;
-        --primary-text-color: #f0fdf4;
-        --secondary-text-color: #a9c2b6;
-        --divider-color: #34483f;
-        --primary-color: #34d399;
-        --crm-editor-accent: #34d399;
-      }
-      .crm-settings-shell[data-theme="custom"] {
-        --divider-color: color-mix(in srgb, var(--primary-text-color) 22%, transparent);
-      }
+      /* Theme colors are provided by the computed inline palette. */
+
       .crm-settings-heading {
         display: flex; align-items: center; gap: 10px;
         padding: 6px 4px 12px;

@@ -146,12 +146,13 @@ class PlaylistFavBrowserEditor extends BaseEditor {
     name: keyof CardConfig,
     label: string,
     fallback = false,
+    description = '',
   ): TemplateResult {
     const checked = Boolean(this.value(name, fallback));
 
     return html`
       <label class="toggle-row">
-        <span class="setting-label">${label}</span>
+        <span class="toggle-copy"><span class="setting-label">${label}</span>${description ? html`<small>${description}</small>` : ''}</span>
         <input
           class="toggle-input"
           type="checkbox"
@@ -171,6 +172,9 @@ class PlaylistFavBrowserEditor extends BaseEditor {
   }
 
   protected render(): TemplateResult {
+    const title = String(this.value('playlistFavBrowserTitle', '')).trim();
+    const subtitle = String(this.value('playlistFavBrowserSubTitle', '')).trim();
+
     return html`
       <div class="studio">
 
@@ -214,6 +218,16 @@ class PlaylistFavBrowserEditor extends BaseEditor {
               this.tr('Subtítulo', 'Untertitel', 'Subtitle'),
               this.tr('Opcional', 'Optional', 'Optional'),
             )}
+          </div>
+          <div class="identity-preview">
+            <span class="preview-eyebrow">${this.tr('Prévia do cabeçalho', 'Vorschau der Überschrift', 'Header preview')}</span>
+            <div class="preview-heading">
+              <ha-icon icon="mdi:playlist-music"></ha-icon>
+              <div class="preview-copy">
+                <strong>${title || this.tr('Playlists favoritas', 'Lieblingsplaylists', 'Favorite playlists')}</strong>
+                ${subtitle ? html`<small>${subtitle}</small>` : html`<small class="preview-placeholder">${this.tr('Sem subtítulo', 'Ohne Untertitel', 'No subtitle')}</small>`}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -264,39 +278,61 @@ class PlaylistFavBrowserEditor extends BaseEditor {
             </strong>
           </div>
 
-          <div class="toggle-list">
-            ${this.toggleField(
-              'playlistFavBrowserItemsHideTitle',
-              this.tr('Ocultar títulos', 'Titel ausblenden', 'Hide titles'),
-            )}
+          <div class="display-group">
+            <div class="group-heading">
+              <ha-icon icon="mdi:eye-outline"></ha-icon>
+              <span>${this.tr('Informações exibidas', 'Angezeigte Informationen', 'Displayed information')}</span>
+            </div>
+            <div class="toggle-list">
+              ${this.toggleField(
+                'playlistFavBrowserItemsHideTitle',
+                this.tr('Ocultar títulos', 'Titel ausblenden', 'Hide titles'),
+                false,
+                this.tr('Esconde o nome abaixo de cada capa.', 'Blendet den Namen unter jedem Cover aus.', 'Hides the name below each cover.'),
+              )}
+              ${this.toggleField(
+                'playlistFavBrowserItemsHideSubTitle',
+                this.tr('Ocultar subtítulos', 'Untertitel ausblenden', 'Hide subtitles'),
+                false,
+                this.tr('Esconde as informações secundárias.', 'Blendet zusätzliche Informationen aus.', 'Hides secondary information.'),
+              )}
+            </div>
+          </div>
 
-            ${this.toggleField(
-              'playlistFavBrowserItemsHideSubTitle',
-              this.tr('Ocultar subtítulos', 'Untertitel ausblenden', 'Hide subtitles'),
-            )}
+          <div class="display-group">
+            <div class="group-heading">
+              <ha-icon icon="mdi:sort-alphabetical-ascending"></ha-icon>
+              <span>${this.tr('Ordenação e atualização', 'Sortierung und Aktualisierung', 'Sorting and refresh')}</span>
+            </div>
+            <div class="toggle-list">
+              ${this.toggleField(
+                'playlistFavBrowserItemsSortTitle',
+                this.tr('Ordenar por título', 'Nach Titel sortieren', 'Sort by title'),
+                false,
+                this.tr('Organiza as playlists pelo nome.', 'Sortiert Playlists nach Namen.', 'Sorts playlists by name.'),
+              )}
+              ${this.toggleField(
+                'playlistFavBrowserItemsRefreshOnEntry',
+                this.tr('Atualizar ao abrir', 'Beim Öffnen aktualisieren', 'Refresh on entry'),
+                false,
+                this.tr('Busca dados atualizados ao entrar nesta seção.', 'Lädt beim Öffnen aktuelle Daten.', 'Fetches updated data when opening this section.'),
+              )}
+            </div>
+          </div>
 
-            ${this.toggleField(
-              'playlistFavBrowserItemsSortTitle',
-              this.tr('Ordenar por título', 'Nach Titel sortieren', 'Sort by title'),
-            )}
-
-            ${this.toggleField(
-              'playlistFavBrowserShuffleOnPlay',
-              this.tr(
-                'Ativar reprodução aleatória',
-                'Zufallswiedergabe aktivieren',
-                'Enable shuffle on play',
-              ),
-            )}
-
-            ${this.toggleField(
-              'playlistFavBrowserItemsRefreshOnEntry',
-              this.tr(
-                'Atualizar ao abrir',
-                'Beim Öffnen aktualisieren',
-                'Refresh on entry',
-              ),
-            )}
+          <div class="display-group">
+            <div class="group-heading">
+              <ha-icon icon="mdi:shuffle-variant"></ha-icon>
+              <span>${this.tr('Reprodução', 'Wiedergabe', 'Playback')}</span>
+            </div>
+            <div class="toggle-list">
+              ${this.toggleField(
+                'playlistFavBrowserShuffleOnPlay',
+                this.tr('Ativar reprodução aleatória', 'Zufallswiedergabe aktivieren', 'Enable shuffle on play'),
+                false,
+                this.tr('Inicia playlists com ordem aleatória.', 'Startet Playlists in zufälliger Reihenfolge.', 'Starts playlists in shuffle mode.'),
+              )}
+            </div>
           </div>
         </section>
 
@@ -495,6 +531,25 @@ class PlaylistFavBrowserEditor extends BaseEditor {
         font-size: 10px;
       }
 
+      .identity-preview {
+        margin-top: 15px;
+        padding: 12px;
+        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
+        border-radius: 12px;
+        background: var(--secondary-background-color, rgba(128,128,128,.07));
+      }
+      .preview-eyebrow { display: block; margin-bottom: 11px; font-size: 10px; color: var(--secondary-text-color); }
+      .preview-heading { display: flex; align-items: center; gap: 11px; min-width: 0; }
+      .preview-heading > ha-icon { flex-shrink: 0; --mdc-icon-size: 23px; color: var(--studio-accent); }
+      .preview-copy { display: grid; gap: 4px; min-width: 0; }
+      .preview-copy strong { font-size: 13px; overflow-wrap: anywhere; }
+      .preview-copy small { font-size: 11px; color: var(--secondary-text-color); overflow-wrap: anywhere; }
+      .preview-placeholder { opacity: .65; font-style: italic; }
+      .display-group + .display-group { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--divider-color, rgba(128,128,128,.17)); }
+      .group-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--secondary-text-color); font-size: 11px; font-weight: 650; }
+      .group-heading ha-icon { --mdc-icon-size: 16px; color: var(--studio-accent); }
+      .toggle-copy { display: grid; flex: 1; min-width: 0; gap: 3px; }
+      .toggle-copy small { color: var(--secondary-text-color); font-size: 10px; line-height: 1.4; }
       .toggle-list {
         display: flex;
         flex-direction: column;
@@ -506,13 +561,11 @@ class PlaylistFavBrowserEditor extends BaseEditor {
         display: flex;
         align-items: center;
         gap: 12px;
-        min-height: 43px;
+        min-height: 54px;
+        padding: 5px 0;
         cursor: pointer;
       }
 
-      .toggle-row .setting-label {
-        flex: 1;
-      }
 
       .toggle-input {
         position: absolute;

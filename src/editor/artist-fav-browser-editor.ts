@@ -13,160 +13,113 @@ class ArtistFavBrowserEditor extends BaseEditor {
       translate(
         `editor.artistFavoritesSettings.${key}`,
         this.config.language ?? 'auto',
-        this.hass.language,
+        this.hass?.locale?.language || this.hass?.language || 'en',
       );
 
     const language = this.config.language === 'auto' || !this.config.language
-      ? this.hass.language
+      ? this.hass?.locale?.language || this.hass?.language || 'en'
       : this.config.language;
-    const pt = language?.toLowerCase().startsWith('pt');
-    const de = language?.toLowerCase().startsWith('de');
-
-    const labels = {
-      identity: pt ? 'Identificação' : de ? 'Bezeichnungen' : 'Identification',
-      identityHint: pt ? 'Título e subtítulo da biblioteca' : de ? 'Titel und Untertitel der Bibliothek' : 'Library title and subtitle',
-      layout: pt ? 'Organização' : de ? 'Anordnung' : 'Layout',
-      layoutHint: pt ? 'Quantidade e disposição dos artistas' : de ? 'Anzahl und Anordnung der Künstler' : 'Artist count and arrangement',
-      behavior: pt ? 'Exibição e reprodução' : de ? 'Anzeige und Wiedergabe' : 'Display and playback',
-      behaviorHint: pt ? 'Visibilidade, ordenação e atualização' : de ? 'Sichtbarkeit, Sortierung und Aktualisierung' : 'Visibility, sorting and refresh',
-    };
+    const pt = language.toLowerCase().startsWith('pt');
+    const de = language.toLowerCase().startsWith('de');
+    const tr = (ptText: string, deText: string, enText: string) =>
+      pt ? ptText : de ? deText : enText;
 
     const identitySchema = [
-      {
-        name: 'artistFavBrowserTitle',
-        label: t('title'),
-        help: t('titleHelp'),
-        required: false,
-        type: 'string',
-      },
-      {
-        name: 'artistFavBrowserSubTitle',
-        label: t('subtitle'),
-        help: t('subtitleHelp'),
-        required: false,
-        type: 'string',
-      },
+      { name: 'artistFavBrowserTitle', label: t('title'), help: t('titleHelp'), required: false, type: 'string' },
+      { name: 'artistFavBrowserSubTitle', label: t('subtitle'), help: t('subtitleHelp'), required: false, type: 'string' },
     ];
 
     const layoutSchema = [
-      {
-        name: 'artistFavBrowserItemsLimit',
-        label: t('itemsLimit'),
-        help: t('itemsLimitHelp'),
-        required: false,
-        type: 'integer',
-        default: 200,
-        valueMin: 1,
-        valueMax: 1000,
-      },
-      {
-        name: 'artistFavBrowserItemsPerRow',
-        label: t('itemsPerRow'),
-        help: t('itemsPerRowHelp'),
-        required: true,
-        type: 'integer',
-        default: EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW,
-        valueMin: 1,
-        valueMax: 12,
-      },
+      { name: 'artistFavBrowserItemsLimit', label: t('itemsLimit'), help: t('itemsLimitHelp'), required: false, type: 'integer', default: 200, valueMin: 1, valueMax: 1000 },
+      { name: 'artistFavBrowserItemsPerRow', label: t('itemsPerRow'), help: t('itemsPerRowHelp'), required: true, type: 'integer', default: EDITOR_DEFAULT_BROWSER_ITEMS_PER_ROW, valueMin: 1, valueMax: 12 },
     ];
 
-    const behaviorSchema = [
-      {
-        name: 'artistFavBrowserItemsHideTitle',
-        label: t('hideTitle'),
-        required: false,
-        selector: { boolean: {} },
-      },
-      {
-        name: 'artistFavBrowserItemsHideSubTitle',
-        label: t('hideSubtitle'),
-        help: t('hideSubtitleHelp'),
-        required: false,
-        selector: { boolean: {} },
-      },
-      {
-        name: 'artistFavBrowserItemsSortTitle',
-        label: t('sortTitle'),
-        required: false,
-        selector: { boolean: {} },
-      },
-      {
-        name: 'artistFavBrowserShuffleOnPlay',
-        label: t('shuffleOnPlay'),
-        required: false,
-        selector: { boolean: {} },
-      },
-      {
-        name: 'artistFavBrowserItemsRefreshOnEntry',
-        label: t('refreshOnEntry'),
-        required: false,
-        selector: { boolean: {} },
-      },
+    const visibilitySchema = [
+      { name: 'artistFavBrowserItemsHideTitle', label: t('hideTitle'), required: false, selector: { boolean: {} } },
+      { name: 'artistFavBrowserItemsHideSubTitle', label: t('hideSubtitle'), help: t('hideSubtitleHelp'), required: false, selector: { boolean: {} } },
     ];
+    const playbackSchema = [
+      { name: 'artistFavBrowserItemsSortTitle', label: t('sortTitle'), required: false, selector: { boolean: {} } },
+      { name: 'artistFavBrowserShuffleOnPlay', label: t('shuffleOnPlay'), required: false, selector: { boolean: {} } },
+    ];
+    const refreshSchema = [
+      { name: 'artistFavBrowserItemsRefreshOnEntry', label: t('refreshOnEntry'), required: false, selector: { boolean: {} } },
+    ];
+
+    const form = (schema: Array<any>) => html`
+      <crm-editor-form
+        .schema=${schema}
+        .section=${Section.ARTIST_FAVORITES}
+        .store=${this.store}
+        .config=${this.config}
+        .hass=${this.hass}
+        @value-changed=${this.onValueChanged}
+      ></crm-editor-form>
+    `;
+
+    const previewTitle = String(this.config.artistFavBrowserTitle || tr('Artistas favoritos', 'Lieblingskünstler', 'Favorite artists'));
+    const previewSubtitle = String(this.config.artistFavBrowserSubTitle || tr('Sua biblioteca de artistas', 'Deine Künstlerbibliothek', 'Your artist library'));
 
     return html`
       <div class="studio-artists">
-        <p class="studio-description">${t('description')}</p>
+        <div class="intro">
+          <span class="intro-icon"><ha-icon icon="mdi:account-music-outline"></ha-icon></span>
+          <div>
+            <strong>${tr('Artistas favoritos', 'Lieblingskünstler', 'Favorite artists')}</strong>
+            <small>${t('description')}</small>
+          </div>
+        </div>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
-            <span class="studio-icon">
-              <ha-icon icon="mdi:form-textbox"></ha-icon>
-            </span>
+            <span class="studio-icon"><ha-icon icon="mdi:form-textbox"></ha-icon></span>
             <div class="studio-heading-copy">
-              <strong>${labels.identity}</strong>
-              <small>${labels.identityHint}</small>
+              <strong>${tr('Identificação', 'Bezeichnungen', 'Identification')}</strong>
+              <small>${tr('Título e subtítulo da biblioteca', 'Titel und Untertitel der Bibliothek', 'Library title and subtitle')}</small>
             </div>
           </div>
-          <crm-editor-form
-            .schema=${identitySchema}
-            .section=${Section.ARTIST_FAVORITES}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-            @value-changed=${this.onValueChanged}
-          ></crm-editor-form>
+          ${form(identitySchema)}
+          <div class="preview-label">${tr('Prévia da seção', 'Bereichsvorschau', 'Section preview')}</div>
+          <div class="preview">
+            <ha-icon icon="mdi:account-music"></ha-icon>
+            <div class="preview-copy">
+              <strong>${previewTitle}</strong>
+              <small>${previewSubtitle}</small>
+            </div>
+          </div>
         </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
-            <span class="studio-icon">
-              <ha-icon icon="mdi:view-grid-outline"></ha-icon>
-            </span>
+            <span class="studio-icon"><ha-icon icon="mdi:view-grid-outline"></ha-icon></span>
             <div class="studio-heading-copy">
-              <strong>${labels.layout}</strong>
-              <small>${labels.layoutHint}</small>
+              <strong>${tr('Organização', 'Anordnung', 'Layout')}</strong>
+              <small>${tr('Quantidade e disposição dos artistas', 'Anzahl und Anordnung der Künstler', 'Artist count and arrangement')}</small>
             </div>
           </div>
-          <crm-editor-form
-            .schema=${layoutSchema}
-            .section=${Section.ARTIST_FAVORITES}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-            @value-changed=${this.onValueChanged}
-          ></crm-editor-form>
+          ${form(layoutSchema)}
         </section>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
-            <span class="studio-icon">
-              <ha-icon icon="mdi:account-music-outline"></ha-icon>
-            </span>
+            <span class="studio-icon"><ha-icon icon="mdi:tune-variant"></ha-icon></span>
             <div class="studio-heading-copy">
-              <strong>${labels.behavior}</strong>
-              <small>${labels.behaviorHint}</small>
+              <strong>${tr('Exibição e reprodução', 'Anzeige und Wiedergabe', 'Display and playback')}</strong>
+              <small>${tr('Visibilidade, ordenação e atualização', 'Sichtbarkeit, Sortierung und Aktualisierung', 'Visibility, sorting and refresh')}</small>
             </div>
           </div>
-          <crm-editor-form
-            .schema=${behaviorSchema}
-            .section=${Section.ARTIST_FAVORITES}
-            .store=${this.store}
-            .config=${this.config}
-            .hass=${this.hass}
-            @value-changed=${this.onValueChanged}
-          ></crm-editor-form>
+          <div class="subsection">
+            <div class="subsection-heading"><ha-icon icon="mdi:eye-outline"></ha-icon><strong>${tr('Visibilidade', 'Sichtbarkeit', 'Visibility')}</strong></div>
+            ${form(visibilitySchema)}
+          </div>
+          <div class="subsection">
+            <div class="subsection-heading"><ha-icon icon="mdi:sort-alphabetical-ascending"></ha-icon><strong>${tr('Ordenação e reprodução', 'Sortierung und Wiedergabe', 'Sorting and playback')}</strong></div>
+            ${form(playbackSchema)}
+          </div>
+          <div class="subsection last">
+            <div class="subsection-heading"><ha-icon icon="mdi:refresh"></ha-icon><strong>${tr('Atualização', 'Aktualisierung', 'Refresh')}</strong></div>
+            ${form(refreshSchema)}
+          </div>
         </section>
       </div>
     `;
@@ -174,68 +127,43 @@ class ArtistFavBrowserEditor extends BaseEditor {
 
   static get styles() {
     return css`
-      :host { display: block; min-width: 0; }
+      :host { display: block; min-width: 0; --studio-accent: var(--success-color, #38c997); }
       * { box-sizing: border-box; }
-      .studio-artists { display: grid; gap: 11px; min-width: 0; }
-      .studio-description {
-        margin: 0 2px 3px;
-        color: var(--secondary-text-color);
-        font-size: 12px;
-        line-height: 1.5;
-      }
-      .studio-panel {
-        min-width: 0;
-        padding: 14px;
-        border: 1px solid var(--divider-color, rgba(128,128,128,.2));
-        border-radius: 14px;
-        background: var(--card-background-color, var(--ha-card-background, transparent));
-      }
-      .studio-panel-heading {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 13px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--divider-color, rgba(128,128,128,.2));
-      }
-      .studio-icon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex: 0 0 35px;
-        width: 35px;
-        height: 35px;
-        border-radius: 10px;
-        background: var(--secondary-background-color, rgba(128,128,128,.12));
-        color: var(--secondary-text-color);
-      }
+      .studio-artists { display: grid; gap: 12px; min-width: 0; }
+      .intro { display: flex; align-items: center; gap: 11px; padding: 3px 2px 5px; }
+      .intro-icon { display: grid; place-items: center; flex: 0 0 42px; height: 42px; border-radius: 13px; color: var(--studio-accent); background: color-mix(in srgb, var(--studio-accent) 12%, transparent); }
+      .intro-icon ha-icon { --mdc-icon-size: 23px; }
+      .intro > div { display: grid; gap: 4px; min-width: 0; }
+      .intro strong { color: var(--primary-text-color); font-size: 14px; }
+      .intro small { color: var(--secondary-text-color); font-size: 11px; line-height: 1.45; }
+      .studio-panel { min-width: 0; padding: 15px; border: 1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius: 14px; background: var(--card-background-color, var(--ha-card-background, transparent)); }
+      .studio-panel-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 13px; border-bottom: 1px solid var(--divider-color, rgba(128,128,128,.2)); }
+      .studio-icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 11px; background: color-mix(in srgb, var(--studio-accent) 11%, var(--secondary-background-color)); color: var(--studio-accent); }
       .studio-icon ha-icon { --mdc-icon-size: 19px; }
       .studio-heading-copy { display: grid; gap: 3px; min-width: 0; }
-      .studio-heading-copy strong {
-        color: var(--primary-text-color);
-        font-size: 13px;
-        font-weight: 650;
-      }
-      .studio-heading-copy small {
-        color: var(--secondary-text-color);
-        font-size: 11px;
-        line-height: 1.35;
-      }
+      .studio-heading-copy strong { color: var(--primary-text-color); font-size: 13px; font-weight: 650; }
+      .studio-heading-copy small { color: var(--secondary-text-color); font-size: 11px; line-height: 1.4; }
       crm-editor-form { display: block; min-width: 0; }
-      @media (max-width: 340px) {
-        .studio-panel { padding: 10px; }
-      }
+      .preview-label { margin: 16px 0 8px; color: var(--secondary-text-color); font-size: 11px; font-weight: 600; }
+      .preview { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 12px; border: 1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius: 11px; background: var(--secondary-background-color, rgba(128,128,128,.08)); }
+      .preview > ha-icon { color: var(--studio-accent); --mdc-icon-size: 23px; }
+      .preview-copy { display: grid; gap: 3px; min-width: 0; }
+      .preview-copy strong { color: var(--primary-text-color); font-size: 12px; overflow-wrap: anywhere; }
+      .preview-copy small { color: var(--secondary-text-color); font-size: 11px; overflow-wrap: anywhere; }
+      .subsection { padding: 0 0 14px; margin-bottom: 14px; border-bottom: 1px solid var(--divider-color, rgba(128,128,128,.16)); }
+      .subsection.last { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+      .subsection-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; color: var(--secondary-text-color); }
+      .subsection-heading ha-icon { --mdc-icon-size: 17px; color: var(--studio-accent); }
+      .subsection-heading strong { font-size: 11px; font-weight: 650; }
+      @media (max-width: 340px) { .studio-panel { padding: 11px; } }
     `;
   }
 
   protected onValueChanged(args: CustomEvent): void {
-    // Mantido como no código original para futuras alterações.
     if (args) {
+      // The shared editor form handles configuration updates.
     }
   }
 }
 
-customElements.define(
-  'crm-artist-fav-browser-editor',
-  ArtistFavBrowserEditor,
-);
+customElements.define('crm-artist-fav-browser-editor', ArtistFavBrowserEditor);

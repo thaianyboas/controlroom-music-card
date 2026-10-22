@@ -16,6 +16,7 @@ class SourceSettingsEditor extends BaseEditor {
 
   private requestId = 0;
   private loadedEntityId = '';
+  private loadedShowHiddenDevices?: boolean;
 
   protected override updated(
     changedProperties: Map<PropertyKey, unknown>,
@@ -31,6 +32,15 @@ class SourceSettingsEditor extends BaseEditor {
       entityId !== this.loadedEntityId
     ) {
       this.loadedEntityId = entityId;
+      this.loadedShowHiddenDevices = !!this.config.deviceBrowserItemsShowHiddenDevices;
+      void this.loadDevices(false);
+    } else if (
+      this.hass &&
+      this.config &&
+      entityId &&
+      this.loadedShowHiddenDevices !== !!this.config.deviceBrowserItemsShowHiddenDevices
+    ) {
+      this.loadedShowHiddenDevices = !!this.config.deviceBrowserItemsShowHiddenDevices;
       void this.loadDevices(false);
     }
   }
@@ -115,6 +125,8 @@ class SourceSettingsEditor extends BaseEditor {
         'Das konfigurierte Gerät ist nicht in der aktuellen Liste.',
         'The configured device is not in the current list.',
       ),
+      preview: label('Prévia da seção', 'Bereichsvorschau', 'Section preview'),
+      defaultLabel: label('Padrão', 'Standard', 'Default'),
       noDefault: label(
         'Nenhum dispositivo padrão definido',
         'Kein Standardgerät festgelegt',
@@ -153,7 +165,24 @@ class SourceSettingsEditor extends BaseEditor {
 
       if (requestId !== this.requestId) return;
 
-      this.availableDevices = result?.Items || [];
+      // Collapse repeated discovery entries with the same visible name and group
+      // status. Prefer an active entry, without changing the SpotifyPlus service.
+      const discovered = result?.Items || [];
+      const unique = new Map<string, ISpotifyConnectDevice>();
+      for (const device of discovered) {
+        const name = (device.Name || device.Id || '').trim().toLocaleLowerCase();
+        const group = device.DeviceInfo?.GroupStatus?.toLowerCase() === 'group';
+        const key = `${group ? 'group' : 'device'}:${name}`;
+        const existing = unique.get(key);
+        const configured = this.config.deviceDefaultId || '';
+        const matchesConfigured = device.Id === configured || device.Name === configured;
+        const existingMatches = existing && (existing.Id === configured || existing.Name === configured);
+        if (!existing || (matchesConfigured && !existingMatches) ||
+            (!existingMatches && !existing.IsActiveDevice && device.IsActiveDevice)) {
+          unique.set(key, device);
+        }
+      }
+      this.availableDevices = Array.from(unique.values());
       this.devicesLoaded = true;
     } catch (error) {
       if (requestId !== this.requestId) return;
@@ -422,6 +451,17 @@ class SourceSettingsEditor extends BaseEditor {
     return html`
       <div class="studio-devices">
         <p class="studio-description">${t('description')}</p>
+        <div class="device-preview" aria-label=${labels.preview}>
+          <span class="device-preview-icon"><ha-icon icon="mdi:speaker-multiple"></ha-icon></span>
+          <span class="device-preview-copy">
+            <small>${labels.preview}</small>
+            <strong>${this.config.deviceBrowserTitle || t('title')}</strong>
+            ${this.config.deviceBrowserSubTitle
+              ? html`<small>${this.config.deviceBrowserSubTitle}</small>`
+              : nothing}
+          </span>
+          <span class="device-preview-tag">${labels.defaultLabel}</span>
+        </div>
 
         <section class="studio-panel">
           <div class="studio-panel-heading">
@@ -571,6 +611,37 @@ class SourceSettingsEditor extends BaseEditor {
         line-height: 1.35;
       }
 
+      .device-preview {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+        padding: 13px 14px;
+        border: 1px solid color-mix(in srgb, var(--primary-color, #1db954) 32%, var(--divider-color, #888));
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--primary-color, #1db954) 7%, var(--card-background-color, transparent));
+      }
+      .device-preview-icon {
+        display: grid;
+        place-items: center;
+        flex: 0 0 39px;
+        height: 39px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--primary-color, #1db954) 15%, transparent);
+        color: var(--primary-color, #1db954);
+      }
+      .device-preview-copy { display: grid; gap: 3px; min-width: 0; flex: 1; }
+      .device-preview-copy strong { color: var(--primary-text-color); font-size: 13px; overflow-wrap: anywhere; }
+      .device-preview-copy small { color: var(--secondary-text-color); font-size: 10px; }
+      .device-preview-tag {
+        flex-shrink: 0;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--primary-color, #1db954) 13%, transparent);
+        color: var(--primary-color, #1db954);
+        font-size: 10px;
+        font-weight: 650;
+      }
       .device-selector {
         display: grid;
         gap: 12px;

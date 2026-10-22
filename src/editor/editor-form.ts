@@ -1,4 +1,3 @@
-
 import { css, html, LitElement, PropertyValues, TemplateResult } from 'lit';
 import { property, query } from 'lit/decorators.js';
 
@@ -49,13 +48,15 @@ class Form extends BaseEditor {
         display: block;
         width: 100%;
         min-width: 0;
+        color: var(--primary-text-color);
 
         --mdc-menu-item-height: 36px;
         --mdc-text-field-fill-color:
           var(--secondary-background-color, rgba(127,127,127,.06));
+        --mdc-text-field-ink-color: var(--primary-text-color);
+        --mdc-text-field-label-ink-color: var(--secondary-text-color);
         --mdc-text-field-outlined-idle-border-color: transparent;
-        --mdc-text-field-outlined-hover-border-color:
-          var(--divider-color);
+        --mdc-text-field-outlined-hover-border-color: var(--divider-color);
         --ha-textfield-border-width: 1px;
       }
     `;
@@ -126,10 +127,14 @@ class Form extends BaseEditor {
         ha-form-select,
         ha-form-multi_select,
         ha-selector {
+          color: var(--primary-text-color);
           --mdc-menu-item-height: 36px;
           --mdc-text-field-fill-color:
             var(--secondary-background-color, rgba(127,127,127,.06));
+          --mdc-text-field-ink-color: var(--primary-text-color);
+          --mdc-text-field-label-ink-color: var(--secondary-text-color);
           --mdc-text-field-outlined-idle-border-color: transparent;
+          --mdc-text-field-outlined-hover-border-color: var(--divider-color);
           --ha-textfield-border-width: 1px;
         }
       `;
