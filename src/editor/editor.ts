@@ -73,25 +73,67 @@ class CardEditor extends BaseEditor {
     //  JSON.stringify(Store.selectedConfigArea),
     //);
 
-    // Keep the settings surface in sync with the card's selected theme.
-    // CSS custom properties inherit through child editors' shadow roots.
-    const configuredTheme = (this.config as typeof this.config & { crmTheme?: string }).crmTheme;
-    const theme = configuredTheme === 'light' || configuredTheme === 'dark' ||
-      configuredTheme === 'custom' || configuredTheme === 'auto'
+    // ControlRoom theme tokens: keep custom choices whenever contrast is sufficient.
+    const configuredTheme = this.config.crmTheme;
+    const theme = ['light', 'dark', 'custom', 'auto'].includes(configuredTheme ?? '')
       ? configuredTheme : 'dark';
-
+    const haDark = this.hass?.themes?.darkMode === true;
+    const dark = theme === 'dark' || (theme === 'auto' && haDark);
     const validColor = (value: unknown, fallback: string): string =>
-      typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
-
-    const customStyles: Record<string, string> = theme === 'custom' ? {
-      '--card-background-color': validColor(this.config.crmBackground, '#101b19'),
-      '--ha-card-background': validColor(this.config.crmBackground, '#101b19'),
-      '--secondary-background-color': validColor(this.config.crmBackground, '#101b19'),
-      '--primary-text-color': validColor(this.config.crmText, '#f0fdf4'),
-      '--secondary-text-color': validColor(this.config.crmText, '#f0fdf4'),
-      '--primary-color': validColor(this.config.crmAccent, '#34d399'),
-      '--crm-editor-accent': validColor(this.config.crmAccent, '#34d399'),
-    } : {};
+      typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value.trim()) ? value.trim() : fallback;
+    const rgb = (hex: string): number[] => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+    const luminance = (hex: string): number => {
+      const [r, g, b] = rgb(hex).map(v => {
+        const x = v / 255;
+        return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const contrast = (a: string, b: string): number => {
+      const x = luminance(a), y = luminance(b);
+      return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+    };
+    const mix = (a: string, b: string, fraction: number): string => {
+      const x = rgb(a), y = rgb(b);
+      return '#' + x.map((v, i) => Math.round(v * (1 - fraction) + y[i] * fraction)
+        .toString(16).padStart(2, '0')).join('');
+    };
+    const readable = (requested: string, background: string, minimum = 4.5): string => {
+      if (contrast(requested, background) >= minimum) return requested;
+      const black = '#000000', white = '#ffffff';
+      const target = contrast(black, background) > contrast(white, background) ? black : white;
+      for (let i = 1; i <= 100; i++) {
+        const candidate = mix(requested, target, i / 100);
+        if (contrast(candidate, background) >= minimum) return candidate;
+      }
+      return target;
+    };
+    const isCustom = theme === 'custom';
+    const background = isCustom
+      ? validColor(this.config.crmBackground, '#101b19')
+      : dark ? '#101b19' : '#ffffff';
+    const backgroundIsDark = luminance(background) < 0.179;
+    const foreground = readable(isCustom
+      ? validColor(this.config.crmText, backgroundIsDark ? '#f0fdf4' : '#17221e')
+      : dark ? '#f0fdf4' : '#17221e', background);
+    const secondaryBackground = mix(background, backgroundIsDark ? '#ffffff' : '#000000', 0.065);
+    const secondaryText = readable(mix(foreground, background, 0.25), secondaryBackground);
+    const requestedAccent = isCustom
+      ? validColor(this.config.crmAccent, '#34d399')
+      : dark ? '#34d399' : '#159568';
+    const accent = readable(requestedAccent, background, 3);
+    const divider = mix(background, foreground, 0.20);
+    const customStyles: Record<string, string> = {
+      '--card-background-color': background,
+      '--ha-card-background': background,
+      '--secondary-background-color': secondaryBackground,
+      '--primary-text-color': foreground,
+      '--secondary-text-color': secondaryText,
+      '--divider-color': divider,
+      '--primary-color': accent,
+      '--crm-editor-accent': accent,
+      'color-scheme': backgroundIsDark ? 'dark' : 'light',
+    };
 
     const lang = resolveLanguage(this.config.language ?? 'auto', this.hass.locale?.language || this.hass.language);
     const labels = {
@@ -255,6 +297,7 @@ class CardEditor extends BaseEditor {
         color-scheme: normal;
         transition: background-color 150ms ease, color 150ms ease;
       }
+      /* Palette values are set inline for all four modes, including Auto. */
       .crm-settings-shell[data-theme="light"] {
         color-scheme: light;
         --card-background-color: #ffffff;
