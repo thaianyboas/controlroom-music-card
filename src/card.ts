@@ -419,51 +419,23 @@ export class Card extends AlertUpdatesBase {
         background: var(--crm-background) !important;
         background-image: none !important;
         border-top: 1px solid rgba(64, 217, 154, 0.12);
+        position: relative;
+        z-index: 5;
+        overflow: visible;
       }
 
+      /* Floating Glass: the footer itself measures its available width. */
       .crm-card-footer {
-        margin: 0.2rem;
         display: flex;
-        align-self: flex-start;
-        align-items: center;
-        justify-content: flex-start;
-        flex-wrap: nowrap;
         flex: 1 1 auto;
+        align-items: center;
+        justify-content: center;
         min-width: 0;
-        width: 100%;
-        max-width: 100%;
-        gap: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
+        width: calc(100% - 0.4rem);
+        max-width: calc(100% - 0.4rem);
+        margin: 0.2rem;
+        overflow: visible;
         box-sizing: border-box;
-        padding-right: 14px;
-        scroll-padding-right: 14px;
-        overscroll-behavior-x: contain;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        --ha-icon-button-size: var(--crm-footer-icon-button-size, 2.5rem);
-        --mdc-icon-size: var(--crm-footer-icon-size, 1.75rem);
-        --mdc-ripple-top: 0px;
-        --mdc-ripple-left: 0px;
-        --mdc-ripple-fg-size: 10px;
-      }
-
-      .crm-card-footer::-webkit-scrollbar {
-        display: none;
-      }
-
-      /* Keep footer controls at their intended size on narrow dashboards. */
-      .crm-card-footer > * {
-        flex: 0 0 auto;
-        min-width: var(--crm-footer-icon-button-size, 2.5rem);
-      }
-
-      @media (max-width: 480px) {
-        .crm-card-footer {
-          margin: 0.1rem 0;
-          --ha-icon-button-size: 2.25rem;
-          --mdc-icon-size: 1.35rem;
-        }
       }
 
       .crm-loader {
