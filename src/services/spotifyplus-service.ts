@@ -127,12 +127,12 @@ export class SpotifyPlusService {
       }
     }
 
-    // if default device configured then override the specified deviceId.
-    if (this.config.deviceDefaultId) {
-      device_id = this.config.deviceDefaultId;
-      debuglog("getDeviceId - overriding device_id with config option deviceDefaultId: \n%s",
-        JSON.stringify(this.config.deviceDefaultId),
-      );
+    // Preserve an explicitly requested device.
+    // Use the configured default only when no device was provided.
+    if (device_id == null || device_id === '') {
+      if (this.config.deviceDefaultId) {
+        device_id = this.config.deviceDefaultId;
+      }
     }
 
     return device_id;
