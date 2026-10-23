@@ -729,7 +729,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
 
       // set error message and reset scroll position to zero so the message is displayed.
       this.alertErrorSet(this.uiText("search.playFailed", "Medium konnte nicht abgespielt werden. ", "Não foi possível reproduzir o item. ", "Could not play media item. ") + getHomeAssistantErrorMessage(error));
-      this.mediaBrowserContentElement.scrollTop = 0;
+      if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
 
     }
     finally {
