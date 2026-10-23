@@ -559,6 +559,9 @@ export class DeviceBrowser extends FavBrowserBase {
             // call base class method, indicating media list update succeeded.
             super.updatedMediaListOk();
 
+            // Ensure the device list is rendered after the async response.
+            this.requestUpdate();
+
             // resolve the promise.
             resolve(true);
 

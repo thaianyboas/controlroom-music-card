@@ -1405,9 +1405,11 @@ export class Card extends AlertUpdatesBase {
       styleInfo['height'] = `${CARD_EDIT_PREVIEW_HEIGHT}`;
       styleInfo['width'] = `${CARD_EDIT_PREVIEW_WIDTH}`;
 
-      // ControlRoom: altura compacta na prévia do editor.
-      // Mantém o tamanho original para playlists e outras seções.
-      if (this.getHeightMode() !== 'fill') {
+      // ControlRoom: respeitar o modo de altura na prévia.
+      if (this.getHeightMode() === 'compact') {
+        styleInfo['height'] = `calc(${this.compactPlayerHeight}px + var(--crm-card-footer-height) + 1rem)`;
+        styleInfo['min-height'] = '0';
+      } else if (this.getHeightMode() === 'auto') {
         styleInfo['height'] = 'auto';
         styleInfo['min-height'] = '0';
       }
