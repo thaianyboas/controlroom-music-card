@@ -1519,7 +1519,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           ${this.isActionsVisible?B`${this.btnHideActionsHtml}`:B``}
           ${this.filterCriteriaHtml}${this.formatMediaListHtml}${this.refreshMediaListHtml}
         </div>
-        <div id="mediaBrowserContentElement" class="media-browser-content>
+        <div id="mediaBrowserContentElement" class="media-browser-content">
           ${this.alertError?B`<ha-alert alert-type="error" dismissable @alert-dismissed-clicked=${this.alertErrorClear}>${this.alertError}</ha-alert>`:""}
           ${this.alertInfo?B`<ha-alert alert-type="info" dismissable @alert-dismissed-clicked=${this.alertInfoClear}>${this.alertInfo}</ha-alert>`:""}
           ${(()=>this.isActionsVisible?B`<crm-album-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-album-actions>`:1===this.favBrowserItemsPerRow?B`<crm-media-browser-list
