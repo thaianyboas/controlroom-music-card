@@ -1910,26 +1910,36 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         margin-bottom: 0.25rem;
       }
 
-    `]}styleMediaBrowserItemImage(e){const t={};return e?.includes("svg+xml")?(t["mask-image"]=`url(${e})`,t["background-color"]=`var(--crm-media-browser-items-svgicon-color, ${o(be)})`):(t["background-image"]=`url(${e})`,t["background-color"]="var(--crm-media-browser-items-svgicon-color, transparent)"),Me(t)}async onClickAction(e){if(this.isCardInEditPreview)return!0;try{return this.progressShow(),e==or.DeviceConnect?this.deviceInfo?.DiscoveryResult.IsDynamicDevice?(this.alertInfoSet("Dynamic devices cannot be managed."),this.progressHide()):this.mediaItem.IsChromeCast?(this.alertInfoSet("Chromecast devices do not support Spotify Connect connect."),this.progressHide()):(this.alertInfoSet("Connecting to Spotify Connect device ..."),await this.spotifyPlusService.ZeroconfDeviceConnect(this.player,this.mediaItem,null,null,null,!0,!0,1),this.alertInfoSet("Spotify Connect device should be connected."),this.updateActions(this.player,[or.DeviceGetInfo])):e==or.DeviceDisconnect?this.mediaItem.DiscoveryResult.IsDynamicDevice?(this.alertInfoSet("Dynamic devices cannot be managed."),this.progressHide()):this.mediaItem.IsChromeCast?(this.alertInfoSet("Chromecast devices do not support Spotify Connect disconnect."),this.progressHide()):"librespot"==this.mediaItem.DeviceInfo.BrandDisplayName?(this.alertInfoSet("Librespot devices do not support Spotify Connect disconnect."),this.progressHide()):(this.alertInfoSet("Disconnecting from Spotify Connect device ..."),await this.spotifyPlusService.ZeroconfDeviceDisconnect(this.player,this.mediaItem,1),this.alertInfoSet("Spotify Connect device was disconnected."),this.updateActions(this.player,[or.DeviceGetInfo])):this.progressHide(),!0}catch(e){return this.progressHide(),this.alertErrorSet("Action failed: "+ui(e)),!0}}updateActions(e,t){if(!super.updateActions(e,t))return!1;try{const i=new Array;if(-1!=t.indexOf(or.DeviceGetInfo)){const t=new Promise((t,i)=>{this.alertInfo='Retrieving Spotify Connect status for "'+this.mediaItem.Name+'" ...';this.spotifyPlusService.GetSpotifyConnectDevice(e,this.mediaItem.Id,null,null,!0,!1).then(e=>{this.alertInfo?.startsWith("Retrieving ")&&this.alertInfoClear(),this.deviceInfo=e,e&&(this.mediaItem=e),t(!0)}).catch(e=>{this.deviceInfo=void 0,this.alertErrorSet("Get Spotify Connect Device failed: "+ui(e)),i(e)})});i.push(t)}return this.progressShow(),Promise.allSettled(i).finally(()=>{this.progressHide()}),!0}catch(e){return this.progressHide(),this.alertErrorSet("Update device actions failed: "+ui(e)),!0}}}Ce([De({attribute:!1})],ar.prototype,"mediaItem",void 0),Ce([Ve()],ar.prototype,"deviceInfo",void 0),customElements.define("crm-device-actions",ar);const nr=_e(ce+":device-browser"),lr={de:{defaultDevice:"Standard",setDefault:"Als Standard festlegen",defaultSaved:"Standardgerät gespeichert.",defaultError:"Standardgerät konnte nicht gespeichert werden.",noDevices:"Keine Spotify-Connect-Geräte gefunden. Bitte Liste aktualisieren.",filter:"Nach Gerätename filtern",settingsTitle:"Sichtbare Geräte auswählen",settingsHint:"Spotify Connect-Geräte können die Wiedergabe übernehmen. Andere Home Assistant-Mediaplayer öffnen ihre eigene Steuerung.",done:"Fertig",selectDevices:"Geräte auswählen",saveError:"Geräteeinstellungen konnten in diesem Browser nicht gespeichert werden.",transferring:"Wiedergabe wird auf Gerät übertragen",selectError:"Wiedergabegerät konnte nicht ausgewählt werden.",fetchError:"Spotify Connect-Geräte konnten nicht geladen werden:",refreshError:"Spotify Connect-Geräte konnten nicht aktualisiert werden:"},pt:{defaultDevice:"Padrão",setDefault:"Definir como padrão",defaultSaved:"Dispositivo padrão salvo.",defaultError:"Não foi possível salvar o dispositivo padrão.",noDevices:"Nenhum dispositivo Spotify Connect encontrado. Atualize a lista.",filter:"Filtrar por nome do dispositivo",settingsTitle:"Selecionar dispositivos visíveis",settingsHint:"Dispositivos Spotify Connect podem receber a reprodução. Outros reprodutores de mídia do Home Assistant abrem seus próprios controles.",done:"Concluído",selectDevices:"Selecionar dispositivos",saveError:"Não foi possível salvar as preferências dos dispositivos neste navegador.",transferring:"Transferindo a reprodução para o dispositivo",selectError:"Não foi possível selecionar o dispositivo.",fetchError:"Falha ao carregar dispositivos Spotify Connect:",refreshError:"Falha ao atualizar dispositivos Spotify Connect:"},en:{defaultDevice:"Default",setDefault:"Set as default",defaultSaved:"Default device saved.",defaultError:"Could not save the default device.",noDevices:"No Spotify Connect devices found. Refresh the list.",filter:"Filter by device name",settingsTitle:"Select visible devices",settingsHint:"Spotify Connect devices can take over playback. Other Home Assistant media players open their own controls.",done:"Done",selectDevices:"Select devices",saveError:"Could not save device preferences in this browser.",transferring:"Transferring playback to device",selectError:"Could not select source.",fetchError:"Get Spotify Connect Devices failed:",refreshError:"Spotify Connect Device refresh failed:"}};let cr=class extends qs{friendlyState(e){const t=Je(this.config?.language??"auto",this.store?.hass?.locale?.language||this.store?.hass?.language);return{idle:{de:"Bereit",pt:"Disponível",en:"Ready"},playing:{de:"Wiedergabe läuft",pt:"Reproduzindo",en:"Playing"},paused:{de:"Pausiert",pt:"Pausado",en:"Paused"},off:{de:"Ausgeschaltet",pt:"Desligado",en:"Off"},standby:{de:"Bereitschaft",pt:"Em espera",en:"Standby"},unavailable:{de:"Nicht verfügbar",pt:"Indisponível",en:"Unavailable"},unknown:{de:"Unbekannt",pt:"Desconhecido",en:"Unknown"},on:{de:"Eingeschaltet",pt:"Ligado",en:"On"}}[e]?.[t]||e}deviceText(e){const t=Je(this.config?.language??"auto",this.store?.hass?.locale?.language||this.store?.hass?.language);return lr[t][e]}get defaultDeviceValue(){const e=this.store.hass?.states?.["input_text.controlroom_default_spotify_device"]?.state;return e&&"unknown"!==e&&"unavailable"!==e?e:this.savedDefaultValue||this.config.deviceDefaultId||""}deviceValue(e){return e.IsSonos||this.config.deviceControlByName?e.Name||e.Id||"":e.Id||e.Name||""}isDefaultDevice(e){const t=this.defaultDeviceValue;return!!t&&(t===e.Id||t===e.Name||t===this.deviceValue(e))}async saveDefaultDevice(e){const t=this.deviceValue(e);if(t&&!this.savingDefault){this.savingDefault=!0;try{await this.store.hass.callService("input_text","set_value",{entity_id:"input_text.controlroom_default_spotify_device",value:t}),this.savedDefaultValue=t,this.alertInfo=this.deviceText("defaultSaved")}catch(e){this.alertErrorSet(this.deviceText("defaultError")+" "+ui(e))}finally{this.savingDefault=!1}}}uniqueDevices(e){const t=new Map;for(const i of e){const e=(i.Name||i.Id||"").trim().toLocaleLowerCase();if(!e)continue;const s=`${"group"===i.DeviceInfo?.GroupStatus?.toLowerCase()?"group":"device"}:${e}`,r=t.get(s);(!r||this.isDefaultDevice(i)&&!this.isDefaultDevice(r)||!this.isDefaultDevice(r)&&!r.IsActiveDevice&&i.IsActiveDevice)&&t.set(s,i)}return[...t.values()]}isSelectedDevice(e){const t=this.selectedDeviceValue||this.player?.attributes?.sp_device_id||this.player?.attributes?.source||"";return!!t&&(t===e.Id||t===e.Name||t===this.deviceValue(e))}renderSpotifyDevices(e){return e.length?B`<div class="crm-spotify-devices">
-      ${e.map(e=>{const t=this.isDefaultDevice(e),i=this.isSelectedDevice(e);return B`<div class="crm-spotify-device ${i?"crm-spotify-device-selected":""}">
-          <button class="crm-spotify-select" type="button"
-            aria-label=${`${this.deviceText("transferring")}: ${e.Name||e.Id}`}
-            aria-pressed=${i?"true":"false"}
-            @click=${()=>{this.SelectSource(e)}}>
-            <ha-svg-icon .path=${Gi}></ha-svg-icon>
-            <span class="crm-spotify-device-name">
-              <strong>${e.Name||e.Id}</strong>
-              <small>Spotify Connect${e.IsActiveDevice?" · Aktiv":""}</small>
+    `]}styleMediaBrowserItemImage(e){const t={};return e?.includes("svg+xml")?(t["mask-image"]=`url(${e})`,t["background-color"]=`var(--crm-media-browser-items-svgicon-color, ${o(be)})`):(t["background-image"]=`url(${e})`,t["background-color"]="var(--crm-media-browser-items-svgicon-color, transparent)"),Me(t)}async onClickAction(e){if(this.isCardInEditPreview)return!0;try{return this.progressShow(),e==or.DeviceConnect?this.deviceInfo?.DiscoveryResult.IsDynamicDevice?(this.alertInfoSet("Dynamic devices cannot be managed."),this.progressHide()):this.mediaItem.IsChromeCast?(this.alertInfoSet("Chromecast devices do not support Spotify Connect connect."),this.progressHide()):(this.alertInfoSet("Connecting to Spotify Connect device ..."),await this.spotifyPlusService.ZeroconfDeviceConnect(this.player,this.mediaItem,null,null,null,!0,!0,1),this.alertInfoSet("Spotify Connect device should be connected."),this.updateActions(this.player,[or.DeviceGetInfo])):e==or.DeviceDisconnect?this.mediaItem.DiscoveryResult.IsDynamicDevice?(this.alertInfoSet("Dynamic devices cannot be managed."),this.progressHide()):this.mediaItem.IsChromeCast?(this.alertInfoSet("Chromecast devices do not support Spotify Connect disconnect."),this.progressHide()):"librespot"==this.mediaItem.DeviceInfo.BrandDisplayName?(this.alertInfoSet("Librespot devices do not support Spotify Connect disconnect."),this.progressHide()):(this.alertInfoSet("Disconnecting from Spotify Connect device ..."),await this.spotifyPlusService.ZeroconfDeviceDisconnect(this.player,this.mediaItem,1),this.alertInfoSet("Spotify Connect device was disconnected."),this.updateActions(this.player,[or.DeviceGetInfo])):this.progressHide(),!0}catch(e){return this.progressHide(),this.alertErrorSet("Action failed: "+ui(e)),!0}}updateActions(e,t){if(!super.updateActions(e,t))return!1;try{const i=new Array;if(-1!=t.indexOf(or.DeviceGetInfo)){const t=new Promise((t,i)=>{this.alertInfo='Retrieving Spotify Connect status for "'+this.mediaItem.Name+'" ...';this.spotifyPlusService.GetSpotifyConnectDevice(e,this.mediaItem.Id,null,null,!0,!1).then(e=>{this.alertInfo?.startsWith("Retrieving ")&&this.alertInfoClear(),this.deviceInfo=e,e&&(this.mediaItem=e),t(!0)}).catch(e=>{this.deviceInfo=void 0,this.alertErrorSet("Get Spotify Connect Device failed: "+ui(e)),i(e)})});i.push(t)}return this.progressShow(),Promise.allSettled(i).finally(()=>{this.progressHide()}),!0}catch(e){return this.progressHide(),this.alertErrorSet("Update device actions failed: "+ui(e)),!0}}}Ce([De({attribute:!1})],ar.prototype,"mediaItem",void 0),Ce([Ve()],ar.prototype,"deviceInfo",void 0),customElements.define("crm-device-actions",ar);const nr=_e(ce+":device-browser"),lr={de:{defaultDevice:"Standard",setDefault:"Als Standard festlegen",defaultSaved:"Standardgerät gespeichert.",defaultError:"Standardgerät konnte nicht gespeichert werden.",noDevices:"Keine Spotify-Connect-Geräte gefunden. Bitte Liste aktualisieren.",filter:"Nach Gerätename filtern",settingsTitle:"Sichtbare Geräte auswählen",settingsHint:"Spotify Connect-Geräte können die Wiedergabe übernehmen. Andere Home Assistant-Mediaplayer öffnen ihre eigene Steuerung.",done:"Fertig",selectDevices:"Geräte auswählen",saveError:"Geräteeinstellungen konnten in diesem Browser nicht gespeichert werden.",transferring:"Wiedergabe wird auf Gerät übertragen",selectError:"Wiedergabegerät konnte nicht ausgewählt werden.",fetchError:"Spotify Connect-Geräte konnten nicht geladen werden:",refreshError:"Spotify Connect-Geräte konnten nicht aktualisiert werden:",multiroom:"Multiroom-Gruppe",active:"Aktiv"},pt:{defaultDevice:"Padrão",setDefault:"Definir como padrão",defaultSaved:"Dispositivo padrão salvo.",defaultError:"Não foi possível salvar o dispositivo padrão.",noDevices:"Nenhum dispositivo Spotify Connect encontrado. Atualize a lista.",filter:"Filtrar por nome do dispositivo",settingsTitle:"Selecionar dispositivos visíveis",settingsHint:"Dispositivos Spotify Connect podem receber a reprodução. Outros reprodutores de mídia do Home Assistant abrem seus próprios controles.",done:"Concluído",selectDevices:"Selecionar dispositivos",saveError:"Não foi possível salvar as preferências dos dispositivos neste navegador.",transferring:"Transferindo a reprodução para o dispositivo",selectError:"Não foi possível selecionar o dispositivo.",fetchError:"Falha ao carregar dispositivos Spotify Connect:",refreshError:"Falha ao atualizar dispositivos Spotify Connect:",multiroom:"Grupo multiroom",active:"Ativo"},en:{defaultDevice:"Default",setDefault:"Set as default",defaultSaved:"Default device saved.",defaultError:"Could not save the default device.",noDevices:"No Spotify Connect devices found. Refresh the list.",filter:"Filter by device name",settingsTitle:"Select visible devices",settingsHint:"Spotify Connect devices can take over playback. Other Home Assistant media players open their own controls.",done:"Done",selectDevices:"Select devices",saveError:"Could not save device preferences in this browser.",transferring:"Transferring playback to device",selectError:"Could not select source.",fetchError:"Get Spotify Connect Devices failed:",refreshError:"Spotify Connect Device refresh failed:",multiroom:"Multiroom group",active:"Active"}};let cr=class extends qs{friendlyState(e){const t=Je(this.config?.language??"auto",this.store?.hass?.locale?.language||this.store?.hass?.language);return{idle:{de:"Bereit",pt:"Disponível",en:"Ready"},playing:{de:"Wiedergabe läuft",pt:"Reproduzindo",en:"Playing"},paused:{de:"Pausiert",pt:"Pausado",en:"Paused"},off:{de:"Ausgeschaltet",pt:"Desligado",en:"Off"},standby:{de:"Bereitschaft",pt:"Em espera",en:"Standby"},unavailable:{de:"Nicht verfügbar",pt:"Indisponível",en:"Unavailable"},unknown:{de:"Unbekannt",pt:"Desconhecido",en:"Unknown"},on:{de:"Eingeschaltet",pt:"Ligado",en:"On"}}[e]?.[t]||e}deviceText(e){const t=Je(this.config?.language??"auto",this.store?.hass?.locale?.language||this.store?.hass?.language);return lr[t][e]}get defaultDeviceValue(){const e=this.store.hass?.states?.["input_text.controlroom_default_spotify_device"]?.state;return e&&"unknown"!==e&&"unavailable"!==e?e:this.savedDefaultValue||this.config.deviceDefaultId||""}deviceValue(e){return e.IsSonos||this.config.deviceControlByName?e.Name||e.Id||"":e.Id||e.Name||""}isDefaultDevice(e){const t=this.defaultDeviceValue;return!!t&&(t===e.Id||t===e.Name||t===this.deviceValue(e))}async saveDefaultDevice(e){const t=this.deviceValue(e);if(t&&!this.savingDefault){this.savingDefault=!0;try{await this.store.hass.callService("input_text","set_value",{entity_id:"input_text.controlroom_default_spotify_device",value:t}),this.savedDefaultValue=t,this.alertInfo=this.deviceText("defaultSaved")}catch(e){this.alertErrorSet(this.deviceText("defaultError")+" "+ui(e))}finally{this.savingDefault=!1}}}uniqueDevices(e){const t=new Map;for(const i of e){const e=(i.Name||i.Id||"").trim().toLocaleLowerCase();if(!e)continue;const s=`${"group"===i.DeviceInfo?.GroupStatus?.toLowerCase()?"group":"device"}:${e}`,r=t.get(s);(!r||this.isDefaultDevice(i)&&!this.isDefaultDevice(r)||!this.isDefaultDevice(r)&&!r.IsActiveDevice&&i.IsActiveDevice)&&t.set(s,i)}return[...t.values()]}isSelectedDevice(e){const t=this.selectedDeviceValue||this.player?.attributes?.sp_device_id||this.player?.attributes?.source||"";return!!t&&(t===e.Id||t===e.Name||t===this.deviceValue(e))}renderSpotifyDevices(e){return e.length?B`<div class="crm-spotify-devices">
+      ${e.map(e=>{const t=this.isDefaultDevice(e),i=this.isSelectedDevice(e),s="group"===e.DeviceInfo?.GroupStatus?.toLowerCase(),r=e.Name||e.Id||"";return B`
+          <div class="crm-spotify-device ${i?"crm-spotify-device-selected":""}">
+            <span class="crm-device-icon" aria-hidden="true">
+              <ha-icon icon=${s?"mdi:speaker-multiple":"mdi:speaker-wireless"}></ha-icon>
             </span>
-            <span class="crm-device-radio ${i?"crm-device-radio-checked":""}" aria-hidden="true">
-              ${i?B`<ha-icon icon="mdi:check"></ha-icon>`:""}
-            </span>
-          </button>
-          <div class="crm-default-action">
-            ${t?B`<span class="crm-default-label"><ha-icon icon="mdi:star"></ha-icon>${this.deviceText("defaultDevice")}</span>`:B`<button type="button" class="crm-default-button" ?disabled=${this.savingDefault}
-                  @click=${()=>{this.saveDefaultDevice(e)}}>${this.deviceText("setDefault")}</button>`}
-          </div>
-        </div>`})}
+
+            <button class="crm-spotify-select" type="button"
+              aria-label=${`${this.deviceText("transferring")}: ${r}`}
+              aria-pressed=${i?"true":"false"}
+              @click=${()=>{this.SelectSource(e)}}>
+              <span class="crm-spotify-device-name">
+                <strong>${r}</strong>
+                <small>${s?this.deviceText("multiroom"):"Spotify Connect"}${e.IsActiveDevice?` · ${this.deviceText("active")}`:""}</small>
+              </span>
+              <span class="crm-device-radio ${i?"crm-device-radio-checked":""}" aria-hidden="true">
+                ${i?B`<ha-icon icon="mdi:check"></ha-icon>`:""}
+              </span>
+            </button>
+
+            <button class="crm-default-star ${t?"crm-default-star-active":""}"
+              type="button"
+              ?disabled=${this.savingDefault||t}
+              title=${t?this.deviceText("defaultDevice"):this.deviceText("setDefault")}
+              aria-label=${`${t?this.deviceText("defaultDevice"):this.deviceText("setDefault")}: ${r}`}
+              aria-pressed=${t?"true":"false"}
+              @click=${()=>{this.saveDefaultDevice(e)}}>
+              <ha-icon icon=${t?"mdi:star":"mdi:star-outline"}></ha-icon>
+            </button>
+          </div>`})}
     </div>`:B`<div class="crm-empty-devices">${this.deviceText("noDevices")}</div>`}spotifyKey(e){return`spotify:${e.Id||e.Name}`}haKey(e){return`ha:${e}`}get visibilityStorageKey(){return`controlroom_devices_visibility_${this.player?.attributes?.sp_user_id||"default"}`}loadVisibility(){if(!this.preferencesLoaded){this.preferencesLoaded=!0;try{const e=localStorage.getItem(this.visibilityStorageKey);this.deviceVisibility=e?JSON.parse(e):{}}catch{this.deviceVisibility={}}}}isVisible(e,t){return this.deviceVisibility[e]??t}toggleVisibility(e,t){this.deviceVisibility={...this.deviceVisibility,[e]:t};try{localStorage.setItem(this.visibilityStorageKey,JSON.stringify(this.deviceVisibility))}catch{this.alertErrorSet(this.deviceText("saveError"))}}getHaPlayers(){const e=this.hass?.states||{};return Object.keys(e).filter(e=>e.startsWith("media_player.")).map(t=>({id:t,name:String(e[t]?.attributes?.friendly_name||t),state:String(e[t]?.state||"unknown")})).sort((e,t)=>e.name.localeCompare(t.name))}showHaMoreInfo(e){this.dispatchEvent(new CustomEvent("hass-more-info",{bubbles:!0,composed:!0,detail:{entityId:e}}))}renderHaPlayers(e){return this.getHaPlayers().filter(e=>this.isVisible(this.haKey(e.id),!1)).filter(t=>t.name.toLocaleLowerCase().includes(e)).map(e=>B`
         <button class="crm-ha-device" @click=${()=>this.showHaMoreInfo(e.id)}>
           <ha-svg-icon .path=${e.id.includes("tv")?"M21,17H3V5H21M21,3H3A2,2 0 0,0 1,5V17A2,2 0 0,0 3,19H8V21H16V19H21A2,2 0 0,0 23,17V5A2,2 0 0,0 21,3Z":e.id.includes("phone")||e.id.includes("iphone")||e.id.includes("handy")?"M17,19H7V5H17M17,1H7C5.89,1 5,1.89 5,3V21A2,2 0 0,0 7,23H17A2,2 0 0,0 19,21V3C19,1.89 18.1,1 17,1Z":Gi}></ha-svg-icon>
@@ -1963,22 +1973,117 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         <button class="crm-settings-done" @click=${()=>this.showDeviceSettings=!1}>${this.deviceText("done")}</button>
       </div>
     `}static get styles(){return[...super.styles,a`
-        .crm-spotify-devices { display:grid; gap:8px; padding:8px 2px; }
-        .crm-spotify-device { display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px; border:1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius:12px; color:var(--crm-text, var(--primary-text-color)); min-width:0; box-sizing:border-box; }
-        .crm-spotify-device-selected { border-color:var(--crm-accent, #34d399); background:rgba(52,211,153,.07); }
-        .crm-spotify-select { display:flex; align-items:center; width:100%; min-width:0; gap:12px; padding:5px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; box-sizing:border-box; }
-        .crm-device-radio { margin-left:auto; width:20px; height:20px; border:2px solid rgba(220,235,229,.7); border-radius:50%; box-sizing:border-box; display:flex; align-items:center; justify-content:center; flex:0 0 20px; }
-        .crm-device-radio-checked { background:var(--crm-accent, #34d399); border-color:var(--crm-accent, #34d399); color:#102019; }
-        .crm-device-radio ha-icon { --mdc-icon-size:15px; }
-        .crm-default-action { display:flex; justify-content:flex-end; align-items:center; min-width:0; }
-        .crm-spotify-select ha-svg-icon { width:25px; height:25px; color:var(--crm-accent, #34d399); flex-shrink:0; }
-        .crm-spotify-device-name { display:grid; gap:4px; min-width:0; }
-        .crm-spotify-device-name strong { font-size:13px; overflow-wrap:anywhere; }
-        .crm-spotify-device-name small { font-size:11px; opacity:.7; }
-        .crm-default-button { border:1px solid var(--crm-accent, #34d399); border-radius:8px; padding:8px 10px; background:transparent; color:var(--crm-accent, #34d399); font-size:11px; cursor:pointer; }
-        .crm-default-button:disabled { opacity:.5; cursor:wait; }
-        .crm-default-label { display:flex; align-items:center; gap:4px; color:var(--crm-accent, #34d399); font-size:11px; font-weight:600; }
-        .crm-default-label ha-icon { --mdc-icon-size:16px; }
+        /* Premium Compact: device rows only. No changes to card dimensions. */
+        .crm-spotify-devices {
+          display: grid;
+          gap: 7px;
+          padding: 8px 2px;
+          min-width: 0;
+        }
+        .crm-spotify-device {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          min-width: 0;
+          box-sizing: border-box;
+          padding: 8px 9px;
+          border: 1px solid rgba(115, 151, 131, .23);
+          border-radius: 12px;
+          background: rgba(25, 53, 40, .22);
+          color: var(--crm-text, var(--primary-text-color));
+          transition: background .15s ease, border-color .15s ease;
+        }
+        .crm-spotify-device-selected {
+          border-color: var(--crm-accent, #34d399);
+          background: rgba(52, 211, 153, .085);
+        }
+        .crm-device-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 34px;
+          width: 34px;
+          height: 34px;
+          border-radius: 9px;
+          background: rgba(52, 211, 153, .12);
+          color: var(--crm-accent, #34d399);
+        }
+        .crm-device-icon ha-icon { --mdc-icon-size: 20px; }
+        .crm-spotify-select {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1 1 auto;
+          min-width: 0;
+          padding: 3px 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          text-align: left;
+          font: inherit;
+          cursor: pointer;
+        }
+        .crm-spotify-device-name {
+          display: grid;
+          gap: 3px;
+          flex: 1 1 auto;
+          min-width: 0;
+        }
+        .crm-spotify-device-name strong {
+          font-size: 12px;
+          font-weight: 600;
+          line-height: 1.25;
+          overflow-wrap: anywhere;
+        }
+        .crm-spotify-device-name small {
+          font-size: 10px;
+          opacity: .7;
+          line-height: 1.25;
+        }
+        .crm-device-radio {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 19px;
+          width: 19px;
+          height: 19px;
+          border: 1.7px solid rgba(190, 214, 200, .65);
+          border-radius: 50%;
+          box-sizing: border-box;
+        }
+        .crm-device-radio-checked {
+          background: var(--crm-accent, #34d399);
+          border-color: var(--crm-accent, #34d399);
+          color: #102019;
+        }
+        .crm-device-radio ha-icon { --mdc-icon-size: 14px; }
+        .crm-default-star {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 30px;
+          width: 30px;
+          height: 30px;
+          padding: 0;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: rgba(168, 192, 177, .72);
+          cursor: pointer;
+        }
+        .crm-default-star ha-icon { --mdc-icon-size: 20px; }
+        .crm-default-star:hover:not(:disabled) {
+          background: rgba(52, 211, 153, .12);
+          color: var(--crm-accent, #34d399);
+        }
+        .crm-default-star-active { color: var(--crm-accent, #34d399); }
+        .crm-default-star:disabled { cursor: default; }
+        .crm-default-star:disabled:not(.crm-default-star-active) { opacity: .5; }
+        .crm-spotify-select:focus-visible,
+        .crm-default-star:focus-visible {
+          outline: 2px solid var(--crm-accent, #34d399);
+          outline-offset: 2px;
+        }
         .crm-empty-devices { padding:16px; opacity:.75; font-size:12px; }
         .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:var(--crm-accent, var(--primary-color, #34d399)); cursor:pointer; }
         .crm-settings-button ha-svg-icon { width:23px; height:23px; }

@@ -24,7 +24,7 @@ import {
 } from '../constants';
 
 
-type DeviceTextKey = 'defaultDevice' | 'setDefault' | 'defaultSaved' | 'defaultError' | 'noDevices' | 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError';
+type DeviceTextKey = 'defaultDevice' | 'setDefault' | 'defaultSaved' | 'defaultError' | 'noDevices' | 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError' | 'multiroom' | 'active';
 
 const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
   de: {
@@ -43,6 +43,8 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     selectError: 'Wiedergabegerät konnte nicht ausgewählt werden.',
     fetchError: 'Spotify Connect-Geräte konnten nicht geladen werden:',
     refreshError: 'Spotify Connect-Geräte konnten nicht aktualisiert werden:',
+    multiroom: 'Multiroom-Gruppe',
+    active: 'Aktiv',
   },
   pt: {
     defaultDevice: 'Padrão',
@@ -60,6 +62,8 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     selectError: 'Não foi possível selecionar o dispositivo.',
     fetchError: 'Falha ao carregar dispositivos Spotify Connect:',
     refreshError: 'Falha ao atualizar dispositivos Spotify Connect:',
+    multiroom: 'Grupo multiroom',
+    active: 'Ativo',
   },
   en: {
     defaultDevice: 'Default',
@@ -77,6 +81,8 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     selectError: 'Could not select source.',
     fetchError: 'Get Spotify Connect Devices failed:',
     refreshError: 'Spotify Connect Device refresh failed:',
+    multiroom: 'Multiroom group',
+    active: 'Active',
   },
 };
 
@@ -181,31 +187,43 @@ export class DeviceBrowser extends FavBrowserBase {
     if (!items.length) {
       return html`<div class="crm-empty-devices">${this.deviceText('noDevices')}</div>`;
     }
+
     return html`<div class="crm-spotify-devices">
       ${items.map(item => {
         const isDefault = this.isDefaultDevice(item);
         const isSelected = this.isSelectedDevice(item);
-        return html`<div class="crm-spotify-device ${isSelected ? 'crm-spotify-device-selected' : ''}">
-          <button class="crm-spotify-select" type="button"
-            aria-label=${`${this.deviceText('transferring')}: ${item.Name || item.Id}`}
-            aria-pressed=${isSelected ? 'true' : 'false'}
-            @click=${() => void this.SelectSource(item)}>
-            <ha-svg-icon .path=${mdiSpeaker}></ha-svg-icon>
-            <span class="crm-spotify-device-name">
-              <strong>${item.Name || item.Id}</strong>
-              <small>Spotify Connect${item.IsActiveDevice ? ' · Aktiv' : ''}</small>
+        const isGroup = item.DeviceInfo?.GroupStatus?.toLowerCase() === 'group';
+        const name = item.Name || item.Id || '';
+
+        return html`
+          <div class="crm-spotify-device ${isSelected ? 'crm-spotify-device-selected' : ''}">
+            <span class="crm-device-icon" aria-hidden="true">
+              <ha-icon icon=${isGroup ? 'mdi:speaker-multiple' : 'mdi:speaker-wireless'}></ha-icon>
             </span>
-            <span class="crm-device-radio ${isSelected ? 'crm-device-radio-checked' : ''}" aria-hidden="true">
-              ${isSelected ? html`<ha-icon icon="mdi:check"></ha-icon>` : ''}
-            </span>
-          </button>
-          <div class="crm-default-action">
-            ${isDefault
-              ? html`<span class="crm-default-label"><ha-icon icon="mdi:star"></ha-icon>${this.deviceText('defaultDevice')}</span>`
-              : html`<button type="button" class="crm-default-button" ?disabled=${this.savingDefault}
-                  @click=${() => void this.saveDefaultDevice(item)}>${this.deviceText('setDefault')}</button>`}
-          </div>
-        </div>`;
+
+            <button class="crm-spotify-select" type="button"
+              aria-label=${`${this.deviceText('transferring')}: ${name}`}
+              aria-pressed=${isSelected ? 'true' : 'false'}
+              @click=${() => void this.SelectSource(item)}>
+              <span class="crm-spotify-device-name">
+                <strong>${name}</strong>
+                <small>${isGroup ? this.deviceText('multiroom') : 'Spotify Connect'}${item.IsActiveDevice ? ` · ${this.deviceText('active')}` : ''}</small>
+              </span>
+              <span class="crm-device-radio ${isSelected ? 'crm-device-radio-checked' : ''}" aria-hidden="true">
+                ${isSelected ? html`<ha-icon icon="mdi:check"></ha-icon>` : ''}
+              </span>
+            </button>
+
+            <button class="crm-default-star ${isDefault ? 'crm-default-star-active' : ''}"
+              type="button"
+              ?disabled=${this.savingDefault || isDefault}
+              title=${isDefault ? this.deviceText('defaultDevice') : this.deviceText('setDefault')}
+              aria-label=${`${isDefault ? this.deviceText('defaultDevice') : this.deviceText('setDefault')}: ${name}`}
+              aria-pressed=${isDefault ? 'true' : 'false'}
+              @click=${() => void this.saveDefaultDevice(item)}>
+              <ha-icon icon=${isDefault ? 'mdi:star' : 'mdi:star-outline'}></ha-icon>
+            </button>
+          </div>`;
       })}
     </div>`;
   }
@@ -315,22 +333,117 @@ export class DeviceBrowser extends FavBrowserBase {
     return [
       ...super.styles,
       css`
-        .crm-spotify-devices { display:grid; gap:8px; padding:8px 2px; }
-        .crm-spotify-device { display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px; border:1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius:12px; color:var(--crm-text, var(--primary-text-color)); min-width:0; box-sizing:border-box; }
-        .crm-spotify-device-selected { border-color:var(--crm-accent, #34d399); background:rgba(52,211,153,.07); }
-        .crm-spotify-select { display:flex; align-items:center; width:100%; min-width:0; gap:12px; padding:5px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; box-sizing:border-box; }
-        .crm-device-radio { margin-left:auto; width:20px; height:20px; border:2px solid rgba(220,235,229,.7); border-radius:50%; box-sizing:border-box; display:flex; align-items:center; justify-content:center; flex:0 0 20px; }
-        .crm-device-radio-checked { background:var(--crm-accent, #34d399); border-color:var(--crm-accent, #34d399); color:#102019; }
-        .crm-device-radio ha-icon { --mdc-icon-size:15px; }
-        .crm-default-action { display:flex; justify-content:flex-end; align-items:center; min-width:0; }
-        .crm-spotify-select ha-svg-icon { width:25px; height:25px; color:var(--crm-accent, #34d399); flex-shrink:0; }
-        .crm-spotify-device-name { display:grid; gap:4px; min-width:0; }
-        .crm-spotify-device-name strong { font-size:13px; overflow-wrap:anywhere; }
-        .crm-spotify-device-name small { font-size:11px; opacity:.7; }
-        .crm-default-button { border:1px solid var(--crm-accent, #34d399); border-radius:8px; padding:8px 10px; background:transparent; color:var(--crm-accent, #34d399); font-size:11px; cursor:pointer; }
-        .crm-default-button:disabled { opacity:.5; cursor:wait; }
-        .crm-default-label { display:flex; align-items:center; gap:4px; color:var(--crm-accent, #34d399); font-size:11px; font-weight:600; }
-        .crm-default-label ha-icon { --mdc-icon-size:16px; }
+        /* Premium Compact: device rows only. No changes to card dimensions. */
+        .crm-spotify-devices {
+          display: grid;
+          gap: 7px;
+          padding: 8px 2px;
+          min-width: 0;
+        }
+        .crm-spotify-device {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          min-width: 0;
+          box-sizing: border-box;
+          padding: 8px 9px;
+          border: 1px solid rgba(115, 151, 131, .23);
+          border-radius: 12px;
+          background: rgba(25, 53, 40, .22);
+          color: var(--crm-text, var(--primary-text-color));
+          transition: background .15s ease, border-color .15s ease;
+        }
+        .crm-spotify-device-selected {
+          border-color: var(--crm-accent, #34d399);
+          background: rgba(52, 211, 153, .085);
+        }
+        .crm-device-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 34px;
+          width: 34px;
+          height: 34px;
+          border-radius: 9px;
+          background: rgba(52, 211, 153, .12);
+          color: var(--crm-accent, #34d399);
+        }
+        .crm-device-icon ha-icon { --mdc-icon-size: 20px; }
+        .crm-spotify-select {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1 1 auto;
+          min-width: 0;
+          padding: 3px 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          text-align: left;
+          font: inherit;
+          cursor: pointer;
+        }
+        .crm-spotify-device-name {
+          display: grid;
+          gap: 3px;
+          flex: 1 1 auto;
+          min-width: 0;
+        }
+        .crm-spotify-device-name strong {
+          font-size: 12px;
+          font-weight: 600;
+          line-height: 1.25;
+          overflow-wrap: anywhere;
+        }
+        .crm-spotify-device-name small {
+          font-size: 10px;
+          opacity: .7;
+          line-height: 1.25;
+        }
+        .crm-device-radio {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 19px;
+          width: 19px;
+          height: 19px;
+          border: 1.7px solid rgba(190, 214, 200, .65);
+          border-radius: 50%;
+          box-sizing: border-box;
+        }
+        .crm-device-radio-checked {
+          background: var(--crm-accent, #34d399);
+          border-color: var(--crm-accent, #34d399);
+          color: #102019;
+        }
+        .crm-device-radio ha-icon { --mdc-icon-size: 14px; }
+        .crm-default-star {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 30px;
+          width: 30px;
+          height: 30px;
+          padding: 0;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: rgba(168, 192, 177, .72);
+          cursor: pointer;
+        }
+        .crm-default-star ha-icon { --mdc-icon-size: 20px; }
+        .crm-default-star:hover:not(:disabled) {
+          background: rgba(52, 211, 153, .12);
+          color: var(--crm-accent, #34d399);
+        }
+        .crm-default-star-active { color: var(--crm-accent, #34d399); }
+        .crm-default-star:disabled { cursor: default; }
+        .crm-default-star:disabled:not(.crm-default-star-active) { opacity: .5; }
+        .crm-spotify-select:focus-visible,
+        .crm-default-star:focus-visible {
+          outline: 2px solid var(--crm-accent, #34d399);
+          outline-offset: 2px;
+        }
         .crm-empty-devices { padding:16px; opacity:.75; font-size:12px; }
         .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:var(--crm-accent, var(--primary-color, #34d399)); cursor:pointer; }
         .crm-settings-button ha-svg-icon { width:23px; height:23px; }
