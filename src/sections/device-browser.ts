@@ -24,10 +24,15 @@ import {
 } from '../constants';
 
 
-type DeviceTextKey = 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError';
+type DeviceTextKey = 'defaultDevice' | 'setDefault' | 'defaultSaved' | 'defaultError' | 'noDevices' | 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError';
 
 const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
   de: {
+    defaultDevice: 'Standard',
+    setDefault: 'Als Standard festlegen',
+    defaultSaved: 'Standardgerät gespeichert.',
+    defaultError: 'Standardgerät konnte nicht gespeichert werden.',
+    noDevices: 'Keine Spotify-Connect-Geräte gefunden. Bitte Liste aktualisieren.',
     filter: 'Nach Gerätename filtern',
     settingsTitle: 'Sichtbare Geräte auswählen',
     settingsHint: 'Spotify Connect-Geräte können die Wiedergabe übernehmen. Andere Home Assistant-Mediaplayer öffnen ihre eigene Steuerung.',
@@ -40,6 +45,11 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     refreshError: 'Spotify Connect-Geräte konnten nicht aktualisiert werden:',
   },
   pt: {
+    defaultDevice: 'Padrão',
+    setDefault: 'Definir como padrão',
+    defaultSaved: 'Dispositivo padrão salvo.',
+    defaultError: 'Não foi possível salvar o dispositivo padrão.',
+    noDevices: 'Nenhum dispositivo Spotify Connect encontrado. Atualize a lista.',
     filter: 'Filtrar por nome do dispositivo',
     settingsTitle: 'Selecionar dispositivos visíveis',
     settingsHint: 'Dispositivos Spotify Connect podem receber a reprodução. Outros reprodutores de mídia do Home Assistant abrem seus próprios controles.',
@@ -52,6 +62,11 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     refreshError: 'Falha ao atualizar dispositivos Spotify Connect:',
   },
   en: {
+    defaultDevice: 'Default',
+    setDefault: 'Set as default',
+    defaultSaved: 'Default device saved.',
+    defaultError: 'Could not save the default device.',
+    noDevices: 'No Spotify Connect devices found. Refresh the list.',
     filter: 'Filter by device name',
     settingsTitle: 'Select visible devices',
     settingsHint: 'Spotify Connect devices can take over playback. Other Home Assistant media players open their own controls.',
@@ -102,6 +117,82 @@ export class DeviceBrowser extends FavBrowserBase {
   @state() private showDeviceSettings = false;
   @state() private deviceVisibility: Record<string, boolean> = {};
   private preferencesLoaded = false;
+  @state() private savingDefault = false;
+  @state() private savedDefaultValue = '';
+
+  private get defaultDeviceValue(): string {
+    const state = this.store.hass?.states?.['input_text.controlroom_default_spotify_device']?.state;
+    if (state && state !== 'unknown' && state !== 'unavailable') return state;
+    return this.savedDefaultValue || this.config.deviceDefaultId || '';
+  }
+
+  private deviceValue(item: ISpotifyConnectDevice): string {
+    return item.IsSonos || this.config.deviceControlByName
+      ? (item.Name || item.Id || '')
+      : (item.Id || item.Name || '');
+  }
+
+  private isDefaultDevice(item: ISpotifyConnectDevice): boolean {
+    const value = this.defaultDeviceValue;
+    return !!value && (value === item.Id || value === item.Name || value === this.deviceValue(item));
+  }
+
+  private async saveDefaultDevice(item: ISpotifyConnectDevice): Promise<void> {
+    const value = this.deviceValue(item);
+    if (!value || this.savingDefault) return;
+    this.savingDefault = true;
+    try {
+      await this.store.hass.callService('input_text', 'set_value', {
+        entity_id: 'input_text.controlroom_default_spotify_device',
+        value,
+      });
+      this.savedDefaultValue = value;
+      this.alertInfo = this.deviceText('defaultSaved');
+    } catch (error) {
+      this.alertErrorSet(this.deviceText('defaultError') + ' ' + getHomeAssistantErrorMessage(error));
+    } finally {
+      this.savingDefault = false;
+    }
+  }
+
+  private uniqueDevices(items: ISpotifyConnectDevice[]): ISpotifyConnectDevice[] {
+    const unique = new Map<string, ISpotifyConnectDevice>();
+    for (const device of items) {
+      const name = (device.Name || device.Id || '').trim().toLocaleLowerCase();
+      if (!name) continue;
+      const group = device.DeviceInfo?.GroupStatus?.toLowerCase() === 'group';
+      const key = `${group ? 'group' : 'device'}:${name}`;
+      const old = unique.get(key);
+      if (!old || (this.isDefaultDevice(device) && !this.isDefaultDevice(old)) ||
+          (!this.isDefaultDevice(old) && !old.IsActiveDevice && device.IsActiveDevice)) {
+        unique.set(key, device);
+      }
+    }
+    return [...unique.values()];
+  }
+
+  private renderSpotifyDevices(items: ISpotifyConnectDevice[]) {
+    if (!items.length) {
+      return html`<div class="crm-empty-devices">${this.deviceText('noDevices')}</div>`;
+    }
+    return html`<div class="crm-spotify-devices">
+      ${items.map(item => {
+        const isDefault = this.isDefaultDevice(item);
+        return html`<div class="crm-spotify-device">
+          <button class="crm-spotify-select" type="button" @click=${() => void this.SelectSource(item)}>
+            <ha-svg-icon .path=${mdiSpeaker}></ha-svg-icon>
+            <span class="crm-spotify-device-name"><strong>${item.Name || item.Id}</strong>
+              <small>Spotify Connect${item.IsActiveDevice ? ' · Aktiv' : ''}</small>
+            </span>
+          </button>
+          ${isDefault ? html`<span class="crm-default-label"><ha-icon icon="mdi:star"></ha-icon>${this.deviceText('defaultDevice')}</span>` :
+            html`<button type="button" class="crm-default-button" ?disabled=${this.savingDefault}
+              @click=${() => void this.saveDefaultDevice(item)}>${this.deviceText('setDefault')}</button>`}
+        </div>`;
+      })}
+    </div>`;
+  }
+
 
   // Spotify Connect devices and HA media_player entities have different actions.
   private spotifyKey(item: ISpotifyConnectDevice): string {
@@ -208,6 +299,18 @@ export class DeviceBrowser extends FavBrowserBase {
     return [
       ...super.styles,
       css`
+        .crm-spotify-devices { display:grid; gap:8px; padding:8px 2px; }
+        .crm-spotify-device { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:10px; border:1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius:12px; color:var(--crm-text, var(--primary-text-color)); }
+        .crm-spotify-select { display:flex; align-items:center; flex:1; min-width:150px; gap:12px; padding:5px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+        .crm-spotify-select ha-svg-icon { width:25px; height:25px; color:var(--crm-accent, #34d399); flex-shrink:0; }
+        .crm-spotify-device-name { display:grid; gap:4px; min-width:0; }
+        .crm-spotify-device-name strong { font-size:13px; overflow-wrap:anywhere; }
+        .crm-spotify-device-name small { font-size:11px; opacity:.7; }
+        .crm-default-button { border:1px solid var(--crm-accent, #34d399); border-radius:8px; padding:8px 10px; background:transparent; color:var(--crm-accent, #34d399); font-size:11px; cursor:pointer; }
+        .crm-default-button:disabled { opacity:.5; cursor:wait; }
+        .crm-default-label { display:flex; align-items:center; gap:4px; color:var(--crm-accent, #34d399); font-size:11px; font-weight:600; }
+        .crm-default-label ha-icon { --mdc-icon-size:16px; }
+        .crm-empty-devices { padding:16px; opacity:.75; font-size:12px; }
         .crm-settings-button { display:flex; align-items:center; justify-content:center; flex:0 0 38px; width:38px; height:38px; border:0; background:transparent; color:var(--crm-accent, var(--primary-color, #34d399)); cursor:pointer; }
         .crm-settings-button ha-svg-icon { width:23px; height:23px; }
         .crm-device-settings { padding: 12px; color:var(--crm-text, var(--primary-text-color, #f0fdf4)); max-width:100%; box-sizing:border-box; overflow:auto; }
@@ -294,32 +397,9 @@ export class DeviceBrowser extends FavBrowserBase {
           ${(() => {
             // if actions are not visbile, then render the media list.
             if (!this.isActionsVisible) {
-              if ((this.config.deviceBrowserItemsPerRow || 1) === 1) {
-                return (
-                  html`<crm-media-browser-list
-                        class="media-browser-list"
-                        .items=${filteredItems}
-                        .itemsPerRow=${this.favBrowserItemsPerRow}
-                        .store=${this.store}
-                        @item-selected=${this.onItemSelected}
-                        @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></crm-media-browser-list>`
-                )
-              } else {
-                return (
-                  html`<crm-media-browser-icons
-                        class="media-browser-list"
-                        .items=${filteredItems}
-                        .itemsPerRow=${this.favBrowserItemsPerRow}
-                        .store=${this.store}
-                        @item-selected=${this.onItemSelected}
-                        @item-selected-with-hold=${this.onItemSelectedWithHold}
-                       ></crm-media-browser-icons>`
-                )
-              }
-            // if actions are visbile, then render the actions display.
-            } else {
-              return html`<crm-device-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-device-actions>`;
+              return this.renderSpotifyDevices(filteredItems || []);
+             } else {
+               return html`<crm-device-actions class="media-browser-actions" .store=${this.store} .mediaItem=${this.mediaItem}></crm-device-actions>`;
             }
           })()}  
           ${!this.isActionsVisible ? this.renderHaPlayers((this.filterCriteria || '').toLocaleLowerCase()) : ''}
@@ -473,7 +553,7 @@ export class DeviceBrowser extends FavBrowserBase {
           .then(result => {
 
             // load media list results.
-            this.mediaList = result.Items;
+            this.mediaList = this.uniqueDevices(result.Items || []);
             this.mediaListLastUpdatedOn = result.DateLastRefreshed || getUtcNowTimestamp();
 
             // call base class method, indicating media list update succeeded.
