@@ -1739,7 +1739,8 @@ export class Card extends AlertUpdatesBase {
         // create image object, and allow cross-origin to avoid CORS errors.
         const img = new Image();
         img.crossOrigin = 'Anonymous';
-        img.src = playerImageSaved + '?not-from-cache-please';
+        // Reuse the browser cache; the media content ID already controls re-analysis.
+        img.src = playerImageSaved;
 
         // create vibrant instance with our desired options.
         const vibrant: Vibrant = new Vibrant(img, vibrantOptions);
