@@ -5367,7 +5367,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       .preview-copy small { font-size: 10px; color: var(--secondary-text-color); overflow-wrap: anywhere; }
       .preview-music { --mdc-icon-size: 20px; color: var(--primary-color, #1db954); }
       @media (max-width: 340px) { .studio-fold-button { padding: 11px; } .studio-fold-body { padding: 0 11px 12px; } .preview-panel { padding: 11px; } }
-    `}}Ce([Ve()],Fo.prototype,"showEssentials",void 0),customElements.define("crm-general-editor",Fo);customElements.define("crm-design-editor",class extends _o{constructor(){super(...arguments),this.defaults={crmBackground:"#101b19",crmAccent:"#34d399",crmText:"#f0fdf4",crmIconColor:"#183329",crmBorderRadius:"20px"}}setField(e,t){this.configChanged({...this.config,[e]:t})}setTheme(e){this.setField("crmTheme",e)}onTextChange(e){const t=e.currentTarget;this.setField(t.name,t.value)}onColorChange(e){const t=e.currentTarget;this.setField(t.name,t.value)}resetField(e){this.setField(e,this.defaults[e])}getValue(e){const t=this.config[e];return null==t?this.defaults[e]:String(t)}getTheme(){const e=this.config.crmTheme;return"light"===e||"dark"===e||"auto"===e||"custom"===e?e:"dark"}contrastInk(e){const t=e.trim().match(/^#([0-9a-f]{6})$/i);if(!t)return"#ffffff";const i=t[1],s=[0,2,4].map(e=>parseInt(i.slice(e,e+2),16)/255),r=s.map(e=>e<=.04045?e/12.92:((e+.055)/1.055)**2.4);return.2126*r[0]+.7152*r[1]+.0722*r[2]>.179?"#101b19":"#ffffff"}colorControl(e,t,i){const s=this.getValue(e),r=/^#[0-9a-fA-F]{6}$/.test(s);return B`
+    `}}Ce([Ve()],Fo.prototype,"showEssentials",void 0),customElements.define("crm-general-editor",Fo);customElements.define("crm-design-editor",class extends _o{constructor(){super(...arguments),this.defaults={crmBackground:"#101b19",crmAccent:"#34d399",crmText:"#f0fdf4",crmIconColor:"#183329",crmBorderRadius:"20px"}}setField(e,t){this.configChanged({...this.config,[e]:t})}setPlayerImage(e,t){const i={...this.config.customImageUrls??{}};t.trim()?i[e]=t.trim():delete i[e],this.configChanged({...this.config,customImageUrls:i})}setPlayerImageSize(e){this.configChanged({...this.config,playerBackgroundImageSize:e})}setTheme(e){this.setField("crmTheme",e)}onTextChange(e){const t=e.currentTarget;this.setField(t.name,t.value)}onColorChange(e){const t=e.currentTarget;this.setField(t.name,t.value)}resetField(e){this.setField(e,this.defaults[e])}getValue(e){const t=this.config[e];return null==t?this.defaults[e]:String(t)}getTheme(){const e=this.config.crmTheme;return"light"===e||"dark"===e||"auto"===e||"custom"===e?e:"dark"}contrastInk(e){const t=e.trim().match(/^#([0-9a-f]{6})$/i);if(!t)return"#ffffff";const i=t[1],s=[0,2,4].map(e=>parseInt(i.slice(e,e+2),16)/255),r=s.map(e=>e<=.04045?e/12.92:((e+.055)/1.055)**2.4);return.2126*r[0]+.7152*r[1]+.0722*r[2]>.179?"#101b19":"#ffffff"}colorControl(e,t,i){const s=this.getValue(e),r=/^#[0-9a-fA-F]{6}$/.test(s);return B`
 
       <div class="color-row">
 
@@ -5447,7 +5447,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
       </button>
 
-    `}render(){super.createStore();const e=this.config.language??"auto",t=t=>Ye(`editor.designSettings.${t}`,e,this.hass.language),i=("auto"===e?this.hass.language:e).toLowerCase(),s=i.startsWith("pt"),r=i.startsWith("de"),o={appearance:s?"Aparência":r?"Erscheinungsbild":"Appearance",appearanceHint:s?"Escolha como o cartão deve aparecer":r?"Wähle das Design der Karte":"Choose how the card looks",light:s?"Claro":r?"Hell":"Light",lightHint:s?"Sempre no modo claro":r?"Immer im hellen Design":"Always use light mode",dark:s?"Escuro":r?"Dunkel":"Dark",darkHint:s?"Sempre no modo escuro":r?"Immer im dunklen Design":"Always use dark mode",auto:s?"Automático":r?"Automatisch":"Automatic",autoHint:s?"Segue o tema do Home Assistant":r?"Folgt dem Home Assistant-Design":"Follow the Home Assistant theme",custom:s?"Personalizado":r?"Benutzerdefiniert":"Custom",customHint:s?"Escolha suas próprias cores":r?"Eigene Farben auswählen":"Choose your own colors",colors:s?"Paleta de cores":r?"Farbpalette":"Color palette",colorsHint:s?"Personalize a identidade visual do cartão":r?"Passe die Farben deiner Karte an":"Customize the card colors",iconColor:s?"Cor dos ícones":r?"Symbolfarbe":"Icon color",iconAuto:s?"Automática":r?"Automatisch":"Automatic",iconCustom:s?"Personalizada":r?"Benutzerdefiniert":"Custom",dimensions:s?"Dimensões personalizadas":r?"Benutzerdefinierte Abmessungen":"Custom dimensions",width:s?"Largura":r?"Breite":"Width",height:s?"Altura":r?"Höhe":"Height",dimensionsHint:s?"Deixe vazio para usar o tamanho padrão.":r?"Leer lassen, um die Standardgröße zu verwenden.":"Leave empty to use the default size.",heightTitle:s?"Altura do cartão":r?"Kartenhöhe":"Card height",heightHint:s?"Escolha como o cartão ocupa o espaço vertical":r?"Lege fest, wie die Karte den vertikalen Platz nutzt":"Choose how the card uses vertical space",compact:s?"Compacto":r?"Kompakt":"Compact",compactHint:s?"Menor altura, com rolagem interna":r?"Kleine Höhe mit internem Scrollen":"Short height with internal scrolling",automatic:s?"Automático":r?"Automatisch":"Automatic",automaticHint:s?"Cresce conforme o conteúdo":r?"Wächst mit dem Inhalt":"Grows with the content",fill:s?"Preencher":r?"Ausfüllen":"Fill",fillHint:s?"Ocupa a altura disponível":r?"Nutzt die verfügbare Höhe":"Uses the available height",shape:s?"Formato":r?"Form":"Shape",preview:s?"Prévia das cores":r?"Farbvorschau":"Color preview",previewTitle:s?"Minha música":r?"Meine Musik":"My music",previewSubtitle:s?"Pronto para tocar":r?"Bereit für Musik":"Ready to play",reset:s?"Restaurar":r?"Zurücksetzen":"Reset",radiusHint:s?"Arraste para ajustar ou digite um valor CSS, como 1rem.":r?"Mit dem Regler anpassen oder einen CSS-Wert wie 1rem eingeben.":"Use the slider or enter a CSS value such as 1rem.",radiusSoft:s?"Suave":r?"Weich":"Soft",radiusSquare:s?"Reto":r?"Eckig":"Square",customUnit:s?"Valor personalizado":r?"Benutzerdefinierter Wert":"Custom value",dimensionStatus:s?"Tamanho definido manualmente":r?"Manuell festgelegte Größe":"Manually defined size",dimensionDefault:s?"Tamanho padrão":r?"Standardgröße":"Default size"},a=this.getValue("crmBorderRadius"),n=/^\s*(\d+(?:\.\d+)?)px\s*$/i.exec(a),l=n?Math.min(48,Math.max(0,Number(n[1]))):20,c=!n,d=String(this.config.width??""),h=String(this.config.height??""),p=this.getTheme(),u=!1!==this.hass?.themes?.darkMode,m="dark"===p||"auto"===p&&u?{background:"#101b19",accent:"#34d399",text:"#f0fdf4"}:{background:"#f7faf8",accent:"#16875c",text:"#183329"},g="custom"===p?this.getValue("crmBackground"):m.background,v="custom"===p?this.getValue("crmAccent"):m.accent,f="custom"===p?this.getValue("crmText"):m.text;return B`
+    `}render(){super.createStore();const e=this.config.language??"auto",t=t=>Ye(`editor.designSettings.${t}`,e,this.hass.language),i=("auto"===e?this.hass.language:e).toLowerCase(),s=i.startsWith("pt"),r=i.startsWith("de"),o={appearance:s?"Aparência":r?"Erscheinungsbild":"Appearance",appearanceHint:s?"Escolha como o cartão deve aparecer":r?"Wähle das Design der Karte":"Choose how the card looks",light:s?"Claro":r?"Hell":"Light",lightHint:s?"Sempre no modo claro":r?"Immer im hellen Design":"Always use light mode",dark:s?"Escuro":r?"Dunkel":"Dark",darkHint:s?"Sempre no modo escuro":r?"Immer im dunklen Design":"Always use dark mode",auto:s?"Automático":r?"Automatisch":"Automatic",autoHint:s?"Segue o tema do Home Assistant":r?"Folgt dem Home Assistant-Design":"Follow the Home Assistant theme",custom:s?"Personalizado":r?"Benutzerdefiniert":"Custom",customHint:s?"Escolha suas próprias cores":r?"Eigene Farben auswählen":"Choose your own colors",colors:s?"Paleta de cores":r?"Farbpalette":"Color palette",colorsHint:s?"Personalize a identidade visual do cartão":r?"Passe die Farben deiner Karte an":"Customize the card colors",iconColor:s?"Cor dos ícones":r?"Symbolfarbe":"Icon color",iconAuto:s?"Automática":r?"Automatisch":"Automatic",iconCustom:s?"Personalizada":r?"Benutzerdefiniert":"Custom",dimensions:s?"Dimensões personalizadas":r?"Benutzerdefinierte Abmessungen":"Custom dimensions",width:s?"Largura":r?"Breite":"Width",height:s?"Altura":r?"Höhe":"Height",dimensionsHint:s?"Deixe vazio para usar o tamanho padrão.":r?"Leer lassen, um die Standardgröße zu verwenden.":"Leave empty to use the default size.",heightTitle:s?"Altura do cartão":r?"Kartenhöhe":"Card height",heightHint:s?"Escolha como o cartão ocupa o espaço vertical":r?"Lege fest, wie die Karte den vertikalen Platz nutzt":"Choose how the card uses vertical space",compact:s?"Compacto":r?"Kompakt":"Compact",compactHint:s?"Menor altura, com rolagem interna":r?"Kleine Höhe mit internem Scrollen":"Short height with internal scrolling",automatic:s?"Automático":r?"Automatisch":"Automatic",automaticHint:s?"Cresce conforme o conteúdo":r?"Wächst mit dem Inhalt":"Grows with the content",fill:s?"Preencher":r?"Ausfüllen":"Fill",fillHint:s?"Ocupa a altura disponível":r?"Nutzt die verfügbare Höhe":"Uses the available height",shape:s?"Formato":r?"Form":"Shape",preview:s?"Prévia das cores":r?"Farbvorschau":"Color preview",previewTitle:s?"Minha música":r?"Meine Musik":"My music",previewSubtitle:s?"Pronto para tocar":r?"Bereit für Musik":"Ready to play",reset:s?"Restaurar":r?"Zurücksetzen":"Reset",radiusHint:s?"Arraste para ajustar ou digite um valor CSS, como 1rem.":r?"Mit dem Regler anpassen oder einen CSS-Wert wie 1rem eingeben.":"Use the slider or enter a CSS value such as 1rem.",radiusSoft:s?"Suave":r?"Weich":"Soft",radiusSquare:s?"Reto":r?"Eckig":"Square",customUnit:s?"Valor personalizado":r?"Benutzerdefinierter Wert":"Custom value",dimensionStatus:s?"Tamanho definido manualmente":r?"Manuell festgelegte Größe":"Manually defined size",dimensionDefault:s?"Tamanho padrão":r?"Standardgröße":"Default size"},a=s?{title:"Imagem de fundo do Player",hint:"Personalize a imagem em cada estado do Player.",playing:"Reproduzindo",idle:"Sem reprodução",off:"Desligado",url:"URL da imagem",clear:"Remover imagem personalizada",fit:"Ajuste da imagem",customSize:"Tamanho CSS personalizado",note:"Use uma URL HTTPS ou /local/arquivo.jpg. Para fotos do celular ou computador, primeiro envie o arquivo para /config/www no Home Assistant.",preview:"Prévia da imagem",fallback:"Imagem padrão / capa da música"}:r?{title:"Player-Hintergrundbild",hint:"Passe das Hintergrundbild für jeden Player-Zustand an.",playing:"Wiedergabe",idle:"Bereit",off:"Ausgeschaltet",url:"Bild-URL",clear:"Eigenes Bild entfernen",fit:"Bildanpassung",customSize:"Benutzerdefinierte CSS-Größe",note:"HTTPS-URL oder /local/datei.jpg verwenden. Bilder vom Gerät zuerst nach /config/www in Home Assistant hochladen.",preview:"Bildvorschau",fallback:"Standardbild / Albumcover"}:{title:"Player background image",hint:"Customize the image for each player state.",playing:"Playing",idle:"Idle",off:"Off",url:"Image URL",clear:"Remove custom image",fit:"Image fit",customSize:"Custom CSS size",note:"Use an HTTPS URL or /local/file.jpg. Upload photos to /config/www in Home Assistant first.",preview:"Image preview",fallback:"Default image / album artwork"},n=[{key:"playerBackground",title:a.playing},{key:"playerIdleBackground",title:a.idle},{key:"playerOffBackground",title:a.off}],l=this.config.playerBackgroundImageSize??"cover",c=this.getValue("crmBorderRadius"),d=/^\s*(\d+(?:\.\d+)?)px\s*$/i.exec(c),h=d?Math.min(48,Math.max(0,Number(d[1]))):20,p=!d,u=String(this.config.width??""),m=String(this.config.height??""),g=this.getTheme(),v=!1!==this.hass?.themes?.darkMode,f="dark"===g||"auto"===g&&v?{background:"#101b19",accent:"#34d399",text:"#f0fdf4"}:{background:"#f7faf8",accent:"#16875c",text:"#183329"},b="custom"===g?this.getValue("crmBackground"):f.background,y="custom"===g?this.getValue("crmAccent"):f.accent,A="custom"===g?this.getValue("crmText"):f.text;return B`
 
       <div class="studio">
 
@@ -5469,15 +5469,51 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
           <div class="theme-list" role="group" aria-label=${o.appearance}>
 
-            ${this.themeChoice("light",o.light,o.lightHint,p)}
+            ${this.themeChoice("light",o.light,o.lightHint,g)}
 
-            ${this.themeChoice("dark",o.dark,o.darkHint,p)}
+            ${this.themeChoice("dark",o.dark,o.darkHint,g)}
 
-            ${this.themeChoice("auto",o.auto,o.autoHint,p)}
+            ${this.themeChoice("auto",o.auto,o.autoHint,g)}
 
-            ${this.themeChoice("custom",o.custom,o.customHint,p)}
+            ${this.themeChoice("custom",o.custom,o.customHint,g)}
 
           </div>
+
+        </div>
+        <div class="studio-panel player-image-panel">
+          <div class="panel-title">${a.title}</div>
+          <div class="panel-hint">${a.hint}</div>
+          ${n.map(e=>{const t=this.config.customImageUrls?.[e.key]??"",i=/^(https?:\/\/|\/local\/)/i.test(t.trim())?t.trim():"";return B`
+              <div class="image-field">
+                <div class="image-field-heading">
+                  <strong>${e.title}</strong>
+                  ${t?B`<button class="reset" type="button" @click=${()=>this.setPlayerImage(e.key,"")}>${a.clear}</button>`:""}
+                </div>
+                <div class="image-preview" style=${i?`background-image: url(&quot;${i.replace(/&/g,"&amp;").replace(/"/g,"&quot;")}&quot;); background-size: ${l};`:""}>
+                  ${i?"":B`<ha-icon icon="mdi:image-outline"></ha-icon><span>${a.fallback}</span>`}
+                </div>
+                <label class="field-label" for=${`crm-image-${e.key}`}>${a.url}</label>
+                <input id=${`crm-image-${e.key}`} class="studio-input" type="text"
+                  .value=${t} placeholder="/local/spotify_idle.png"
+                  @change=${t=>this.setPlayerImage(e.key,t.currentTarget.value)} />
+              </div>
+            `})}
+          <div class="image-fit-control">
+            <label class="field-label" for="crm-image-fit">${a.fit}</label>
+            <select id="crm-image-fit" class="studio-input" .value=${["cover","contain","100% 100%"].includes(l)?l:"custom"}
+              @change=${e=>{const t=e.currentTarget.value;this.setPlayerImageSize("custom"===t?"80% auto":t)}}>
+              <option value="cover">Cover</option>
+              <option value="contain">Contain</option>
+              <option value="100% 100%">Stretch</option>
+              <option value="custom">Custom</option>
+            </select>
+            ${["cover","contain","100% 100%"].includes(l)?"":B`
+              <label class="field-label" for="crm-image-custom-size">${a.customSize}</label>
+              <input id="crm-image-custom-size" class="studio-input" type="text" .value=${l}
+                @change=${e=>this.setPlayerImageSize(e.currentTarget.value.trim()||"cover")} />
+            `}
+          </div>
+          <div class="field-hint">${a.note}</div>
 
         </div>
 
@@ -5561,11 +5597,11 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
                 <input class="studio-input dimension-input" type="text" name="width"
 
-                  .value=${d} placeholder="—" @change=${this.onTextChange} />
+                  .value=${u} placeholder="—" @change=${this.onTextChange} />
 
               </span>
 
-              <span class="dimension-meta">${d.trim()?o.dimensionStatus:o.dimensionDefault}</span>
+              <span class="dimension-meta">${u.trim()?o.dimensionStatus:o.dimensionDefault}</span>
 
             </label>
 
@@ -5577,11 +5613,11 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
                 <input class="studio-input dimension-input" type="text" name="height"
 
-                  .value=${h} placeholder="—" @change=${this.onTextChange} />
+                  .value=${m} placeholder="—" @change=${this.onTextChange} />
 
               </span>
 
-              <span class="dimension-meta">${h.trim()?o.dimensionStatus:o.dimensionDefault}</span>
+              <span class="dimension-meta">${m.trim()?o.dimensionStatus:o.dimensionDefault}</span>
 
             </label>
 
@@ -5591,7 +5627,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
 
 
-        ${"custom"===p?B`
+        ${"custom"===g?B`
 
           <div class="studio-panel">
 
@@ -5651,7 +5687,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
             <div class="shape-illustration" aria-hidden="true">
 
-              <div class="shape-sample" style=${`border-radius: ${a};`}>
+              <div class="shape-sample" style=${`border-radius: ${c};`}>
 
                 <span></span><span></span><span></span>
 
@@ -5665,13 +5701,13 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
                 <label class="field-label" for="radius">${t("borderRadius")}</label>
 
-                <span class="shape-value">${c?o.customUnit:`${l}px`}</span>
+                <span class="shape-value">${p?o.customUnit:`${h}px`}</span>
 
               </div>
 
               <input class="radius-range" type="range" min="0" max="48" step="1"
 
-                aria-label=${t("borderRadius")} .value=${String(l)}
+                aria-label=${t("borderRadius")} .value=${String(h)}
 
                 @input=${e=>this.setField("crmBorderRadius",`${e.currentTarget.value}px`)} />
 
@@ -5685,7 +5721,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
             <input id="radius" class="studio-input" type="text" name="crmBorderRadius"
 
-              .value=${a} @change=${this.onTextChange} />
+              .value=${c} @change=${this.onTextChange} />
 
             <div class="field-hint">${o.radiusHint}</div>
 
@@ -5699,13 +5735,13 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
           <div class="panel-title">${o.preview}</div>
 
-          <div class="preview" style=${`background: ${g}; color: ${f}; border-radius: ${a};`}>
+          <div class="preview" style=${`background: ${b}; color: ${A}; border-radius: ${c};`}>
 
-            <div class="preview-cover" style=${`background: ${v}; color: ${this.contrastInk(v)};`}>♫</div>
+            <div class="preview-cover" style=${`background: ${y}; color: ${this.contrastInk(y)};`}>♫</div>
 
             <div class="preview-info"><strong>${o.previewTitle}</strong><span>${o.previewSubtitle}</span></div>
 
-            <span class="preview-play" style=${`background: ${v}; color: ${this.contrastInk(v)};`}>▶</span>
+            <span class="preview-play" style=${`background: ${y}; color: ${this.contrastInk(y)};`}>▶</span>
 
           </div>
 
@@ -5716,6 +5752,16 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     `}static get styles(){return a`
 
       :host { display: block; min-width: 0; }
+
+      .player-image-panel { display: grid; gap: 12px; }
+      .player-image-panel .panel-hint { margin: 0; }
+      .image-field { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--divider-color); border-radius: 12px; background: var(--secondary-background-color, rgba(128,128,128,.06)); min-width: 0; }
+      .image-field-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .image-field-heading strong { font-size: 12px; }
+      .image-preview { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; height: 110px; border-radius: 9px; background-color: var(--card-background-color, #14211d); background-position: center; background-repeat: no-repeat; color: var(--secondary-text-color); font-size: 11px; }
+      .image-preview ha-icon { --mdc-icon-size: 25px; }
+      .image-fit-control { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--divider-color); }
+
 
       .dimensions-grid {
 
