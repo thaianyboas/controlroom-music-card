@@ -729,7 +729,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
 
       // set error message and reset scroll position to zero so the message is displayed.
       this.alertErrorSet(this.uiText("search.playFailed", "Medium konnte nicht abgespielt werden. ", "Não foi possível reproduzir o item. ", "Could not play media item. ") + getHomeAssistantErrorMessage(error));
-      if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
+      if (this.mediaBrowserContentElement) if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
 
     }
     finally {
@@ -758,14 +758,14 @@ export class FavBrowserBase extends AlertUpdatesBase {
 
       // set info message and reset scroll position to zero so the message is displayed.
       this.alertInfo = this.uiText("search.addedToQueue", "Zur Warteschlange hinzugefügt", "Adicionado à fila", "Added to queue") + ": \"" + mediaItem.name + "\".";
-      this.mediaBrowserContentElement.scrollTop = 0;
+      if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
 
     }
     catch (error) {
 
       // set error message and reset scroll position to zero so the message is displayed.
       this.alertErrorSet(this.uiText("search.queueFailed", "Element konnte nicht zur Warteschlange hinzugefügt werden. ", "Não foi possível adicionar à fila. ", "Could not queue media item. ") + getHomeAssistantErrorMessage(error));
-      this.mediaBrowserContentElement.scrollTop = 0;
+      if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
 
     }
     finally {
@@ -820,7 +820,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
     }
 
     // set the vertical scroll position.
-    this.mediaBrowserContentElement.scrollTop = this.scrollTopSaved || 0;
+    if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = this.scrollTopSaved || 0;
 
     // set a timeout to re-apply media list items scroll position, as some of the shadowRoot
     // elements may not have completed updating when the re-render occured.
@@ -861,7 +861,7 @@ export class FavBrowserBase extends AlertUpdatesBase {
     this.isActionsVisible = false;
 
     // reset scroll top position, as we are generating a new list.
-    this.mediaBrowserContentElement.scrollTop = 0;
+    if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
     this.scrollTopSaved = 0;
 
     // prepare to update the media list.
