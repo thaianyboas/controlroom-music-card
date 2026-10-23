@@ -1,6 +1,7 @@
-// lovelace card imports.
+
 import { css, html, LitElement, TemplateResult, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+
 import {
   mdiAccountMusicOutline,
   mdiAlbum,
@@ -17,114 +18,250 @@ import {
   mdiSpeakerWireless,
 } from '@mdi/js';
 
-// our imports.
 import { SHOW_SECTION } from '../constants';
 import { CardConfig } from '../types/card-config';
 import { Section } from '../types/section';
 import { customEvent } from '../utils/utils';
 
+type FooterLanguage = 'de' | 'pt' | 'en';
 
-@customElement("crm-footer")
+type HomeAssistantElement = Element & {
+  hass?: {
+    locale?: {
+      language?: string;
+    };
+    language?: string;
+  };
+};
+
+const FOOTER_LABELS: Record<
+  string,
+  Record<FooterLanguage, string>
+> = {
+  player: {
+    de: 'Player',
+    pt: 'Reprodutor',
+    en: 'Player',
+  },
+  devices: {
+    de: 'Geräte',
+    pt: 'Dispositivos',
+    en: 'Devices',
+  },
+  userPresets: {
+    de: 'Eigene Presets',
+    pt: 'Predefinições pessoais',
+    en: 'User Presets',
+  },
+  recents: {
+    de: 'Zuletzt gespielt',
+    pt: 'Reproduzidos recentemente',
+    en: 'Recently Played',
+  },
+  categories: {
+    de: 'Kategorien',
+    pt: 'Categorias',
+    en: 'Categories',
+  },
+  playlistFavorites: {
+    de: 'Lieblingsplaylists',
+    pt: 'Playlists favoritas',
+    en: 'Playlist Favorites',
+  },
+  albumFavorites: {
+    de: 'Lieblingsalben',
+    pt: 'Álbuns favoritos',
+    en: 'Album Favorites',
+  },
+  artistFavorites: {
+    de: 'Lieblingskünstler',
+    pt: 'Artistas favoritos',
+    en: 'Artist Favorites',
+  },
+  trackFavorites: {
+    de: 'Lieblingssongs',
+    pt: 'Músicas favoritas',
+    en: 'Track Favorites',
+  },
+  audiobookFavorites: {
+    de: 'Lieblingshörbücher',
+    pt: 'Audiolivros favoritos',
+    en: 'Audiobook Favorites',
+  },
+  showFavorites: {
+    de: 'Lieblingssendungen',
+    pt: 'Programas favoritos',
+    en: 'Show Favorites',
+  },
+  episodeFavorites: {
+    de: 'Lieblingsepisoden',
+    pt: 'Episódios favoritos',
+    en: 'Episode Favorites',
+  },
+  searchSpotify: {
+    de: 'Spotify durchsuchen',
+    pt: 'Pesquisar no Spotify',
+    en: 'Search Spotify',
+  },
+};
+
+@customElement('crm-footer')
 export class Footer extends LitElement {
 
-  @property({ attribute: false }) config!: CardConfig;
-  @property() section!: Section;
+  @property({ attribute: false })
+  config!: CardConfig;
 
-  /** 
-   * Invoked on each update to perform rendering tasks. 
-   * This method may return any value renderable by lit-html's `ChildPart` (typically a `TemplateResult`). 
-   * Setting properties inside this method will *not* trigger the element to update.
-  */
+  @property()
+  section!: Section;
+
+  /**
+   * Returns the selected card language.
+   * In auto mode, attempts to use the Home Assistant language.
+   */
+  private getFooterLanguage(): FooterLanguage {
+    const selected = String(
+      this.config?.language || 'auto'
+    ).toLowerCase();
+
+    const homeAssistant = document.querySelector(
+      'home-assistant'
+    ) as HomeAssistantElement | null;
+
+    const language = selected === 'auto'
+      ? String(
+          homeAssistant?.hass?.locale?.language ||
+          homeAssistant?.hass?.language ||
+          document.documentElement.lang ||
+          navigator.language ||
+          'en'
+        ).toLowerCase()
+      : selected;
+
+    if (language.startsWith('de')) {
+      return 'de';
+    }
+
+    if (language.startsWith('pt')) {
+      return 'pt';
+    }
+
+    return 'en';
+  }
+
+  /**
+   * Returns the translated label for a footer button.
+   */
+  private footerLabel(key: string): string {
+    const labels = FOOTER_LABELS[key];
+
+    if (!labels) {
+      return key;
+    }
+
+    return labels[this.getFooterLanguage()] || labels.en;
+  }
+
   protected render(): TemplateResult | void {
-
     return html`
       <ha-icon-button
         .path=${mdiPlayCircleOutline}
-        label="Player"
+        label=${this.footerLabel('player')}
         @click=${() => this.onSectionClick(Section.PLAYER)}
         selected=${this.getSectionSelected(Section.PLAYER)}
         hide=${this.getSectionEnabled(Section.PLAYER)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiSpeakerWireless}
-        label="Devices"
+        label=${this.footerLabel('devices')}
         @click=${() => this.onSectionClick(Section.DEVICES)}
         selected=${this.getSectionSelected(Section.DEVICES)}
         hide=${this.getSectionEnabled(Section.DEVICES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiBookmarkOutline}
-        label="User Presets"
+        label=${this.footerLabel('userPresets')}
         @click=${() => this.onSectionClick(Section.USERPRESETS)}
         selected=${this.getSectionSelected(Section.USERPRESETS)}
         hide=${this.getSectionEnabled(Section.USERPRESETS)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiHistory}
-        label="Recently Played"
+        label=${this.footerLabel('recents')}
         @click=${() => this.onSectionClick(Section.RECENTS)}
         selected=${this.getSectionSelected(Section.RECENTS)}
         hide=${this.getSectionEnabled(Section.RECENTS)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiShapeOutline}
-        label='Categories'
+        label=${this.footerLabel('categories')}
         @click=${() => this.onSectionClick(Section.CATEGORYS)}
         selected=${this.getSectionSelected(Section.CATEGORYS)}
         hide=${this.getSectionEnabled(Section.CATEGORYS)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiPlaylistMusicOutline}
-        label='Playlist Favorites'
+        label=${this.footerLabel('playlistFavorites')}
         @click=${() => this.onSectionClick(Section.PLAYLIST_FAVORITES)}
         selected=${this.getSectionSelected(Section.PLAYLIST_FAVORITES)}
         hide=${this.getSectionEnabled(Section.PLAYLIST_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiAlbum}
-        label='Album Favorites'
+        label=${this.footerLabel('albumFavorites')}
         @click=${() => this.onSectionClick(Section.ALBUM_FAVORITES)}
         selected=${this.getSectionSelected(Section.ALBUM_FAVORITES)}
         hide=${this.getSectionEnabled(Section.ALBUM_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiAccountMusicOutline}
-        label='Artist Favorites'
+        label=${this.footerLabel('artistFavorites')}
         @click=${() => this.onSectionClick(Section.ARTIST_FAVORITES)}
         selected=${this.getSectionSelected(Section.ARTIST_FAVORITES)}
         hide=${this.getSectionEnabled(Section.ARTIST_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiMusicNoteOutline}
-        label='Track Favorites'
+        label=${this.footerLabel('trackFavorites')}
         @click=${() => this.onSectionClick(Section.TRACK_FAVORITES)}
         selected=${this.getSectionSelected(Section.TRACK_FAVORITES)}
         hide=${this.getSectionEnabled(Section.TRACK_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiBookOpenOutline}
-        label='Audiobook Favorites'
+        label=${this.footerLabel('audiobookFavorites')}
         @click=${() => this.onSectionClick(Section.AUDIOBOOK_FAVORITES)}
         selected=${this.getSectionSelected(Section.AUDIOBOOK_FAVORITES)}
         hide=${this.getSectionEnabled(Section.AUDIOBOOK_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiPodcast}
-        label='Show Favorites'
+        label=${this.footerLabel('showFavorites')}
         @click=${() => this.onSectionClick(Section.SHOW_FAVORITES)}
         selected=${this.getSectionSelected(Section.SHOW_FAVORITES)}
         hide=${this.getSectionEnabled(Section.SHOW_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiMicrophoneOutline}
-        label='Episode Favorites'
+        label=${this.footerLabel('episodeFavorites')}
         @click=${() => this.onSectionClick(Section.EPISODE_FAVORITES)}
         selected=${this.getSectionSelected(Section.EPISODE_FAVORITES)}
         hide=${this.getSectionEnabled(Section.EPISODE_FAVORITES)}
       ></ha-icon-button>
+
       <ha-icon-button
         .path=${mdiMagnify}
-        label='Search Spotify'
+        label=${this.footerLabel('searchSpotify')}
         @click=${() => this.onSectionClick(Section.SEARCH_MEDIA)}
         selected=${this.getSectionSelected(Section.SEARCH_MEDIA)}
         hide=${this.getSectionEnabled(Section.SEARCH_MEDIA)}
@@ -132,10 +269,6 @@ export class Footer extends LitElement {
     `;
   }
 
-
-  /**
-   * Style definitions used by this card section.
-   */
   static get styles() {
     return css`
       :host > ha-icon-button {
@@ -165,42 +298,20 @@ export class Footer extends LitElement {
     `;
   }
 
-
-  /**
-   * Handles the `click` event fired when a section icon is clicked.
-   * 
-   * @param section Event arguments.
-   */
   private onSectionClick(section: Section) {
-
     this.dispatchEvent(customEvent(SHOW_SECTION, section));
-
   }
 
-
-  /**
-   * Checks to see if a section is active or not, and returns true for the specified
-   * section if it's the active section.  This is what shows the selected section
-   * in the footer area.
-   * 
-   * @param section Section identifier to check.
-   */
-  private getSectionSelected(section: Section | typeof nothing) {
-
+  private getSectionSelected(
+    section: Section | typeof nothing
+  ) {
     return this.section === section || nothing;
-
   }
 
-
-  /**
-   * Returns nothing if the specified section value is NOT enabled in the configuration,
-   * which will cause the section icon to be hidden (via css styling).
-   * 
-   * @param section Section identifier to check.
-   */
   private getSectionEnabled(searchElement: Section) {
-
-    return (this.config.sections && !this.config.sections?.includes(searchElement)) || nothing;
-
+    return (
+      this.config.sections &&
+      !this.config.sections?.includes(searchElement)
+    ) || nothing;
   }
 }
