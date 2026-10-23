@@ -169,7 +169,9 @@ export abstract class BaseEditor extends LitElement {
 
       // show the config area and set the section references.
       this.section = configAreaSection;
-      this.store.section = this.section;
+      if (this.store) {
+        this.store.section = this.section;
+      }
 
       // inform the card that it needs to show the section for the selected ConfigArea
       // by dispatching the EDITOR_CONFIG_AREA_SELECTED event.
