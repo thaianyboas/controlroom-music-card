@@ -119,6 +119,7 @@ export class DeviceBrowser extends FavBrowserBase {
   private preferencesLoaded = false;
   @state() private savingDefault = false;
   @state() private savedDefaultValue = '';
+  @state() private selectedDeviceValue = '';
 
   private get defaultDeviceValue(): string {
     const state = this.store.hass?.states?.['input_text.controlroom_default_spotify_device']?.state;
@@ -171,6 +172,11 @@ export class DeviceBrowser extends FavBrowserBase {
     return [...unique.values()];
   }
 
+  private isSelectedDevice(item: ISpotifyConnectDevice): boolean {
+    const selected = this.selectedDeviceValue || this.player?.attributes?.sp_device_id || this.player?.attributes?.source || '';
+    return !!selected && (selected === item.Id || selected === item.Name || selected === this.deviceValue(item));
+  }
+
   private renderSpotifyDevices(items: ISpotifyConnectDevice[]) {
     if (!items.length) {
       return html`<div class="crm-empty-devices">${this.deviceText('noDevices')}</div>`;
@@ -178,21 +184,31 @@ export class DeviceBrowser extends FavBrowserBase {
     return html`<div class="crm-spotify-devices">
       ${items.map(item => {
         const isDefault = this.isDefaultDevice(item);
-        return html`<div class="crm-spotify-device">
-          <button class="crm-spotify-select" type="button" @click=${() => void this.SelectSource(item)}>
+        const isSelected = this.isSelectedDevice(item);
+        return html`<div class="crm-spotify-device ${isSelected ? 'crm-spotify-device-selected' : ''}">
+          <button class="crm-spotify-select" type="button"
+            aria-label=${`${this.deviceText('transferring')}: ${item.Name || item.Id}`}
+            aria-pressed=${isSelected ? 'true' : 'false'}
+            @click=${() => void this.SelectSource(item)}>
             <ha-svg-icon .path=${mdiSpeaker}></ha-svg-icon>
-            <span class="crm-spotify-device-name"><strong>${item.Name || item.Id}</strong>
+            <span class="crm-spotify-device-name">
+              <strong>${item.Name || item.Id}</strong>
               <small>Spotify Connect${item.IsActiveDevice ? ' · Aktiv' : ''}</small>
             </span>
+            <span class="crm-device-radio ${isSelected ? 'crm-device-radio-checked' : ''}" aria-hidden="true">
+              ${isSelected ? html`<ha-icon icon="mdi:check"></ha-icon>` : ''}
+            </span>
           </button>
-          ${isDefault ? html`<span class="crm-default-label"><ha-icon icon="mdi:star"></ha-icon>${this.deviceText('defaultDevice')}</span>` :
-            html`<button type="button" class="crm-default-button" ?disabled=${this.savingDefault}
-              @click=${() => void this.saveDefaultDevice(item)}>${this.deviceText('setDefault')}</button>`}
+          <div class="crm-default-action">
+            ${isDefault
+              ? html`<span class="crm-default-label"><ha-icon icon="mdi:star"></ha-icon>${this.deviceText('defaultDevice')}</span>`
+              : html`<button type="button" class="crm-default-button" ?disabled=${this.savingDefault}
+                  @click=${() => void this.saveDefaultDevice(item)}>${this.deviceText('setDefault')}</button>`}
+          </div>
         </div>`;
       })}
     </div>`;
   }
-
 
   // Spotify Connect devices and HA media_player entities have different actions.
   private spotifyKey(item: ISpotifyConnectDevice): string {
@@ -300,8 +316,13 @@ export class DeviceBrowser extends FavBrowserBase {
       ...super.styles,
       css`
         .crm-spotify-devices { display:grid; gap:8px; padding:8px 2px; }
-        .crm-spotify-device { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:10px; border:1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius:12px; color:var(--crm-text, var(--primary-text-color)); }
-        .crm-spotify-select { display:flex; align-items:center; flex:1; min-width:150px; gap:12px; padding:5px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+        .crm-spotify-device { display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px; border:1px solid var(--divider-color, rgba(128,128,128,.2)); border-radius:12px; color:var(--crm-text, var(--primary-text-color)); min-width:0; box-sizing:border-box; }
+        .crm-spotify-device-selected { border-color:var(--crm-accent, #34d399); background:rgba(52,211,153,.07); }
+        .crm-spotify-select { display:flex; align-items:center; width:100%; min-width:0; gap:12px; padding:5px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; box-sizing:border-box; }
+        .crm-device-radio { margin-left:auto; width:20px; height:20px; border:2px solid rgba(220,235,229,.7); border-radius:50%; box-sizing:border-box; display:flex; align-items:center; justify-content:center; flex:0 0 20px; }
+        .crm-device-radio-checked { background:var(--crm-accent, #34d399); border-color:var(--crm-accent, #34d399); color:#102019; }
+        .crm-device-radio ha-icon { --mdc-icon-size:15px; }
+        .crm-default-action { display:flex; justify-content:flex-end; align-items:center; min-width:0; }
         .crm-spotify-select ha-svg-icon { width:25px; height:25px; color:var(--crm-accent, #34d399); flex-shrink:0; }
         .crm-spotify-device-name { display:grid; gap:4px; min-width:0; }
         .crm-spotify-device-name strong { font-size:13px; overflow-wrap:anywhere; }
@@ -497,6 +518,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
       // select the source.
       await this.store.mediaControlService.select_source(this.player, deviceId);
+      this.selectedDeviceValue = deviceId;
 
       // show player section.
       this.store.card.SetSection(Section.PLAYER);
@@ -506,7 +528,7 @@ export class DeviceBrowser extends FavBrowserBase {
 
       // set error message and reset scroll position to zero so the message is displayed.
       this.alertErrorSet(this.deviceText('selectError') + ' ' + getHomeAssistantErrorMessage(error));
-      this.mediaBrowserContentElement.scrollTop = 0;
+      if (this.mediaBrowserContentElement) this.mediaBrowserContentElement.scrollTop = 0;
 
     }
     finally {

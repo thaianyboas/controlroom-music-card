@@ -435,6 +435,9 @@ export class Card extends AlertUpdatesBase {
         gap: 0;
         overflow-x: auto;
         overflow-y: hidden;
+        box-sizing: border-box;
+        padding-right: 14px;
+        scroll-padding-right: 14px;
         overscroll-behavior-x: contain;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
