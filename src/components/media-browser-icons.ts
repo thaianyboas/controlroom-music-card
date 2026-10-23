@@ -94,6 +94,10 @@ export class MediaBrowserIcons extends MediaBrowserBase {
 
     return html`
       <div class="thumbnail">
+        <span class="play-indicator" aria-hidden="true">
+          <ha-icon icon="mdi:play"></ha-icon>
+        </span>
+
         ${divNowPlayingBars}
       </div>
 
@@ -101,7 +105,9 @@ export class MediaBrowserIcons extends MediaBrowserBase {
         class="title${clsActive}${hasImage ? ' title-on-image' : ''}"
         ?hidden=${!showTitle}
       >
-        ${item.mbi_item.title}
+        <span class="title-text">
+          ${item.mbi_item.title}
+        </span>
 
         <div
           class="subtitle"
@@ -119,11 +125,11 @@ export class MediaBrowserIcons extends MediaBrowserBase {
     return [
       css`
         /*
-         * ControlRoom Music
-         * Emerald Edition — Premium Library
+         * ControlRoom Music — Emerald Edition
+         * Premium Library Refinement
          *
-         * Shared artwork presentation.
-         * Existing grid dimensions and events preserved.
+         * Visual changes only.
+         * Original click, hold and touch events preserved.
          */
 
         :host {
@@ -142,7 +148,7 @@ export class MediaBrowserIcons extends MediaBrowserBase {
           --crm-library-radius: 12px;
         }
 
-        /* Grid: original geometry */
+        /* Preserve original grid geometry */
 
         .icons {
           display: flex;
@@ -163,6 +169,7 @@ export class MediaBrowserIcons extends MediaBrowserBase {
           position: relative;
           box-sizing: border-box;
           overflow: hidden;
+          isolation: isolate;
 
           border-radius: var(--crm-library-radius);
 
@@ -180,15 +187,53 @@ export class MediaBrowserIcons extends MediaBrowserBase {
           -webkit-tap-highlight-color: transparent;
         }
 
+        /*
+         * Inner accent ring:
+         * More visible regardless of artwork colors.
+         */
+
+        .button::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 5;
+
+          border: 2px solid transparent;
+          border-radius: inherit;
+
+          box-sizing: border-box;
+          pointer-events: none;
+
+          transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease;
+        }
+
         /* Desktop hover */
 
         @media (hover: hover) and (pointer: fine) {
           .button:hover {
             box-shadow:
-              0 4px 14px rgba(0, 0, 0, 0.24),
-              inset 0 0 0 1px var(--crm-library-accent);
+              0 5px 16px rgba(0, 0, 0, 0.25);
 
-            filter: brightness(1.07);
+            filter: brightness(1.06);
+          }
+
+          .button:hover::after {
+            border-color: var(--crm-library-accent);
+
+            box-shadow:
+              inset 0 0 0 1px rgba(0, 0, 0, 0.30);
+          }
+
+          .button:hover .play-indicator {
+            opacity: 1;
+            transform:
+              translate(-50%, -50%) scale(1);
+          }
+
+          .button:hover .thumbnail {
+            filter: brightness(0.85);
           }
         }
 
@@ -200,11 +245,23 @@ export class MediaBrowserIcons extends MediaBrowserBase {
             0 3px 12px rgba(0, 0, 0, 0.20);
         }
 
+        .button.is-active::after {
+          border-color: var(--crm-library-accent);
+        }
+
+        /* Keyboard accessibility */
+
+        .button:focus-visible::after {
+          border-color: var(--crm-library-accent);
+        }
+
         /* Artwork */
 
         .thumbnail {
           width: 100%;
           padding-bottom: 100%;
+
+          position: relative;
 
           background-size: 100%;
           background-repeat: no-repeat;
@@ -212,36 +269,98 @@ export class MediaBrowserIcons extends MediaBrowserBase {
 
           mask-repeat: no-repeat;
           mask-position: center;
+
+          transition: filter 200ms ease;
         }
 
-        /* Titles */
+        /*
+         * Centered Play indicator.
+         * Decorative only — no independent click event.
+         */
+
+        .play-indicator {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          z-index: 3;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          width: clamp(26px, 38%, 46px);
+          aspect-ratio: 1;
+
+          border-radius: 50%;
+
+          background: var(--crm-library-accent);
+          color: var(--crm-play-icon-contrast, #102019);
+
+          box-shadow:
+            0 4px 16px rgba(0, 0, 0, 0.35);
+
+          opacity: 0;
+
+          transform:
+            translate(-50%, -50%) scale(0.85);
+
+          transition:
+            opacity 180ms ease,
+            transform 180ms ease;
+
+          pointer-events: none;
+        }
+
+        .play-indicator ha-icon {
+          --mdc-icon-size: 23px;
+          color: inherit;
+        }
+
+        /* Titles overlay */
 
         .title {
+          position: absolute;
+          bottom: 0;
+          z-index: 4;
+
+          width: 100%;
+          box-sizing: border-box;
+
+          padding: 1rem 0.5rem 0.45rem;
+
           color: var(--crm-library-text);
 
           font-size:
             var(--crm-media-browser-items-title-font-size, 0.8rem);
 
           font-weight: 600;
-          line-height: 160%;
+          line-height: 1.25;
           letter-spacing: -0.01em;
 
-          padding: 0.75rem 0.5rem 0;
-
-          position: absolute;
-          width: 100%;
-          bottom: 0;
-
-          box-sizing: border-box;
-
           overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
 
           background: transparent;
+
+          pointer-events: none;
         }
 
-        /* Readable overlay across all themes */
+        .title[hidden],
+        .subtitle[hidden] {
+          display: none;
+        }
+
+        .title-text {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+
+          overflow: hidden;
+          overflow-wrap: anywhere;
+
+          line-clamp: 2;
+        }
+
+        /* Readable overlay for any artwork */
 
         .title-on-image {
           color: #ffffff;
@@ -249,9 +368,9 @@ export class MediaBrowserIcons extends MediaBrowserBase {
           background: linear-gradient(
             to bottom,
             rgba(0, 0, 0, 0) 0%,
-            rgba(0, 0, 0, 0.28) 25%,
-            rgba(0, 0, 0, 0.68) 70%,
-            rgba(0, 0, 0, 0.86) 100%
+            rgba(0, 0, 0, 0.30) 25%,
+            rgba(0, 0, 0, 0.72) 68%,
+            rgba(0, 0, 0, 0.88) 100%
           );
         }
 
@@ -272,33 +391,41 @@ export class MediaBrowserIcons extends MediaBrowserBase {
             var(--crm-media-browser-items-subtitle-font-size, 0.8rem);
 
           font-weight: 400;
-          line-height: 120%;
+          line-height: 1.2;
 
           width: 100%;
-          padding-bottom: 0.25rem;
+          margin-top: 3px;
 
           overflow: hidden;
           text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .title-on-image .subtitle {
           color: rgba(255, 255, 255, 0.88);
         }
 
-        /* Existing now-playing indicator */
+        /* Now-playing indicator */
 
         .bars {
           position: absolute;
+          z-index: 4;
+
           width: 20px;
           height: 10px;
+
           margin-top: 20px;
           margin-left: 10px;
+
+          pointer-events: none;
         }
 
         .bar {
           background: var(--crm-library-accent);
+
           bottom: 1px;
           height: 3px;
+
           position: absolute;
           width: 3px;
 
@@ -310,7 +437,7 @@ export class MediaBrowserIcons extends MediaBrowserBase {
 
         @keyframes sound {
           0% {
-            opacity: .35;
+            opacity: 0.35;
             height: 3px;
           }
 
@@ -340,10 +467,21 @@ export class MediaBrowserIcons extends MediaBrowserBase {
           animation-duration: 458ms;
         }
 
+        /* Touch: keep normal tap and long-press behavior */
+
+        @media (hover: none) {
+          .play-indicator {
+            display: none;
+          }
+        }
+
         /* Accessibility */
 
         @media (prefers-reduced-motion: reduce) {
-          .button {
+          .button,
+          .button::after,
+          .thumbnail,
+          .play-indicator {
             transition: none;
           }
 

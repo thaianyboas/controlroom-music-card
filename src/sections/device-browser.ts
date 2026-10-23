@@ -347,15 +347,15 @@ export class DeviceBrowser extends FavBrowserBase {
           min-width: 0;
           box-sizing: border-box;
           padding: 8px 9px;
-          border: 1px solid rgba(115, 151, 131, .23);
+          border: 1px solid color-mix(in srgb, var(--crm-text, #f0fdf4) 16%, transparent);
           border-radius: 12px;
-          background: rgba(25, 53, 40, .22);
+          background: color-mix(in srgb, var(--crm-background-secondary, #091310) 72%, transparent);
           color: var(--crm-text, var(--primary-text-color));
           transition: background .15s ease, border-color .15s ease;
         }
         .crm-spotify-device-selected {
           border-color: var(--crm-accent, #34d399);
-          background: rgba(52, 211, 153, .085);
+          background: color-mix(in srgb, var(--crm-accent, #34d399) 9%, var(--crm-background-secondary, #091310));
         }
         .crm-device-icon {
           display: flex;
@@ -365,10 +365,10 @@ export class DeviceBrowser extends FavBrowserBase {
           width: 34px;
           height: 34px;
           border-radius: 9px;
-          background: rgba(52, 211, 153, .12);
-          color: var(--crm-accent, #34d399);
+          background: color-mix(in srgb, var(--crm-accent, #34d399) 10%, transparent);
+          color: var(--crm-icon-color, var(--crm-accent, #34d399));
         }
-        .crm-device-icon ha-icon { --mdc-icon-size: 20px; }
+        .crm-device-icon ha-icon { --mdc-icon-size: 20px; color: inherit; --ha-icon-color: currentColor; }
         .crm-spotify-select {
           display: flex;
           align-items: center;
@@ -407,14 +407,14 @@ export class DeviceBrowser extends FavBrowserBase {
           flex: 0 0 19px;
           width: 19px;
           height: 19px;
-          border: 1.7px solid rgba(190, 214, 200, .65);
+          border: 1.7px solid color-mix(in srgb, var(--crm-text, #f0fdf4) 50%, transparent);
           border-radius: 50%;
           box-sizing: border-box;
         }
         .crm-device-radio-checked {
           background: var(--crm-accent, #34d399);
           border-color: var(--crm-accent, #34d399);
-          color: #102019;
+          color: var(--crm-accent-contrast, #102019);
         }
         .crm-device-radio ha-icon { --mdc-icon-size: 14px; }
         .crm-default-star {
@@ -428,12 +428,12 @@ export class DeviceBrowser extends FavBrowserBase {
           border: 0;
           border-radius: 8px;
           background: transparent;
-          color: rgba(168, 192, 177, .72);
+          color: color-mix(in srgb, var(--crm-text, #f0fdf4) 55%, transparent);
           cursor: pointer;
         }
         .crm-default-star ha-icon { --mdc-icon-size: 20px; }
         .crm-default-star:hover:not(:disabled) {
-          background: rgba(52, 211, 153, .12);
+          background: color-mix(in srgb, var(--crm-accent, #34d399) 10%, transparent);
           color: var(--crm-accent, #34d399);
         }
         .crm-default-star-active { color: var(--crm-accent, #34d399); }
@@ -458,7 +458,7 @@ export class DeviceBrowser extends FavBrowserBase {
         .crm-device-option small { font-size:11px; color:var(--crm-text-secondary, var(--secondary-text-color, var(--crm-text, #f0fdf4))); opacity:.75; overflow-wrap:anywhere; }
         .crm-settings-done { margin-top:16px; padding:10px 18px; border:0; border-radius:8px; background:var(--crm-accent, var(--primary-color, #34d399)); color:var(--crm-accent-contrast, #102019); font-weight:700; cursor:pointer; }
         .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:var(--crm-text, var(--primary-text-color, #f0fdf4)); border:0; text-align:left; cursor:pointer; }
-        .crm-ha-device ha-svg-icon { color:var(--crm-accent, var(--primary-color, #34d399)); width:22px; height:22px; flex-shrink:0; }
+        .crm-ha-device ha-svg-icon { color:var(--crm-icon-color, var(--crm-accent, var(--primary-color, #34d399))); width:22px; height:22px; flex-shrink:0; }
         .crm-ha-device-text { min-width:0; display:flex; flex-direction:column; gap:3px; }
         .crm-ha-device-text strong { color:inherit; font-size:14px; font-weight:500; }
         .crm-ha-device-text small { font-size:11px; color:var(--crm-text-secondary, var(--secondary-text-color, inherit)); }

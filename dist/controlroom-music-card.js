@@ -265,6 +265,10 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       </div>
     `}renderMediaBrowserItem(e,t=!0,i=!0){const s=e.mbi_item.is_active?" title-active":"",r=Boolean(e.mbi_item.image_url),o=e.mbi_item.is_active?this.nowPlayingBars:B``;return B`
       <div class="thumbnail">
+        <span class="play-indicator" aria-hidden="true">
+          <ha-icon icon="mdi:play"></ha-icon>
+        </span>
+
         ${o}
       </div>
 
@@ -272,7 +276,9 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         class="title${s}${r?" title-on-image":""}"
         ?hidden=${!t}
       >
-        ${e.mbi_item.title}
+        <span class="title-text">
+          ${e.mbi_item.title}
+        </span>
 
         <div
           class="subtitle"
@@ -283,11 +289,11 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
       </div>
     `}static get styles(){return[a`
         /*
-         * ControlRoom Music
-         * Emerald Edition — Premium Library
+         * ControlRoom Music — Emerald Edition
+         * Premium Library Refinement
          *
-         * Shared artwork presentation.
-         * Existing grid dimensions and events preserved.
+         * Visual changes only.
+         * Original click, hold and touch events preserved.
          */
 
         :host {
@@ -306,7 +312,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           --crm-library-radius: 12px;
         }
 
-        /* Grid: original geometry */
+        /* Preserve original grid geometry */
 
         .icons {
           display: flex;
@@ -327,6 +333,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           position: relative;
           box-sizing: border-box;
           overflow: hidden;
+          isolation: isolate;
 
           border-radius: var(--crm-library-radius);
 
@@ -344,15 +351,53 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           -webkit-tap-highlight-color: transparent;
         }
 
+        /*
+         * Inner accent ring:
+         * More visible regardless of artwork colors.
+         */
+
+        .button::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 5;
+
+          border: 2px solid transparent;
+          border-radius: inherit;
+
+          box-sizing: border-box;
+          pointer-events: none;
+
+          transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease;
+        }
+
         /* Desktop hover */
 
         @media (hover: hover) and (pointer: fine) {
           .button:hover {
             box-shadow:
-              0 4px 14px rgba(0, 0, 0, 0.24),
-              inset 0 0 0 1px var(--crm-library-accent);
+              0 5px 16px rgba(0, 0, 0, 0.25);
 
-            filter: brightness(1.07);
+            filter: brightness(1.06);
+          }
+
+          .button:hover::after {
+            border-color: var(--crm-library-accent);
+
+            box-shadow:
+              inset 0 0 0 1px rgba(0, 0, 0, 0.30);
+          }
+
+          .button:hover .play-indicator {
+            opacity: 1;
+            transform:
+              translate(-50%, -50%) scale(1);
+          }
+
+          .button:hover .thumbnail {
+            filter: brightness(0.85);
           }
         }
 
@@ -364,11 +409,23 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
             0 3px 12px rgba(0, 0, 0, 0.20);
         }
 
+        .button.is-active::after {
+          border-color: var(--crm-library-accent);
+        }
+
+        /* Keyboard accessibility */
+
+        .button:focus-visible::after {
+          border-color: var(--crm-library-accent);
+        }
+
         /* Artwork */
 
         .thumbnail {
           width: 100%;
           padding-bottom: 100%;
+
+          position: relative;
 
           background-size: 100%;
           background-repeat: no-repeat;
@@ -376,36 +433,98 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
           mask-repeat: no-repeat;
           mask-position: center;
+
+          transition: filter 200ms ease;
         }
 
-        /* Titles */
+        /*
+         * Centered Play indicator.
+         * Decorative only — no independent click event.
+         */
+
+        .play-indicator {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          z-index: 3;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          width: clamp(26px, 38%, 46px);
+          aspect-ratio: 1;
+
+          border-radius: 50%;
+
+          background: var(--crm-library-accent);
+          color: var(--crm-play-icon-contrast, #102019);
+
+          box-shadow:
+            0 4px 16px rgba(0, 0, 0, 0.35);
+
+          opacity: 0;
+
+          transform:
+            translate(-50%, -50%) scale(0.85);
+
+          transition:
+            opacity 180ms ease,
+            transform 180ms ease;
+
+          pointer-events: none;
+        }
+
+        .play-indicator ha-icon {
+          --mdc-icon-size: 23px;
+          color: inherit;
+        }
+
+        /* Titles overlay */
 
         .title {
+          position: absolute;
+          bottom: 0;
+          z-index: 4;
+
+          width: 100%;
+          box-sizing: border-box;
+
+          padding: 1rem 0.5rem 0.45rem;
+
           color: var(--crm-library-text);
 
           font-size:
             var(--crm-media-browser-items-title-font-size, 0.8rem);
 
           font-weight: 600;
-          line-height: 160%;
+          line-height: 1.25;
           letter-spacing: -0.01em;
 
-          padding: 0.75rem 0.5rem 0;
-
-          position: absolute;
-          width: 100%;
-          bottom: 0;
-
-          box-sizing: border-box;
-
           overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
 
           background: transparent;
+
+          pointer-events: none;
         }
 
-        /* Readable overlay across all themes */
+        .title[hidden],
+        .subtitle[hidden] {
+          display: none;
+        }
+
+        .title-text {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+
+          overflow: hidden;
+          overflow-wrap: anywhere;
+
+          line-clamp: 2;
+        }
+
+        /* Readable overlay for any artwork */
 
         .title-on-image {
           color: #ffffff;
@@ -413,9 +532,9 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           background: linear-gradient(
             to bottom,
             rgba(0, 0, 0, 0) 0%,
-            rgba(0, 0, 0, 0.28) 25%,
-            rgba(0, 0, 0, 0.68) 70%,
-            rgba(0, 0, 0, 0.86) 100%
+            rgba(0, 0, 0, 0.30) 25%,
+            rgba(0, 0, 0, 0.72) 68%,
+            rgba(0, 0, 0, 0.88) 100%
           );
         }
 
@@ -436,33 +555,41 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
             var(--crm-media-browser-items-subtitle-font-size, 0.8rem);
 
           font-weight: 400;
-          line-height: 120%;
+          line-height: 1.2;
 
           width: 100%;
-          padding-bottom: 0.25rem;
+          margin-top: 3px;
 
           overflow: hidden;
           text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .title-on-image .subtitle {
           color: rgba(255, 255, 255, 0.88);
         }
 
-        /* Existing now-playing indicator */
+        /* Now-playing indicator */
 
         .bars {
           position: absolute;
+          z-index: 4;
+
           width: 20px;
           height: 10px;
+
           margin-top: 20px;
           margin-left: 10px;
+
+          pointer-events: none;
         }
 
         .bar {
           background: var(--crm-library-accent);
+
           bottom: 1px;
           height: 3px;
+
           position: absolute;
           width: 3px;
 
@@ -474,7 +601,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
         @keyframes sound {
           0% {
-            opacity: .35;
+            opacity: 0.35;
             height: 3px;
           }
 
@@ -504,10 +631,21 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           animation-duration: 458ms;
         }
 
+        /* Touch: keep normal tap and long-press behavior */
+
+        @media (hover: none) {
+          .play-indicator {
+            display: none;
+          }
+        }
+
         /* Accessibility */
 
         @media (prefers-reduced-motion: reduce) {
-          .button {
+          .button,
+          .button::after,
+          .thumbnail,
+          .play-indicator {
             transition: none;
           }
 
@@ -1089,9 +1227,9 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-weight: bold;
-    font-size: var(--spc-media-browser-section-title-font-size, 1.0rem);
-    line-height: var(--spc-media-browser-section-title-font-size, 1.0rem);
+    font-weight: 700;
+    font-size: var(--spc-media-browser-section-title-font-size, 1rem);
+    line-height: var(--spc-media-browser-section-title-font-size, 1rem);
     color: var(
       --spc-media-browser-section-title-color,
       var(--crm-text, var(--primary-text-color))
@@ -1104,7 +1242,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-weight: normal;
+    font-weight: 400;
     font-size: var(--spc-media-browser-section-subtitle-font-size, 0.85rem);
     line-height: var(--spc-media-browser-section-subtitle-font-size, 0.85rem);
     color: var(
@@ -1114,38 +1252,133 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     opacity: 0.78;
   }
 
+  /*
+   * Premium controls
+   * Preserve the existing layout and control dimensions.
+   */
+
   .media-browser-controls {
     padding: 0.2rem 0.4rem 0.2rem;
     white-space: nowrap;
+
     --ha-select-height: 2.5rem;
     --mdc-menu-item-height: 2.5rem;
     --ha-icon-button-size: 2.5rem;
     --md-menu-item-top-space: 0.5rem;
     --md-menu-item-bottom-space: 0.5rem;
-    --md-menu-item-one-line-container-height: 2.0rem;
+    --md-menu-item-one-line-container-height: 2rem;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-direction: row;
     flex-shrink: 0;
+    min-width: 0;
+
+    gap: 2px;
   }
+
+  /*
+   * Search field
+   * Theme-aware surface, focus and border.
+   */
 
   .media-browser-control-filter {
     padding-right: 0.5rem;
     padding-left: 0.5rem;
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    --primary-color: var(--crm-accent, #34d399);
+    --mdc-theme-primary: var(--crm-accent, #34d399);
+    --mdc-theme-on-surface:
+      var(--crm-text, var(--primary-text-color));
+
+    --mdc-text-field-ink-color:
+      var(--crm-text, var(--primary-text-color));
+
+    --mdc-text-field-label-ink-color:
+      var(--crm-text-secondary, var(--secondary-text-color));
+
+    --mdc-text-field-fill-color:
+      var(--crm-background-secondary, transparent);
+  }
+
+  .media-browser-control-filter ha-textfield,
+  .media-browser-control-filter ha-textfield *,
+  .media-browser-control-filter ha-select {
+    --primary-color: var(--crm-accent, #34d399);
+    --mdc-theme-primary: var(--crm-accent, #34d399);
+  }
+
+  .media-browser-control-filter ha-textfield,
+  .media-browser-control-filter ha-select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    color: var(--crm-text, var(--primary-text-color));
+    border-radius: 10px;
+
+    transition:
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .media-browser-control-filter ha-textfield:focus-within,
+  .media-browser-control-filter ha-select:focus-within {
+    box-shadow:
+      0 0 0 1px var(--crm-accent, #34d399);
   }
 
   .media-browser-control-filter-disabled {
     padding-right: 0.5rem;
     padding-left: 0.5rem;
     width: 100%;
+    min-width: 0;
     align-self: center;
+
     color: var(--crm-text, var(--primary-text-color));
     opacity: 0.65;
+
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /*
+   * Filter and action buttons
+   */
+
+  .media-browser-controls ha-icon-button {
+    --primary-color: var(--crm-accent, #34d399);
+    --mdc-theme-primary: var(--crm-accent, #34d399);
+    color: var(--crm-text, var(--primary-text-color));
+    border-radius: 10px;
+    transition:
+      background-color 180ms ease,
+      color 180ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .media-browser-controls ha-icon-button:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--crm-accent, #34d399) 10%,
+        transparent
+      );
+    }
+  }
+
+  .media-browser-controls ha-icon-button:focus-visible {
+    outline: 2px solid var(--crm-accent, #34d399);
+    outline-offset: 1px;
+  }
+
+  /*
+   * Browser content
+   * Preserve original maximum height and scrolling.
+   */
 
   .media-browser-content {
     margin: 0.5rem;
@@ -1153,12 +1386,22 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     height: auto;
     max-height: var(--crm-browser-list-height, 230px);
     min-height: 0;
+
     overflow-y: auto;
     overflow-x: hidden;
+
     scrollbar-color:
-      var(--crm-text, var(--primary-text-color))
-      var(--crm-background-secondary, var(--secondary-background-color));
-    scrollbar-width: auto;
+      color-mix(
+        in srgb,
+        var(--crm-accent, #34d399) 55%,
+        transparent
+      )
+      var(
+        --crm-background-secondary,
+        var(--secondary-background-color)
+      );
+
+    scrollbar-width: thin;
   }
 
   .media-browser-list {
@@ -1170,6 +1413,10 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
     min-height: 100%;
   }
 
+  /*
+   * Alerts
+   */
+
   ha-alert {
     display: block;
     margin-bottom: 0.25rem;
@@ -1178,6 +1425,14 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
 
   *[hide] {
     display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media-browser-control-filter ha-textfield,
+    .media-browser-control-filter ha-select,
+    .media-browser-controls ha-icon-button {
+      transition: none;
+    }
   }
 
 `;const Ds=new class{constructor(){this._propValues={}}addPropertyValue(e){if(!this._propValues.hasOwnProperty(e)){const t=window.localStorage.getItem(e);this._propValues[e]=t?JSON.parse(t):null}}getPropertyValue(e){return this._propValues[e]}setPropertyValue(e,t){this._propValues[e]=t}saveProperties(){for(const e in this._propValues)this._propValues.hasOwnProperty(e)&&window.localStorage.setItem(e,JSON.stringify(this._propValues[e]))}saveProperty(e){this._propValues.hasOwnProperty(e)&&window.localStorage.setItem(e,JSON.stringify(this._propValues[e]))}getStorageValue(e,t=null){const i=window.localStorage.getItem(e);return i?JSON.parse(i):t}setStorageValue(e,t){window.localStorage.setItem(e,JSON.stringify(t))}clearStorageValue(e){window.localStorage.removeItem(e)}clearStorage(){window.localStorage.clear();for(const e in this._propValues)this._propValues.hasOwnProperty(e)&&(this._propValues[e]=null)}clearStorageByKey(e){this._propValues.hasOwnProperty(e)&&(window.localStorage.removeItem(e),this._propValues[e]=null)}},Vs=_e(ce+":fav-browser-base"),Us="_filtercriteria",zs="_medialist",Ns="_medialistlastupdated",Ws="Previous refresh is still in progress - please wait";class qs extends es{constructor(e){super(),this.EDITOR_LIMIT_TOTAL_MAX=25,this.LIMIT_TOTAL_MAX=200,this.isActionsEnabled=!0,this.isMediaListRefreshedOnSectionEntry=!1,this.mediaType=e,this.shuffleOnPlay=!1,this.onKeyDown_EventListenerBound=this.onKeyDown.bind(this)}uiText(e,t,i,s){const r=this.hass?.locale?.language||this.hass?.language,o=Ye(e,"auto",r);if(o!==e)return o;return{de:t,pt:i,en:s}[Je("auto",r)]}render(){Vs.enabled&&Vs("render - rendering control: %s\n- mediaListLastUpdatedOn = %s\n- scrollTopSaved = %s\n- filterItemCount = %s (pre-render)",JSON.stringify(this.mediaType),JSON.stringify(this.mediaListLastUpdatedOn),JSON.stringify(this.scrollTopSaved),JSON.stringify(this.filterItemCount)),this.hass=this.store.hass,this.config=this.store.config,this.player=this.store.player,this.spotifyPlusService=this.store.spotifyPlusService,this.isCardInEditPreview=ni(this.store.card),this.setScrollPosition(),this.isFilterCriteriaReadOnly=!1,this.isFilterCriteriaVisible=!0,this.filterCriteriaHtml=B`
@@ -2133,15 +2388,15 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           min-width: 0;
           box-sizing: border-box;
           padding: 8px 9px;
-          border: 1px solid rgba(115, 151, 131, .23);
+          border: 1px solid color-mix(in srgb, var(--crm-text, #f0fdf4) 16%, transparent);
           border-radius: 12px;
-          background: rgba(25, 53, 40, .22);
+          background: color-mix(in srgb, var(--crm-background-secondary, #091310) 72%, transparent);
           color: var(--crm-text, var(--primary-text-color));
           transition: background .15s ease, border-color .15s ease;
         }
         .crm-spotify-device-selected {
           border-color: var(--crm-accent, #34d399);
-          background: rgba(52, 211, 153, .085);
+          background: color-mix(in srgb, var(--crm-accent, #34d399) 9%, var(--crm-background-secondary, #091310));
         }
         .crm-device-icon {
           display: flex;
@@ -2151,10 +2406,10 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           width: 34px;
           height: 34px;
           border-radius: 9px;
-          background: rgba(52, 211, 153, .12);
-          color: var(--crm-accent, #34d399);
+          background: color-mix(in srgb, var(--crm-accent, #34d399) 10%, transparent);
+          color: var(--crm-icon-color, var(--crm-accent, #34d399));
         }
-        .crm-device-icon ha-icon { --mdc-icon-size: 20px; }
+        .crm-device-icon ha-icon { --mdc-icon-size: 20px; color: inherit; --ha-icon-color: currentColor; }
         .crm-spotify-select {
           display: flex;
           align-items: center;
@@ -2193,14 +2448,14 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           flex: 0 0 19px;
           width: 19px;
           height: 19px;
-          border: 1.7px solid rgba(190, 214, 200, .65);
+          border: 1.7px solid color-mix(in srgb, var(--crm-text, #f0fdf4) 50%, transparent);
           border-radius: 50%;
           box-sizing: border-box;
         }
         .crm-device-radio-checked {
           background: var(--crm-accent, #34d399);
           border-color: var(--crm-accent, #34d399);
-          color: #102019;
+          color: var(--crm-accent-contrast, #102019);
         }
         .crm-device-radio ha-icon { --mdc-icon-size: 14px; }
         .crm-default-star {
@@ -2214,12 +2469,12 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
           border: 0;
           border-radius: 8px;
           background: transparent;
-          color: rgba(168, 192, 177, .72);
+          color: color-mix(in srgb, var(--crm-text, #f0fdf4) 55%, transparent);
           cursor: pointer;
         }
         .crm-default-star ha-icon { --mdc-icon-size: 20px; }
         .crm-default-star:hover:not(:disabled) {
-          background: rgba(52, 211, 153, .12);
+          background: color-mix(in srgb, var(--crm-accent, #34d399) 10%, transparent);
           color: var(--crm-accent, #34d399);
         }
         .crm-default-star-active { color: var(--crm-accent, #34d399); }
@@ -2244,7 +2499,7 @@ const We=(e,t,i)=>{for(const i of t)if(i[0]===e)return(0,i[1])();return null==i?
         .crm-device-option small { font-size:11px; color:var(--crm-text-secondary, var(--secondary-text-color, var(--crm-text, #f0fdf4))); opacity:.75; overflow-wrap:anywhere; }
         .crm-settings-done { margin-top:16px; padding:10px 18px; border:0; border-radius:8px; background:var(--crm-accent, var(--primary-color, #34d399)); color:var(--crm-accent-contrast, #102019); font-weight:700; cursor:pointer; }
         .crm-ha-device { width:100%; display:flex; align-items:center; gap:20px; padding:10px 14px; background:transparent; color:var(--crm-text, var(--primary-text-color, #f0fdf4)); border:0; text-align:left; cursor:pointer; }
-        .crm-ha-device ha-svg-icon { color:var(--crm-accent, var(--primary-color, #34d399)); width:22px; height:22px; flex-shrink:0; }
+        .crm-ha-device ha-svg-icon { color:var(--crm-icon-color, var(--crm-accent, var(--primary-color, #34d399))); width:22px; height:22px; flex-shrink:0; }
         .crm-ha-device-text { min-width:0; display:flex; flex-direction:column; gap:3px; }
         .crm-ha-device-text strong { color:inherit; font-size:14px; font-weight:500; }
         .crm-ha-device-text small { font-size:11px; color:var(--crm-text-secondary, var(--secondary-text-color, inherit)); }
