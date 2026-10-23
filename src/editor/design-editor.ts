@@ -37,6 +37,17 @@ class DesignEditor extends BaseEditor {
     this.configChanged({ ...this.config, [name]: value });
 
   }
+  private setPlayerImage(key: string, value: string): void {
+    const customImageUrls = { ...(this.config.customImageUrls ?? {}) };
+    if (value.trim()) customImageUrls[key] = value.trim();
+    else delete customImageUrls[key];
+    this.configChanged({ ...this.config, customImageUrls });
+  }
+
+  private setPlayerImageSize(value: string): void {
+    this.configChanged({ ...this.config, playerBackgroundImageSize: value });
+
+  }
 
 
 
@@ -316,6 +327,36 @@ class DesignEditor extends BaseEditor {
 
 
 
+    const imageLabels = pt ? {
+      title: 'Imagem de fundo do Player', hint: 'Personalize a imagem em cada estado do Player.',
+      playing: 'Reproduzindo', idle: 'Sem reprodução', off: 'Desligado',
+      url: 'URL da imagem', clear: 'Remover imagem personalizada',
+      fit: 'Ajuste da imagem', customSize: 'Tamanho CSS personalizado',
+      note: 'Use uma URL HTTPS ou /local/arquivo.jpg. Para fotos do celular ou computador, primeiro envie o arquivo para /config/www no Home Assistant.',
+      preview: 'Prévia da imagem', fallback: 'Imagem padrão / capa da música',
+    } : de ? {
+      title: 'Player-Hintergrundbild', hint: 'Passe das Hintergrundbild für jeden Player-Zustand an.',
+      playing: 'Wiedergabe', idle: 'Bereit', off: 'Ausgeschaltet',
+      url: 'Bild-URL', clear: 'Eigenes Bild entfernen',
+      fit: 'Bildanpassung', customSize: 'Benutzerdefinierte CSS-Größe',
+      note: 'HTTPS-URL oder /local/datei.jpg verwenden. Bilder vom Gerät zuerst nach /config/www in Home Assistant hochladen.',
+      preview: 'Bildvorschau', fallback: 'Standardbild / Albumcover',
+    } : {
+      title: 'Player background image', hint: 'Customize the image for each player state.',
+      playing: 'Playing', idle: 'Idle', off: 'Off',
+      url: 'Image URL', clear: 'Remove custom image',
+      fit: 'Image fit', customSize: 'Custom CSS size',
+      note: 'Use an HTTPS URL or /local/file.jpg. Upload photos to /config/www in Home Assistant first.',
+      preview: 'Image preview', fallback: 'Default image / album artwork',
+    };
+    const imageFields = [
+      { key: 'playerBackground', title: imageLabels.playing },
+      { key: 'playerIdleBackground', title: imageLabels.idle },
+      { key: 'playerOffBackground', title: imageLabels.off },
+    ];
+    const imageSize = this.config.playerBackgroundImageSize ?? 'cover';
+
+
     const radius = this.getValue('crmBorderRadius');
 
     const radiusPixels = /^\s*(\d+(?:\.\d+)?)px\s*$/i.exec(radius);
@@ -421,6 +462,49 @@ class DesignEditor extends BaseEditor {
             ${this.themeChoice('custom', ui.custom, ui.customHint, selected)}
 
           </div>
+
+        </div>
+        <div class="studio-panel player-image-panel">
+          <div class="panel-title">${imageLabels.title}</div>
+          <div class="panel-hint">${imageLabels.hint}</div>
+          ${imageFields.map(field => {
+            const url = this.config.customImageUrls?.[field.key] ?? '';
+            const safePreview = /^(https?:\/\/|\/local\/)/i.test(url.trim()) ? url.trim() : '';
+            return html`
+              <div class="image-field">
+                <div class="image-field-heading">
+                  <strong>${field.title}</strong>
+                  ${url ? html`<button class="reset" type="button" @click=${() => this.setPlayerImage(field.key, '')}>${imageLabels.clear}</button>` : ''}
+                </div>
+                <div class="image-preview" style=${safePreview ? `background-image: url(&quot;${safePreview.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}&quot;); background-size: ${imageSize};` : ''}>
+                  ${!safePreview ? html`<ha-icon icon="mdi:image-outline"></ha-icon><span>${imageLabels.fallback}</span>` : ''}
+                </div>
+                <label class="field-label" for=${`crm-image-${field.key}`}>${imageLabels.url}</label>
+                <input id=${`crm-image-${field.key}`} class="studio-input" type="text"
+                  .value=${url} placeholder="/local/spotify_idle.png"
+                  @change=${(event: Event) => this.setPlayerImage(field.key, (event.currentTarget as HTMLInputElement).value)} />
+              </div>
+            `;
+          })}
+          <div class="image-fit-control">
+            <label class="field-label" for="crm-image-fit">${imageLabels.fit}</label>
+            <select id="crm-image-fit" class="studio-input" .value=${['cover', 'contain', '100% 100%'].includes(imageSize) ? imageSize : 'custom'}
+              @change=${(event: Event) => {
+                const value = (event.currentTarget as HTMLSelectElement).value;
+                this.setPlayerImageSize(value === 'custom' ? '80% auto' : value);
+              }}>
+              <option value="cover">Cover</option>
+              <option value="contain">Contain</option>
+              <option value="100% 100%">Stretch</option>
+              <option value="custom">Custom</option>
+            </select>
+            ${!['cover', 'contain', '100% 100%'].includes(imageSize) ? html`
+              <label class="field-label" for="crm-image-custom-size">${imageLabels.customSize}</label>
+              <input id="crm-image-custom-size" class="studio-input" type="text" .value=${imageSize}
+                @change=${(event: Event) => this.setPlayerImageSize((event.currentTarget as HTMLInputElement).value.trim() || 'cover')} />
+            ` : ''}
+          </div>
+          <div class="field-hint">${imageLabels.note}</div>
 
         </div>
 
@@ -697,6 +781,16 @@ class DesignEditor extends BaseEditor {
     return css`
 
       :host { display: block; min-width: 0; }
+
+      .player-image-panel { display: grid; gap: 12px; }
+      .player-image-panel .panel-hint { margin: 0; }
+      .image-field { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--divider-color); border-radius: 12px; background: var(--secondary-background-color, rgba(128,128,128,.06)); min-width: 0; }
+      .image-field-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .image-field-heading strong { font-size: 12px; }
+      .image-preview { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; height: 110px; border-radius: 9px; background-color: var(--card-background-color, #14211d); background-position: center; background-repeat: no-repeat; color: var(--secondary-text-color); font-size: 11px; }
+      .image-preview ha-icon { --mdc-icon-size: 25px; }
+      .image-fit-control { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--divider-color); }
+
 
       .dimensions-grid {
 
