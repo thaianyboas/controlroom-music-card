@@ -178,6 +178,11 @@ export class Card extends AlertUpdatesBase {
   @state() private vibrantColorLightVibrant?: string;
   @state() private vibrantColorLightMuted?: string;
 
+  // Height of the player area, measured at the current card width.
+  @state() private compactPlayerHeight = 265;
+  private playerSizeObserver?: ResizeObserver;
+  private observedPlayer?: Element;
+
   // card section references.
   @query("#elmSearchMediaBrowserForm", false) private elmSearchMediaBrowserForm!: SearchBrowser;
   @query("#elmCategoryBrowserForm", false) private elmCategoryBrowserForm!: CategoryBrowser;
@@ -369,7 +374,7 @@ export class Card extends AlertUpdatesBase {
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        height: calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height));
+        height: auto;
         min-width: 0;
         max-width: 100%;
         width: 100%;
@@ -406,6 +411,7 @@ export class Card extends AlertUpdatesBase {
       .crm-card-footer-container {
         width: 100%;
         min-width: 0;
+        flex: 0 0 auto;
         box-sizing: border-box;
         display: flex;
         align-items: center;
@@ -420,11 +426,18 @@ export class Card extends AlertUpdatesBase {
         display: flex;
         align-self: flex-start;
         align-items: center;
-        justify-content: space-around;
+        justify-content: flex-start;
         flex-wrap: nowrap;
+        flex: 1 1 auto;
         min-width: 0;
         width: 100%;
+        max-width: 100%;
         gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
         --ha-icon-button-size: var(--crm-footer-icon-button-size, 2.5rem);
         --mdc-icon-size: var(--crm-footer-icon-size, 1.75rem);
         --mdc-ripple-top: 0px;
@@ -432,10 +445,14 @@ export class Card extends AlertUpdatesBase {
         --mdc-ripple-fg-size: 10px;
       }
 
-      /* Keep footer controls inside narrow dashboard columns. */
+      .crm-card-footer::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Keep footer controls at their intended size on narrow dashboards. */
       .crm-card-footer > * {
-        flex: 0 1 auto;
-        min-width: 0;
+        flex: 0 0 auto;
+        min-width: var(--crm-footer-icon-button-size, 2.5rem);
       }
 
       @media (max-width: 480px) {
@@ -625,6 +642,10 @@ export class Card extends AlertUpdatesBase {
     // remove document level event listeners.
     document.removeEventListener(EDITOR_CONFIG_AREA_SELECTED, this.onEditorConfigAreaSelectedEventHandler);
 
+    this.playerSizeObserver?.disconnect();
+    this.playerSizeObserver = undefined;
+    this.observedPlayer = undefined;
+
     // invoke base class method.
     super.disconnectedCallback();
   }
@@ -635,6 +656,26 @@ export class Card extends AlertUpdatesBase {
    * lifetime of an element. Useful for one-time setup work that requires access to
    * the DOM.
    */
+  protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+    this.observePlayerHeight();
+  }
+
+  private observePlayerHeight(): void {
+    const player = this.shadowRoot?.querySelector('crm-player');
+    if (player === this.observedPlayer) return;
+    this.playerSizeObserver?.disconnect();
+    this.observedPlayer = player ?? undefined;
+    if (!player || typeof ResizeObserver === 'undefined') return;
+    this.playerSizeObserver = new ResizeObserver(() => {
+      const measured = Math.ceil(player.getBoundingClientRect().height);
+      if (measured > 0 && measured !== this.compactPlayerHeight) {
+        this.compactPlayerHeight = measured;
+      }
+    });
+    this.playerSizeObserver.observe(player);
+  }
+
   protected firstUpdated(changedProperties: PropertyValues): void {
 
     // invoke base class method.
@@ -1430,7 +1471,7 @@ export class Card extends AlertUpdatesBase {
       if (isNumber(String(this.config.height))) {
         styleInfo['height'] = String(this.config.height) + 'rem';
       } else {
-        styleInfo['height'] = 'calc(100vh - var(--crm-card-footer-height) - var(--crm-card-edit-tab-height) - var(--crm-card-edit-bottom-toolbar-height))';
+        styleInfo['height'] = '100%';
       }
     } else if (isNumber(String(this.config.height))) {
       styleInfo['height'] = String(this.config.height) + 'rem';
@@ -1441,7 +1482,9 @@ export class Card extends AlertUpdatesBase {
     // ControlRoom: compact player, footer immediately after the player surface.
     // Explicit 'fill' mode remains full-height by user choice.
     if (this.getHeightMode() !== 'fill') {
-      styleInfo['height'] = 'auto';
+      styleInfo['height'] = this.getHeightMode() === 'compact'
+        ? `calc(${this.compactPlayerHeight}px + var(--crm-card-footer-height) + 1rem)`
+        : 'auto';
       styleInfo['min-height'] = '0';
     }
 
@@ -1515,16 +1558,25 @@ export class Card extends AlertUpdatesBase {
     const heightMode = this.getHeightMode();
 
     styleInfo['--crm-browser-list-height'] =
-      heightMode === 'compact' ? '230px' :
-      heightMode === 'auto' ? '600px' : '100%';
+      heightMode === 'compact' ? `${this.compactPlayerHeight}px` :
+      heightMode === 'auto' ? 'none' : '100%';
 
-    // ControlRoom: allow the horizontal player to take only the space it needs.
-    // Keep the other browser sections scrollable and at their configured height.
-    if (this.getHeightMode() !== 'fill') {
+    if (heightMode === 'compact') {
+      styleInfo['flex'] = '1 1 auto';
+      styleInfo['min-height'] = '0';
+      styleInfo['height'] = 'auto';
+      styleInfo['overflow-x'] = 'hidden';
+      styleInfo['overflow-y'] = 'auto';
+    } else if (heightMode === 'auto') {
       styleInfo['flex'] = '0 0 auto';
       styleInfo['height'] = 'auto';
       styleInfo['min-height'] = '0';
       styleInfo['overflow'] = 'visible';
+    } else {
+      styleInfo['flex'] = '1 1 auto';
+      styleInfo['min-height'] = '0';
+      styleInfo['overflow-x'] = 'hidden';
+      styleInfo['overflow-y'] = 'auto';
     }
 
     // adjust css styling for minimized player format.
