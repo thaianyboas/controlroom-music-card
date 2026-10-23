@@ -66,9 +66,11 @@ export class Player extends AlertUpdatesBase {
 
     const isOffIdle = this.player.isPoweredOffOrIdle();
     const artwork = this.player.attributes.entity_picture || this.player.attributes.entity_picture_local;
-    const artworkUrl = !isOffIdle && artwork
-      ? this.store.hass.hassUrl(artwork)
-      : '/local/Bild%20f%C3%BCr%20Spotify.jpg';
+    const configuredIdleImage = this.config.customImageUrls?.['playerIdleBackground']
+      || this.config.customImageUrls?.['playerOffBackground'];
+    const artworkUrl = isOffIdle
+      ? (configuredIdleImage || '/local/Bild%20f%C3%BCr%20Spotify.jpg')
+      : (artwork ? this.store.hass.hassUrl(artwork) : '');
 
     const idleLabels = this.idleLabels();
     const title = !isOffIdle && this.player.attributes.media_title
@@ -82,7 +84,7 @@ export class Player extends AlertUpdatesBase {
     return html`
       <div class="player-section-container ${isOffIdle ? 'is-idle' : 'is-active'}"
            style=${this.stylePlayerSection()}>
-        <div class="player-artwork" style=${styleMap({ 'background-image': `url("${artworkUrl}")` })}></div>
+        <div class="player-artwork" style=${styleMap({ 'background-image': artworkUrl ? `url("${artworkUrl}")` : 'none' })}></div>
         <div class="player-artwork-overlay"></div>
 
         <div class="player-content">
@@ -358,9 +360,8 @@ export class Player extends AlertUpdatesBase {
 
     // get various image source settings.
     const configImageDefault = this.config.customImageUrls?.['default'];
-    const configImagePlayerBg = this.config.customImageUrls?.['playerBackground'];
-    const configImagePlayerBgIdle = this.config.customImageUrls?.['playerIdleBackground'];
-    const configImagePlayerBgOff = this.config.customImageUrls?.['playerOffBackground'];
+    const configImagePlayerBgIdle = this.config.customImageUrls?.['playerIdleBackground'] || this.config.customImageUrls?.['playerOffBackground'];
+    const configImagePlayerBgOff = configImagePlayerBgIdle;
 
     // get current media player image and media content id values.
     let playerMediaContentId:string | undefined = undefined;
@@ -455,33 +456,20 @@ export class Player extends AlertUpdatesBase {
         styleInfo['--crm-player-background-size'] = `${this.config.playerBackgroundImageSize}`;
       }
 
-    } else if (configImagePlayerBg) {
-
-      // use configured player background image (static image, does not change).
-      this.store.card.playerMediaContentId = "configImagePlayerBg"
-      if ((configImagePlayerBg || "").toLowerCase() == "none") {
-        // force no image.
-        styleInfo['background-image'] = undefined;
-      } else if (configImagePlayerBg) {
-        // image specified in card config.
-        styleInfo['background-image'] = `url(${configImagePlayerBg})`;
-        backgroundImageUrl = configImagePlayerBg;
-      }
-
     } else if (playerImage) {
 
       // use currently playing artwork background image; image changes with the track.
       // note that theming variable will override this value if specified.
       this.store.card.playerMediaContentId = playerMediaContentId;
       backgroundImageUrl = playerImage;
-      styleInfo['background-image'] = `var(--crm-player-background-image, url(${playerImage}))`;
+      styleInfo['background-image'] = `url("${playerImage}")`;
 
     } else if (configImageDefault) {
 
       // use configured default background image.
       this.store.card.playerMediaContentId = "configImageDefault"
       backgroundImageUrl = configImageDefault;
-      styleInfo['background-image'] = `url(${configImageDefault}`;
+      styleInfo['background-image'] = `url(${configImageDefault})`;
 
     } else {
 
