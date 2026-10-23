@@ -92,7 +92,7 @@ export class DeviceBrowser extends FavBrowserBase {
   private friendlyState(state: string): string {
     const language = resolveLanguage(
       this.config?.language ?? 'auto',
-      this.store.hass?.locale?.language || this.store.hass?.language
+      this.store?.hass?.locale?.language || this.store?.hass?.language
     );
 
     const labels: Record<string, Record<'de' | 'pt' | 'en', string>> = {
@@ -110,7 +110,7 @@ export class DeviceBrowser extends FavBrowserBase {
   }
 
   private deviceText(key: DeviceTextKey): string {
-    const language = resolveLanguage(this.config?.language ?? 'auto', this.store.hass?.locale?.language || this.store.hass?.language);
+    const language = resolveLanguage(this.config?.language ?? 'auto', this.store?.hass?.locale?.language || this.store?.hass?.language);
     return deviceTexts[language][key];
   }
 
