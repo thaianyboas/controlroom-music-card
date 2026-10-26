@@ -70,7 +70,7 @@ class AdvancedEditor extends BaseEditor {
         font-size: 14px;
       }
       .heading ha-icon {
-        color: #34d399;
+        color: var(--crm-editor-accent, var(--primary-color, #34d399));
       }
       .setting {
         justify-content: space-between;
@@ -89,7 +89,7 @@ class AdvancedEditor extends BaseEditor {
       input {
         width: 18px;
         height: 18px;
-        accent-color: #34d399;
+        accent-color: var(--crm-editor-accent, var(--primary-color, #34d399));
       }
     `;
   }

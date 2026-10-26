@@ -46,7 +46,6 @@ import { IArtistPage } from '../types/spotifyplus/artist-page';
 import { IAudiobook } from '../types/spotifyplus/audiobook';
 import { IAudiobookPageSimplified } from '../types/spotifyplus/audiobook-page-simplified';
 import { IAudiobookSimplified } from '../types/spotifyplus/audiobook-simplified';
-import { ICategoryPage } from '../types/spotifyplus/category-page';
 import { IChapter } from '../types/spotifyplus/chapter';
 import { IChapterPageSimplified } from '../types/spotifyplus/chapter-page-simplified';
 import { IEpisode } from '../types/spotifyplus/episode';
@@ -1516,67 +1515,6 @@ export class SpotifyPlusService {
    * @param trimResults True to trim certain fields of the output results that are not required and to conserve memory; otherwise, False to return all fields that were returned in by the Spotify Web API.
    * @returns A ICategoryPage object.
   */
-  public async GetBrowseCategorysList(
-    player: MediaPlayer,
-    country: string | undefined | null = null,
-    locale: string | undefined | null = null,
-    refresh: boolean | null = null,
-    trimResults: boolean = true,
-  ): Promise<ICategoryPage> {
-
-    try {
-
-      // create service data (with required parameters).
-      const serviceData: { [key: string]: any } = {
-        entity_id: player.id,
-      };
-
-      // update service data parameters (with optional parameters).
-      if (country != null)
-        serviceData['country'] = country;
-      if (locale != null)
-        serviceData['locale'] = locale;
-      if (refresh != null)
-        serviceData['refresh'] = refresh;
-
-      // create service request.
-      const serviceRequest: ServiceCallRequest = {
-        domain: DOMAIN_SPOTIFYPLUS,
-        service: 'get_browse_categorys_list',
-        serviceData: serviceData
-      };
-
-      // call the service, and return the response.
-      const response = await this.CallServiceWithResponse(serviceRequest);
-
-      // get the "result" portion of the response, and convert it to a type.
-      const responseObj = response["result"] as ICategoryPage;
-
-      // omit some data from the results, as it's not necessary and conserves memory.
-      if (trimResults) {
-        if ((responseObj != null) && (responseObj.items != null)) {
-          responseObj.items.forEach(item => {
-            item.icons = [];
-          })
-        }
-      }
-
-      // trace.
-      if (debuglog.enabled) {
-        debuglog("%cCallServiceWithResponse - Service %s response (trimmed):\n%s",
-          "color: orange",
-          JSON.stringify(serviceRequest.service),
-          JSON.stringify(responseObj, null, 2)
-        );
-      }
-
-      // return results to caller.
-      return responseObj;
-
-    }
-    finally {
-    }
-  }
 
 
   /**
@@ -1592,75 +1530,6 @@ export class SpotifyPlusService {
    * @param trimResults True to trim certain fields of the output results that are not required and to conserve memory; otherwise, False to return all fields that were returned in by the Spotify Web API.
    * @returns An IPlaylistPageSimplified object.
   */
-  public async GetCategoryPlaylists(
-    player: MediaPlayer,
-    category_id: string | undefined | null = null,
-    limit: number | null = null,
-    offset: number | null = null,
-    country: string | undefined | null = null,
-    limit_total: number | null = null,
-    sort_result: boolean | null = null,
-    trimResults: boolean = true,
-  ): Promise<IPlaylistPageSimplified> {
-
-    try {
-
-      // create service data (with required parameters).
-      const serviceData: { [key: string]: any } = {
-        entity_id: player.id,
-        category_id: category_id,
-      };
-
-      // update service data parameters (with optional parameters).
-      if (limit != null)
-        serviceData['limit'] = limit;
-      if (offset != null)
-        serviceData['offset'] = offset;
-      if (country != null)
-        serviceData['country'] = country;
-      if (limit_total != null)
-        serviceData['limit_total'] = limit_total;
-      if (sort_result != null)
-        serviceData['sort_result'] = sort_result;
-
-      // create service request.
-      const serviceRequest: ServiceCallRequest = {
-        domain: DOMAIN_SPOTIFYPLUS,
-        service: 'get_category_playlists',
-        serviceData: serviceData
-      };
-
-      // call the service, and return the response.
-      const response = await this.CallServiceWithResponse(serviceRequest);
-
-      // get the "result" portion of the response, and convert it to a type.
-      const responseObj = response["result"] as IPlaylistPageSimplified;
-
-      // omit some data from the results, as it's not necessary and conserves memory.
-      if (trimResults) {
-        if ((responseObj != null) && (responseObj.items != null)) {
-          responseObj.items.forEach(item => {
-            item.images = [];
-          })
-        }
-      }
-
-      // trace.
-      if (debuglog.enabled) {
-        debuglog("%cCallServiceWithResponse - Service %s response (trimmed):\n%s",
-          "color: orange",
-          JSON.stringify(serviceRequest.service),
-          JSON.stringify(responseObj, null, 2)
-        );
-      }
-
-      // return results to caller.
-      return responseObj;
-
-    }
-    finally {
-    }
-  }
 
 
   /**

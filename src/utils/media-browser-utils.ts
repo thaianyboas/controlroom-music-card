@@ -352,8 +352,30 @@ export function truncateMediaList(mediaList: any, maxItems: number): string | un
  * 
  * @param url Link to open.
  */
-export function openWindowNewTab(url: string):void {
-  window.open(url, "_blank");
+export function getSafeExternalUrl(url: string | null | undefined): string | undefined {
+  if (!url || typeof url !== "string") {
+    return undefined;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+      return undefined;
+    }
+
+    return parsedUrl.href;
+  } catch {
+    return undefined;
+  }
+}
+
+export function openWindowNewTab(url: string): void {
+  const safeUrl = getSafeExternalUrl(url);
+
+  if (safeUrl) {
+    window.open(safeUrl, "_blank", "noopener,noreferrer");
+  }
 }
 
 

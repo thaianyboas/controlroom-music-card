@@ -58,8 +58,8 @@ class PlayerSettingsEditor extends BaseEditor {
     const labels: Record<ConfigArea, { icon: string; subtitle: string; detail: string }> = {
       [GENERAL]: {
         icon: 'mdi:tune-variant',
-        subtitle: label('Fundo e modo inativo', 'Hintergrund und Ruhezustand', 'Background and idle mode'),
-        detail: label('Imagem e comportamento', 'Bild und Verhalten', 'Image and behavior'),
+        subtitle: label('Comportamento em modo inativo', 'Verhalten im Ruhezustand', 'Idle mode behavior'),
+        detail: label('Ajustes sem reprodução', 'Einstellungen ohne Wiedergabe', 'Settings when not playing'),
       },
       [HEADER]: {
         icon: 'mdi:card-text-outline',

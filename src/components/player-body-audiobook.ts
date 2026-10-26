@@ -26,7 +26,7 @@ import { MediaPlayer } from '../model/media-player';
 import { SearchMediaTypes } from '../types/search-media-types';
 import { SearchMediaEvent } from '../events/search-media';
 import { getIdFromSpotifyUri } from '../services/spotifyplus-service';
-import { copyToClipboard, formatDateHHMMSSFromMilliseconds, getHomeAssistantErrorMessage, unescapeHtml } from '../utils/utils';
+import { copyToClipboard, formatDateHHMMSSFromMilliseconds, getHomeAssistantErrorMessage, sanitizeSpotifyHtml } from '../utils/utils';
 import { openWindowNewTab } from '../utils/media-browser-utils';
 import { GetAudiobookAuthors, GetAudiobookNarrators } from '../types/spotifyplus/audiobook-simplified';
 import { GetUserPresetConfigEntry, GetUserPresetConfigEntryJson, GetUserPresetObject } from '../types/spotifyplus/user-preset';
@@ -272,7 +272,7 @@ export class PlayerBodyAudiobook extends PlayerBodyBase {
           </div>
 
           <div style="padding-top: 10px;">
-            <div class="media-info-text-s" .innerHTML="${unescapeHtml(this.chapter?.html_description || "")}"></div>
+            <div class="media-info-text-s" .innerHTML="${sanitizeSpotifyHtml(this.chapter?.html_description || "")}"></div>
           </div>
 
         </div>

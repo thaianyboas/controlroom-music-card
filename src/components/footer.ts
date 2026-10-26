@@ -2,7 +2,7 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   mdiAccountMusicOutline, mdiAlbum, mdiBookmarkOutline, mdiBookOpenOutline,
-  mdiShapeOutline, mdiHistory, mdiMicrophoneOutline, mdiMusicNoteOutline,
+  mdiHistory, mdiMicrophoneOutline, mdiMusicNoteOutline,
   mdiPlayCircleOutline, mdiPlaylistMusicOutline, mdiPodcast, mdiMagnify,
   mdiSpeakerWireless, mdiDotsHorizontal, mdiClose,
 } from '@mdi/js';
@@ -20,7 +20,6 @@ const FOOTER_LABELS: Record<string, Record<FooterLanguage, string>> = {
   devices: { de: 'Geräte', pt: 'Dispositivos', en: 'Devices' },
   userPresets: { de: 'Eigene Presets', pt: 'Predefinições pessoais', en: 'User Presets' },
   recents: { de: 'Zuletzt gespielt', pt: 'Reproduzidos recentemente', en: 'Recently Played' },
-  categories: { de: 'Kategorien', pt: 'Categorias', en: 'Categories' },
   playlistFavorites: { de: 'Lieblingsplaylists', pt: 'Playlists favoritas', en: 'Playlist Favorites' },
   albumFavorites: { de: 'Lieblingsalben', pt: 'Álbuns favoritos', en: 'Album Favorites' },
   artistFavorites: { de: 'Lieblingskünstler', pt: 'Artistas favoritos', en: 'Artist Favorites' },
@@ -38,7 +37,6 @@ const NAVIGATION: NavigationItem[] = [
   { section: Section.DEVICES, key: 'devices', path: mdiSpeakerWireless },
   { section: Section.USERPRESETS, key: 'userPresets', path: mdiBookmarkOutline },
   { section: Section.RECENTS, key: 'recents', path: mdiHistory },
-  { section: Section.CATEGORYS, key: 'categories', path: mdiShapeOutline },
   { section: Section.PLAYLIST_FAVORITES, key: 'playlistFavorites', path: mdiPlaylistMusicOutline },
   { section: Section.ALBUM_FAVORITES, key: 'albumFavorites', path: mdiAlbum },
   { section: Section.ARTIST_FAVORITES, key: 'artistFavorites', path: mdiAccountMusicOutline },
@@ -124,7 +122,9 @@ export class Footer extends LitElement {
   }
 
   protected render(): TemplateResult {
-    const enabled = NAVIGATION.filter(item => this.config?.sections?.includes(item.section));
+    const enabled = (this.config?.sections ?? [])
+      .map(section => NAVIGATION.find(item => item.section === section))
+      .filter((item): item is NavigationItem => item !== undefined);
     // 40px per button + 4px gap; 12px reserved for horizontal padding.
     const width = this.availableWidth || 320;
     const capacity = Math.max(0, Math.floor((width - 12 + 4) / 44));

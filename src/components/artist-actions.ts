@@ -38,7 +38,7 @@ import { MediaPlayer } from '../model/media-player';
 import { SearchMediaTypes } from '../types/search-media-types';
 import { SearchMediaEvent } from '../events/search-media';
 import { openWindowNewTab } from '../utils/media-browser-utils';
-import { copyToClipboard, getHomeAssistantErrorMessage, unescapeHtml } from '../utils/utils';
+import { copyToClipboard, getHomeAssistantErrorMessage, sanitizeSpotifyHtml } from '../utils/utils';
 import { GetUserPresetConfigEntry, GetUserPresetConfigEntryJson, GetUserPresetObject } from '../types/spotifyplus/user-preset';
 import { IArtist, GetGenres } from '../types/spotifyplus/artist';
 import { IArtistInfo } from '../types/spotifyplus/artist-info';
@@ -281,7 +281,7 @@ class ArtistActions extends FavActionsBase {
               ></ha-icon-button>
             </div>
           ` : ""}
-          <div class="media-info-text-s" .innerHTML="${unescapeHtml(this.artistInfo?.bio_html || "Artist biography was not found")}"></div>
+          <div class="media-info-text-s" .innerHTML="${sanitizeSpotifyHtml(this.artistInfo?.bio_html || "Artist biography was not found")}"></div>
         </div>
       </div>`;
   }

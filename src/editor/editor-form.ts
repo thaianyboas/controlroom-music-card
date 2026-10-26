@@ -28,6 +28,31 @@ class Form extends BaseEditor {
   }
 
   protected render(): TemplateResult {
+    const isManualDeviceField = Array.isArray(this.schema)
+      && this.schema.length === 1
+      && this.schema[0]?.name === 'deviceDefaultId';
+    // Use a native input only for the manual device ID. HA's nested shadow
+    // controls may ignore inherited text colors on light editor surfaces.
+    if (isManualDeviceField) {
+      const field = (this.schema as Array<{ label?: string; help?: string }>)[0];
+      const config = (this.data || this.config) as CardConfig;
+      const value = String(config?.deviceDefaultId ?? '');
+      return html`
+        <div class="crm-manual-device-field">
+          <label for="crm-manual-device-id">${field.label || 'Device ID'}</label>
+          <input
+            id="crm-manual-device-id"
+            type="text"
+            .value=${value}
+            aria-describedby=${field.help ? 'crm-manual-device-help' : ''}
+            @change=${(event: Event) => {
+              const newValue = (event.currentTarget as HTMLInputElement).value;
+              this.configChanged({ ...config, deviceDefaultId: newValue });
+            }}
+          />
+          ${field.help ? html`<div id="crm-manual-device-help" class="crm-manual-device-help">${field.help}</div>` : ''}
+        </div>`;
+    }
     const integers = this.compactIntegerFields;
     if (integers) return html`
       <div class="crm-compact-fields">
@@ -51,6 +76,7 @@ class Form extends BaseEditor {
     return html`
       <ha-form
         id="elmHaForm"
+        class=${isManualDeviceField ? 'crm-manual-device-form' : ''}
         .data=${this.data || this.config}
         .schema=${this.schema}
         .computeLabel=${formatLabel}
@@ -80,6 +106,32 @@ class Form extends BaseEditor {
         --crm-form-muted: var(--secondary-text-color, #52635b);
         --crm-form-surface: var(--secondary-background-color, transparent);
       }
+
+      /* Only the manual device ID/name field: readable on its light surface. */
+      ha-form.crm-manual-device-form {
+        --crm-form-text: #17221e;
+        --crm-form-muted: #52635b;
+        --primary-text-color: #17221e;
+        --secondary-text-color: #52635b;
+        --mdc-text-field-ink-color: #17221e;
+        --mdc-text-field-label-ink-color: #52635b;
+        --md-sys-color-on-surface: #17221e;
+        --md-sys-color-on-surface-variant: #52635b;
+      }
+
+      /* Scoped native input: reliable dark text on the light device field. */
+      .crm-manual-device-field { display: grid; gap: 6px; min-width: 0; }
+      .crm-manual-device-field label { font-size: 13px; color: #52635b; }
+      .crm-manual-device-field input {
+        display: block; width: 100%; min-width: 0; box-sizing: border-box;
+        min-height: 42px; padding: 10px 12px; border-radius: 9px;
+        border: 1px solid #aab6ae; background: #fff; color: #17221e;
+        font: inherit; -webkit-text-fill-color: #17221e;
+      }
+      .crm-manual-device-field input:focus-visible {
+        outline: 2px solid var(--crm-form-accent, #159568); outline-offset: 1px;
+      }
+      .crm-manual-device-help { font-size: 12px; color: #52635b; line-height: 1.4; }
 
       .crm-compact-fields { display: grid; gap: 16px; width: 100%; min-width: 0; padding: 2px 0; }
       .crm-compact-field { display: grid; gap: 9px; min-width: 0; }
@@ -243,6 +295,20 @@ class Form extends BaseEditor {
       `;
 
       root.appendChild(style);
+    }
+
+    // The deviceDefaultId field is the only field with a contrast problem.
+    // Scope the fix to this ha-form instance and its nested HA string control.
+    if (form.classList.contains('crm-manual-device-form')) {
+      const stringField = root.querySelector('ha-form-string');
+      if (stringField instanceof HTMLElement) {
+        stringField.style.setProperty('--primary-text-color', '#17221e');
+        stringField.style.setProperty('--secondary-text-color', '#52635b');
+        stringField.style.setProperty('--mdc-text-field-ink-color', '#17221e');
+        stringField.style.setProperty('--mdc-text-field-label-ink-color', '#52635b');
+        stringField.style.setProperty('--md-sys-color-on-surface', '#17221e');
+        stringField.style.setProperty('--md-sys-color-on-surface-variant', '#52635b');
+      }
     }
 
     // Cosmetic adjustments only. Native controls retain

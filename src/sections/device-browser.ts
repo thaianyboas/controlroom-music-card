@@ -24,7 +24,7 @@ import {
 } from '../constants';
 
 
-type DeviceTextKey = 'defaultDevice' | 'setDefault' | 'defaultSaved' | 'defaultError' | 'noDevices' | 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError' | 'multiroom' | 'active';
+type DeviceTextKey = 'defaultDevice' | 'setDefault' | 'defaultSaved' | 'defaultError' | 'noDevices' | 'filter' | 'settingsTitle' | 'settingsHint' | 'done' | 'selectDevices' | 'saveError' | 'transferring' | 'selectError' | 'fetchError' | 'refreshError' | 'multiroom' | 'active' | 'helperMissing' | 'visibilityTooLong' | 'defaultHelperMissing';
 
 const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
   de: {
@@ -45,6 +45,9 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     refreshError: 'Spotify Connect-Geräte konnten nicht aktualisiert werden:',
     multiroom: 'Multiroom-Gruppe',
     active: 'Aktiv',
+    helperMissing: 'Für die Synchronisierung bitte die Home-Assistant-Helfer input_text.controlroom_visible_spotify_devices und input_text.controlroom_visible_ha_players anlegen.',
+    visibilityTooLong: 'Die Auswahl überschreitet das 255-Zeichen-Limit des Home-Assistant-Helfers.',
+    defaultHelperMissing: 'Der Home-Assistant-Helfer input_text.controlroom_default_spotify_device fehlt.',
   },
   pt: {
     defaultDevice: 'Padrão',
@@ -64,6 +67,9 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     refreshError: 'Falha ao atualizar dispositivos Spotify Connect:',
     multiroom: 'Grupo multiroom',
     active: 'Ativo',
+    helperMissing: 'Para sincronizar, crie os auxiliares input_text.controlroom_visible_spotify_devices e input_text.controlroom_visible_ha_players no Home Assistant.',
+    visibilityTooLong: 'A seleção excede o limite de 255 caracteres do auxiliar do Home Assistant.',
+    defaultHelperMissing: 'O auxiliar input_text.controlroom_default_spotify_device não existe no Home Assistant.',
   },
   en: {
     defaultDevice: 'Default',
@@ -83,6 +89,9 @@ const deviceTexts: Record<'de' | 'pt' | 'en', Record<DeviceTextKey, string>> = {
     refreshError: 'Spotify Connect Device refresh failed:',
     multiroom: 'Multiroom group',
     active: 'Active',
+    helperMissing: 'Create Home Assistant helpers input_text.controlroom_visible_spotify_devices and input_text.controlroom_visible_ha_players to sync visibility.',
+    visibilityTooLong: 'The selection exceeds the Home Assistant helper limit of 255 characters.',
+    defaultHelperMissing: 'Home Assistant helper input_text.controlroom_default_spotify_device is missing.',
   },
 };
 
@@ -121,11 +130,13 @@ export class DeviceBrowser extends FavBrowserBase {
   }
 
   @state() private showDeviceSettings = false;
-  @state() private deviceVisibility: Record<string, boolean> = {};
-  private preferencesLoaded = false;
+  // Shared Home Assistant helpers are the source of truth across browsers.
+  // Each value stores a JSON array of visible names / entity IDs.
+  private readonly spotifyVisibilityEntity = 'input_text.controlroom_visible_spotify_devices';
+  private readonly haVisibilityEntity = 'input_text.controlroom_visible_ha_players';
+  @state() private savingVisibility = false;
   @state() private savingDefault = false;
   @state() private savedDefaultValue = '';
-  @state() private selectedDeviceValue = '';
 
   private get defaultDeviceValue(): string {
     const state = this.store.hass?.states?.['input_text.controlroom_default_spotify_device']?.state;
@@ -147,6 +158,10 @@ export class DeviceBrowser extends FavBrowserBase {
   private async saveDefaultDevice(item: ISpotifyConnectDevice): Promise<void> {
     const value = this.deviceValue(item);
     if (!value || this.savingDefault) return;
+    if (!this.store.hass?.states?.['input_text.controlroom_default_spotify_device']) {
+      this.alertErrorSet(this.deviceText('defaultHelperMissing'));
+      return;
+    }
     this.savingDefault = true;
     try {
       await this.store.hass.callService('input_text', 'set_value', {
@@ -179,8 +194,11 @@ export class DeviceBrowser extends FavBrowserBase {
   }
 
   private isSelectedDevice(item: ISpotifyConnectDevice): boolean {
-    const selected = this.selectedDeviceValue || this.player?.attributes?.sp_device_id || this.player?.attributes?.source || '';
-    return !!selected && (selected === item.Id || selected === item.Name || selected === this.deviceValue(item));
+    // Follow live Spotify state; never pin an outdated local selection.
+    const currentId = this.player?.attributes?.sp_device_id || '';
+    const currentSource = this.player?.attributes?.source || '';
+    return (!!currentId && (currentId === item.Id || currentId === item.Name)) ||
+      (!!currentSource && (currentSource === item.Id || currentSource === item.Name));
   }
 
   private renderSpotifyDevices(items: ISpotifyConnectDevice[]) {
@@ -230,39 +248,72 @@ export class DeviceBrowser extends FavBrowserBase {
 
   // Spotify Connect devices and HA media_player entities have different actions.
   private spotifyKey(item: ISpotifyConnectDevice): string {
-    return `spotify:${item.Id || item.Name}`;
+    return (item.Name || item.Id || '').trim();
   }
 
   private haKey(entityId: string): string {
     return `ha:${entityId}`;
   }
 
-  private get visibilityStorageKey(): string {
-    const account = this.player?.attributes?.sp_user_id || 'default';
-    return `controlroom_devices_visibility_${account}`;
+  private get visibilityHelpersValid(): boolean {
+    const states = this.store?.hass?.states;
+    return [this.spotifyVisibilityEntity, this.haVisibilityEntity].every(entity => {
+      const value = states?.[entity]?.state;
+      return value !== undefined && value !== 'unknown' && value !== 'unavailable';
+    });
   }
 
-  private loadVisibility(): void {
-    if (this.preferencesLoaded) return;
-    this.preferencesLoaded = true;
+  private readVisibleIds(entity: string): string[] | null {
+    const value = this.store?.hass?.states?.[entity]?.state;
+    if (value === undefined || value === 'unknown' || value === 'unavailable') return null;
+    // Empty helper = not configured yet. Spotify defaults to all visible;
+    // Home Assistant entities default to hidden.
+    if (!value.trim()) return null;
     try {
-      const stored = localStorage.getItem(this.visibilityStorageKey);
-      this.deviceVisibility = stored ? JSON.parse(stored) : {};
+      const parsed: unknown = JSON.parse(value);
+      return Array.isArray(parsed) && parsed.every(id => typeof id === 'string') ? parsed : null;
     } catch {
-      this.deviceVisibility = {};
+      return null;
     }
   }
 
   private isVisible(key: string, defaultValue: boolean): boolean {
-    return this.deviceVisibility[key] ?? defaultValue;
+    const entity = defaultValue ? this.spotifyVisibilityEntity : this.haVisibilityEntity;
+    const visible = this.readVisibleIds(entity);
+    return visible === null ? defaultValue : visible.includes(key);
   }
 
-  private toggleVisibility(key: string, checked: boolean): void {
-    this.deviceVisibility = { ...this.deviceVisibility, [key]: checked };
+  private async toggleVisibility(key: string, checked: boolean, spotify: boolean): Promise<void> {
+    if (this.savingVisibility) return;
+    if (!this.visibilityHelpersValid) {
+      this.alertErrorSet(this.deviceText('helperMissing'));
+      return;
+    }
+
+    const entity = spotify ? this.spotifyVisibilityEntity : this.haVisibilityEntity;
+    const current = this.readVisibleIds(entity);
+    const allKeys = spotify
+      ? this.uniqueDevices(this.mediaList || []).map(item => this.spotifyKey(item))
+      : this.getHaPlayers().map(item => this.haKey(item.id));
+    const visible = new Set(current ?? (spotify ? allKeys : []));
+    if (checked) visible.add(key);
+    else visible.delete(key);
+    const nextValue = JSON.stringify([...visible]);
+    const maxLength = Number(this.store.hass.states[entity]?.attributes?.max ?? 255);
+    if (nextValue.length > maxLength) {
+      this.alertErrorSet(this.deviceText('visibilityTooLong'));
+      this.requestUpdate();
+      return;
+    }
+
+    this.savingVisibility = true;
     try {
-      localStorage.setItem(this.visibilityStorageKey, JSON.stringify(this.deviceVisibility));
-    } catch {
-      this.alertErrorSet(this.deviceText('saveError'));
+      await this.store.hass.callService('input_text', 'set_value', { entity_id: entity, value: nextValue });
+    } catch (error) {
+      this.alertErrorSet(this.deviceText('saveError') + ' ' + getHomeAssistantErrorMessage(error));
+    } finally {
+      this.savingVisibility = false;
+      this.requestUpdate();
     }
   }
 
@@ -304,14 +355,16 @@ export class DeviceBrowser extends FavBrowserBase {
   private renderDeviceSettings() {
     return html`
       <div class="crm-device-settings">
+        ${!this.visibilityHelpersValid ? html`<ha-alert alert-type="warning">${this.deviceText('helperMissing')}</ha-alert>` : ''}
         <div class="crm-settings-title">${this.deviceText('settingsTitle')}</div>
         <div class="crm-settings-hint">${this.deviceText('settingsHint')}</div>
         <div class="crm-settings-subtitle">Spotify Connect</div>
-        ${(this.mediaList || []).map(item => html`
+        ${this.uniqueDevices(this.mediaList || []).map(item => html`
           <label class="crm-device-option">
             <input type="checkbox"
               .checked=${this.isVisible(this.spotifyKey(item), true)}
-              @change=${(ev: Event) => this.toggleVisibility(this.spotifyKey(item), (ev.target as HTMLInputElement).checked)}>
+              ?disabled=${this.savingVisibility || !this.visibilityHelpersValid}
+              @change=${(ev: Event) => void this.toggleVisibility(this.spotifyKey(item), (ev.target as HTMLInputElement).checked, true)}>
             <span><strong>${item.Name}</strong><small>Spotify Connect</small></span>
           </label>
         `)}
@@ -320,7 +373,8 @@ export class DeviceBrowser extends FavBrowserBase {
           <label class="crm-device-option">
             <input type="checkbox"
               .checked=${this.isVisible(this.haKey(item.id), false)}
-              @change=${(ev: Event) => this.toggleVisibility(this.haKey(item.id), (ev.target as HTMLInputElement).checked)}>
+              ?disabled=${this.savingVisibility || !this.visibilityHelpersValid}
+              @change=${(ev: Event) => void this.toggleVisibility(this.haKey(item.id), (ev.target as HTMLInputElement).checked, false)}>
             <span><strong>${item.name}</strong><small>${this.friendlyState(item.state)}</small></span>
           </label>
         `)}
@@ -562,7 +616,6 @@ export class DeviceBrowser extends FavBrowserBase {
 
     // invoke base class method.
     super.firstUpdated(changedProperties);
-    this.loadVisibility();
   }
 
 
@@ -631,7 +684,6 @@ export class DeviceBrowser extends FavBrowserBase {
 
       // select the source.
       await this.store.mediaControlService.select_source(this.player, deviceId);
-      this.selectedDeviceValue = deviceId;
 
       // show player section.
       this.store.card.SetSection(Section.PLAYER);

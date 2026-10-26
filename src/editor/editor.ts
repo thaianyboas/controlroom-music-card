@@ -23,7 +23,6 @@ import './player-editor';
 import './album-fav-browser-editor';
 import './artist-fav-browser-editor';
 import './audiobook-fav-browser-editor';
-import './category-browser-editor';
 import './device-browser-editor';
 import './episode-fav-browser-editor';
 import './playlist-fav-browser-editor';
@@ -121,7 +120,11 @@ class CardEditor extends BaseEditor {
     const requestedAccent = isCustom
       ? validColor(this.config.crmAccent, '#34d399')
       : dark ? '#34d399' : '#159568';
-    const accent = readable(requestedAccent, background, 3);
+    // Keep the user's exact accent for filled controls and use a readable
+    // variation only where the accent itself appears as text or an icon.
+    const accent = requestedAccent;
+    const readableAccent = readable(requestedAccent, background, 3);
+    const onAccent = readable(backgroundIsDark ? '#101b19' : '#ffffff', accent, 4.5);
     const divider = mix(background, foreground, 0.20);
     const customStyles: Record<string, string> = {
       '--card-background-color': background,
@@ -130,8 +133,21 @@ class CardEditor extends BaseEditor {
       '--primary-text-color': foreground,
       '--secondary-text-color': secondaryText,
       '--divider-color': divider,
-      '--primary-color': accent,
-      '--crm-editor-accent': accent,
+      '--primary-color': readableAccent,
+      '--crm-editor-accent': readableAccent,
+      '--crm-editor-accent-raw': accent,
+      '--crm-editor-on-accent': onAccent,
+      '--accent-color': accent,
+      '--mdc-theme-primary': readableAccent,
+      '--mdc-theme-secondary': readableAccent,
+      '--mdc-theme-on-primary': onAccent,
+      '--switch-checked-color': accent,
+      '--switch-checked-button-color': accent,
+      '--switch-checked-track-color': accent,
+      '--checkbox-checked-color': accent,
+      '--radio-checked-color': accent,
+      '--slider-color': accent,
+      '--slider-secondary-color': readableAccent,
       'color-scheme': backgroundIsDark ? 'dark' : 'light',
     };
 
@@ -152,7 +168,6 @@ class CardEditor extends BaseEditor {
         [ConfigArea.AUDIOBOOK_FAVORITES]: 'Audiolivros favoritos',
         [ConfigArea.EPISODE_FAVORITES]: 'Episódios favoritos',
         [ConfigArea.SHOW_FAVORITES]: 'Podcasts favoritos',
-        [ConfigArea.CATEGORY_BROWSER]: 'Categorias',
         [ConfigArea.USERPRESET_BROWSER]: 'Presets personalizados',
         [ConfigArea.RECENT_BROWSER]: 'Reproduzidos recentemente',
         [ConfigArea.SEARCH_MEDIA_BROWSER]: 'Pesquisa de mídia',
@@ -165,7 +180,6 @@ class CardEditor extends BaseEditor {
         [ConfigArea.AUDIOBOOK_FAVORITES]: 'Lieblingshörbücher',
         [ConfigArea.EPISODE_FAVORITES]: 'Lieblingsepisoden',
         [ConfigArea.SHOW_FAVORITES]: 'Lieblingssendungen',
-        [ConfigArea.CATEGORY_BROWSER]: 'Kategorien',
         [ConfigArea.USERPRESET_BROWSER]: 'Benutzer-Presets',
         [ConfigArea.RECENT_BROWSER]: 'Zuletzt gespielt',
         [ConfigArea.SEARCH_MEDIA_BROWSER]: 'Mediensuche',
@@ -178,7 +192,6 @@ class CardEditor extends BaseEditor {
         [ConfigArea.AUDIOBOOK_FAVORITES]: 'Favorite audiobooks',
         [ConfigArea.EPISODE_FAVORITES]: 'Favorite episodes',
         [ConfigArea.SHOW_FAVORITES]: 'Favorite shows',
-        [ConfigArea.CATEGORY_BROWSER]: 'Categories',
         [ConfigArea.USERPRESET_BROWSER]: 'User presets',
         [ConfigArea.RECENT_BROWSER]: 'Recently played',
         [ConfigArea.SEARCH_MEDIA_BROWSER]: 'Media search',
@@ -190,7 +203,7 @@ class CardEditor extends BaseEditor {
       ConfigArea.PLAYLIST_FAVORITES, ConfigArea.ALBUM_FAVORITES,
       ConfigArea.ARTIST_FAVORITES, ConfigArea.TRACK_FAVORITES,
       ConfigArea.AUDIOBOOK_FAVORITES, ConfigArea.EPISODE_FAVORITES,
-      ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER,
+      ConfigArea.SHOW_FAVORITES,
     ];
     const navigationAreas = [
       ConfigArea.USERPRESET_BROWSER,
@@ -294,10 +307,21 @@ class CardEditor extends BaseEditor {
         border-radius: 16px;
         background: var(--card-background-color, transparent);
         color: var(--primary-text-color);
-        color-scheme: normal;
+        color-scheme: inherit;
+        accent-color: var(--crm-editor-accent-raw, var(--primary-color));
         transition: background-color 150ms ease, color 150ms ease;
       }
       /* Theme colors are provided by the computed inline palette. */
+      .crm-settings-shell input[type='checkbox'],
+      .crm-settings-shell input[type='radio'],
+      .crm-settings-shell input[type='range'] {
+        accent-color: var(--crm-editor-accent-raw, var(--primary-color));
+      }
+      .crm-settings-shell button:focus-visible,
+      .crm-settings-shell select:focus-visible,
+      .crm-settings-shell input:focus-visible {
+        outline-color: var(--crm-editor-accent);
+      }
 
       .crm-settings-heading {
         display: flex; align-items: center; gap: 10px;
@@ -426,7 +450,7 @@ class CardEditor extends BaseEditor {
     if ([ConfigArea.PLAYLIST_FAVORITES, ConfigArea.ALBUM_FAVORITES,
       ConfigArea.ARTIST_FAVORITES, ConfigArea.TRACK_FAVORITES,
       ConfigArea.AUDIOBOOK_FAVORITES, ConfigArea.EPISODE_FAVORITES,
-      ConfigArea.SHOW_FAVORITES, ConfigArea.CATEGORY_BROWSER].includes(area)) return 'library';
+      ConfigArea.SHOW_FAVORITES].includes(area)) return 'library';
     if ([ConfigArea.USERPRESET_BROWSER, ConfigArea.RECENT_BROWSER,
       ConfigArea.SEARCH_MEDIA_BROWSER].includes(area)) return 'navigation';
     if (area === ConfigArea.DESIGN) return 'design';
@@ -459,10 +483,6 @@ class CardEditor extends BaseEditor {
       [
         ConfigArea.AUDIOBOOK_FAVORITES,
         () => html`<crm-audiobook-fav-browser-editor .config=${this.config} .hass=${this.hass}></crm-audiobook-fav-browser-editor>`,
-      ],
-      [
-        ConfigArea.CATEGORY_BROWSER,
-        () => html`<crm-category-browser-editor .config=${this.config} .hass=${this.hass}></crm-category-browser-editor>`,
       ],
       [
         ConfigArea.DEVICE_BROWSER,

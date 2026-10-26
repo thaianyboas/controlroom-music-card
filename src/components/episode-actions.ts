@@ -25,7 +25,7 @@ import { Section } from '../types/section';
 import { MediaPlayer } from '../model/media-player';
 import { SearchMediaTypes } from '../types/search-media-types';
 import { SearchMediaEvent } from '../events/search-media';
-import { copyToClipboard, formatDateHHMMSSFromMilliseconds, getHomeAssistantErrorMessage, unescapeHtml } from '../utils/utils';
+import { copyToClipboard, formatDateHHMMSSFromMilliseconds, getHomeAssistantErrorMessage, sanitizeSpotifyHtml } from '../utils/utils';
 import { openWindowNewTab } from '../utils/media-browser-utils';
 import { GetUserPresetConfigEntry, GetUserPresetConfigEntryJson, GetUserPresetObject } from '../types/spotifyplus/user-preset';
 import { IEpisode, isEpisodeObject } from '../types/spotifyplus/episode';
@@ -272,7 +272,7 @@ class EpisodeActions extends FavActionsBase {
           </div>
         </div>
         <div class="media-info-description">
-          <div class="media-info-text-s" .innerHTML="${unescapeHtml(this.episode?.html_description || "")}"></div>
+          <div class="media-info-text-s" .innerHTML="${sanitizeSpotifyHtml(this.episode?.html_description || "")}"></div>
         </div>
       </div>
       `;

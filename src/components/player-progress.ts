@@ -124,7 +124,7 @@ class Progress extends AlertUpdatesBase {
       :host { display: block; width: 100%; min-width: 0; }
       .progress { width: 100%; display: flex; flex-direction: column; gap: 7px; box-sizing: border-box; padding: 7px 0 5px; }
       .bar { display: block; width: 100%; height: 5px; background: rgba(255,255,255,0.18); border: 0; border-radius: 999px; overflow: hidden; cursor: pointer; box-sizing: border-box; touch-action: manipulation; }
-      .bar:focus-visible { outline: 2px solid #4adea4; outline-offset: 4px; }
+      .bar:focus-visible { outline: 2px solid var(--crm-player-progress-slider-color, var(--crm-accent, #4adea4)); outline-offset: 4px; }
       .progress-bar { height: 100%; background: var(--crm-player-progress-slider-color, ${unsafeCSS(PLAYER_CONTROLS_ICON_TOGGLE_COLOR_DEFAULT)}); border-radius: inherit; transition: width 0.25s linear; }
       .progress-times { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
       .progress-time { color: var(--crm-player-progress-label-color, rgba(255,255,255,0.65)); font-size: var(--crm-player-progress-label-font-size, 0.75rem); font-variant-numeric: tabular-nums; line-height: 1.2; }

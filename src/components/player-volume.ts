@@ -368,7 +368,7 @@ class Volume extends AlertUpdatesBase {
         display: block;
         width: 100%;
         --control-slider-color: var(--crm-player-volume-slider-color, #34d399);
-        --control-slider-thickness: 6px;
+        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 6px);
         --control-slider-border-radius: 999px;
         border: none;
         box-sizing: border-box;
@@ -376,7 +376,7 @@ class Volume extends AlertUpdatesBase {
 
       ha-control-slider[disabled] {
         --control-slider-color: var(--disabled-text-color);
-        --control-slider-thickness: 6px;
+        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 6px);
         border: none;
       }
 
@@ -408,7 +408,7 @@ class Volume extends AlertUpdatesBase {
       }
 
       *[slim] * {
-        --control-slider-thickness: 6px;
+        --control-slider-thickness: var(--crm-player-volume-slider-thickness, 6px);
         --ha-icon-button-size: 30px;
         --mdc-icon-size: 20px;
       }

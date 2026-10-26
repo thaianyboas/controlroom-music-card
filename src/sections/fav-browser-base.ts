@@ -283,20 +283,8 @@ export class FavBrowserBase extends AlertUpdatesBase {
       /* you can also copy this method into any inheriting class to apply fav-browser specific styles. */
 
 
-      ha-input-search {
-        color: orange;
-        font-size: 16px;
-      }
-
-      ha-input-search::part(input) {
-        color: orange;
-        font-size: 20px;
-      }
-
-      ha-input-search::part(input)::placeholder {
-        color: orange;
-        font-size: 24px;
-      }
+      /* Search control dimensions and text colors are defined centrally
+         in sharedStylesFavBrowser for all browser sections. */
 
       ha-input-search ha-svg-icon {
         color: var(--secondary-text-color);

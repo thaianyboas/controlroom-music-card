@@ -24,7 +24,6 @@ import { Palette } from '@vibrant/color';
 import './sections/album-fav-browser';          // SECTION.ALBUM_FAVORITES
 import './sections/artist-fav-browser';         // SECTION.ARTIST_FAVORITES
 import './sections/audiobook-fav-browser';      // SECTION.AUDIOBOOK_FAVORITES
-import './sections/category-browser';           // SECTION.CATEGORYS
 import './sections/device-browser';             // SECTION.DEVICES
 import './sections/episode-fav-browser';        // SECTION.EPISODE_FAVORITES
 import './sections/player';                     // SECTION.PLAYER
@@ -57,7 +56,6 @@ import { EDITOR_CONFIG_AREA_SELECTED, EditorConfigAreaSelectedEventArgs } from '
 import { FILTER_SECTION_MEDIA, FilterSectionMediaEventArgs } from './events/filter-section-media';
 import { PROGRESS_STARTED } from './events/progress-started';
 import { PROGRESS_ENDED } from './events/progress-ended';
-import { CATEGORY_DISPLAY, CategoryDisplayEventArgs } from './events/category-display';
 import { SEARCH_MEDIA, SearchMediaEventArgs } from './events/search-media';
 import { Store } from './model/store';
 import { Section } from './types/section';
@@ -73,7 +71,6 @@ import { UserPresetBrowser } from './sections/userpreset-browser';
 import { AlbumFavBrowser } from './sections/album-fav-browser';
 import { ArtistFavBrowser } from './sections/artist-fav-browser';
 import { AudiobookFavBrowser } from './sections/audiobook-fav-browser';
-import { CategoryBrowser } from './sections/category-browser';
 import { DeviceBrowser } from './sections/device-browser';
 import { EpisodeFavBrowser } from './sections/episode-fav-browser';
 import { PlaylistFavBrowser } from './sections/playlist-fav-browser';
@@ -185,7 +182,6 @@ export class Card extends AlertUpdatesBase {
 
   // card section references.
   @query("#elmSearchMediaBrowserForm", false) private elmSearchMediaBrowserForm!: SearchBrowser;
-  @query("#elmCategoryBrowserForm", false) private elmCategoryBrowserForm!: CategoryBrowser;
   @query("#elmAlbumFavBrowserForm", false) private elmAlbumFavBrowserForm!: AlbumFavBrowser;
   @query("#elmArtistFavBrowserForm", false) private elmArtistFavBrowserForm!: ArtistFavBrowser;
   @query("#elmAudiobookFavBrowserForm", false) private elmAudiobookFavBrowserForm!: AudiobookFavBrowser;
@@ -276,7 +272,6 @@ export class Card extends AlertUpdatesBase {
                 [Section.ALBUM_FAVORITES, () => html`<crm-album-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmAlbumFavBrowserForm"></crm-album-fav-browser>`],
                 [Section.ARTIST_FAVORITES, () => html`<crm-artist-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmArtistFavBrowserForm"></crm-artist-fav-browser>`],
                 [Section.AUDIOBOOK_FAVORITES, () => html`<crm-audiobook-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmAudiobookFavBrowserForm"></crm-audiobook-fav-browser>`],
-                [Section.CATEGORYS, () => html`<crm-category-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmCategoryBrowserForm"></crm-category-browser>`],
                 [Section.DEVICES, () => html`<crm-device-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmDeviceBrowserForm"></crm-device-browser>`],
                 [Section.EPISODE_FAVORITES, () => html`<crm-episode-fav-browser .store=${this.store} @item-selected=${this.onMediaListItemSelected} id="elmEpisodeFavBrowserForm"></crm-episode-fav-browser>`],
                 [Section.PLAYER, () => html`<crm-player id="spcPlayer" .store=${this.store}></crm-player>`],
@@ -474,8 +469,17 @@ export class Card extends AlertUpdatesBase {
   */
   private createStore() {
 
-    // create the store.
-    this.store = new Store(this.hass, this.config, this, this.section);
+    // Reuse the store only while Home Assistant and card configuration
+    // references remain unchanged. Otherwise, rebuild its services.
+    if (
+      !this.store ||
+      this.store.hass !== this.hass ||
+      this.store.config !== this.config
+    ) {
+      this.store = new Store(this.hass, this.config, this, this.section);
+    } else {
+      this.store.section = this.section;
+    }
 
     // set card editor indicator.
     this.isCardInEditPreview = isCardInEditPreview(this);
@@ -587,7 +591,6 @@ export class Card extends AlertUpdatesBase {
     this.addEventListener(PROGRESS_ENDED, this.onProgressEndedEventHandler);
     this.addEventListener(PROGRESS_STARTED, this.onProgressStartedEventHandler);
     this.addEventListener(SEARCH_MEDIA, this.onSearchMediaEventHandler);
-    this.addEventListener(CATEGORY_DISPLAY, this.onCategoryDisplayEventHandler);
     this.addEventListener(FILTER_SECTION_MEDIA, this.onFilterSectionMediaEventHandler);
 
     // add document level event listeners.
@@ -611,7 +614,6 @@ export class Card extends AlertUpdatesBase {
     this.removeEventListener(PROGRESS_ENDED, this.onProgressEndedEventHandler);
     this.removeEventListener(PROGRESS_STARTED, this.onProgressStartedEventHandler);
     this.removeEventListener(SEARCH_MEDIA, this.onSearchMediaEventHandler);
-    this.removeEventListener(CATEGORY_DISPLAY, this.onCategoryDisplayEventHandler);
     this.removeEventListener(FILTER_SECTION_MEDIA, this.onFilterSectionMediaEventHandler);
 
     // remove document level event listeners.
@@ -685,8 +687,6 @@ export class Card extends AlertUpdatesBase {
         sectionNew = Section.USERPRESETS;
       } else if (sectionsConfigured.includes(Section.RECENTS)) {
         sectionNew = Section.RECENTS;
-      } else if (sectionsConfigured.includes(Section.CATEGORYS)) {
-        sectionNew = Section.CATEGORYS;
       } else if (sectionsConfigured.includes(Section.PLAYLIST_FAVORITES)) {
         sectionNew = Section.PLAYLIST_FAVORITES;
       } else if (sectionsConfigured.includes(Section.ALBUM_FAVORITES)) {
@@ -988,50 +988,6 @@ export class Card extends AlertUpdatesBase {
 
 
   /**
-   * Handles the `CATEGORY_DISPLAY` event.
-   * This will display the specified category list in the event arguments.
-   * 
-   * @param ev Event definition and arguments.
-  */
-  protected onCategoryDisplayEventHandler = (ev: Event) => {
-
-    // map event arguments.
-    const evArgs = (ev as CustomEvent).detail as CategoryDisplayEventArgs;
-
-    // is section activated?  if so, then select it.
-    if (this.config.sections?.includes(Section.CATEGORYS)) {
-
-      // show the category section.
-      this.section = Section.CATEGORYS;
-      this.store.section = this.section;
-
-      // wait just a bit before displaying the category.
-      setTimeout(() => {
-
-        if (debuglog.enabled) {
-          debuglog("onCategoryDisplayEventHandler - displaying category:\n%s",
-            JSON.stringify(evArgs, null, 2),
-          );
-        }
-
-        // display category.
-        this.elmCategoryBrowserForm.displayCategory(evArgs);
-
-      }, 250);
-
-    } else {
-
-      // section is not activated; cannot search.
-      debuglog("%conCategoryDisplayEventHandler - Category section is not enabled; ignoring display request:\n%s",
-        "color:red",
-        JSON.stringify(evArgs, null, 2),
-      );
-
-    }
-  }
-
-
-  /**
    * Home Assistant will call setConfig(config) when the configuration changes.  This
    * is most likely to occur when changing the configuration via the UI editor, but
    * can also occur if YAML changes are made (for cards without UI config editor).
@@ -1089,10 +1045,26 @@ export class Card extends AlertUpdatesBase {
     }
     newConfig.customImageUrls = customImageUrlsTemp;
 
-    // if no sections are configured then configure the default.
+    // Remove the discontinued Spotify Categories section from legacy YAML.
+    // Preserve the other configured sections and their original order.
+    if (Array.isArray(newConfig.sections)) {
+      newConfig.sections = newConfig.sections.filter(
+        (section) => section !== Section.CATEGORYS
+      );
+    }
+
+    // Keep the card functional when no supported sections remain.
     if (!newConfig.sections || newConfig.sections.length === 0) {
       newConfig.sections = [Section.PLAYER];
       Store.selectedConfigArea = ConfigArea.GENERAL;
+    }
+
+    // A removed or disabled default section must never be selected.
+    if (
+      !newConfig.sectionDefault ||
+      !newConfig.sections.includes(newConfig.sectionDefault)
+    ) {
+      newConfig.sectionDefault = newConfig.sections[0];
     }
 
     // set configuration reference so other card sections can access it.
@@ -1178,13 +1150,7 @@ export class Card extends AlertUpdatesBase {
       audiobookFavBrowserItemsHideSubTitle: false,
       audiobookFavBrowserItemsSortTitle: true,
 
-      categoryBrowserTitle: "Categorys for {player.sp_user_display_name} ({medialist.filteritemcount} items)",
-      categoryBrowserSubTitle: "click a tile item to view the content; click-hold for actions",
-      categoryBrowserItemsPerRow: 4,
-      categoryBrowserItemsHideTitle: false,
-      categoryBrowserItemsHideSubTitle: true,
-      categoryBrowserItemsSortTitle: true,
-
+            
       deviceBrowserTitle: "Spotify Connect Devices ({medialist.filteritemcount} items)",
       deviceBrowserSubTitle: "click an item to select the device; click-hold for device info",
       deviceBrowserItemsPerRow: 1,

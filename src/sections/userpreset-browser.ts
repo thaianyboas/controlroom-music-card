@@ -17,7 +17,6 @@ import { MediaPlayer } from '../model/media-player';
 import { formatTitleInfo } from '../utils/media-browser-utils';
 import { getHomeAssistantErrorMessage, getUtcNowTimestamp } from '../utils/utils';
 import { IUserPreset } from '../types/spotifyplus/user-preset';
-import { CategoryDisplayEvent } from '../events/category-display';
 import { FilterSectionMediaEvent } from '../events/filter-section-media';
 import {
   ALERT_ERROR_SPOTIFY_PREMIUM_REQUIRED,
@@ -153,11 +152,6 @@ export class UserPresetBrowser extends FavBrowserBase {
 
       // fire event.
       this.dispatchEvent(FilterSectionMediaEvent(preset.filter_section, preset.filter_criteria));
-
-    } else if (evArgs.detail.type == "category") {
-
-      const preset = evArgs.detail as IUserPreset;
-      this.dispatchEvent(CategoryDisplayEvent(preset.subtitle, preset.name, preset.uri));
 
     } else if (evArgs.detail.type == "trackfavorites") {
 

@@ -407,7 +407,7 @@ class PlayerControlsSettingsEditor extends BaseEditor {
       }
 
       .control-tile.selected {
-        border-color: #34d399;
+        border-color: var(--crm-editor-accent, var(--primary-color, #34d399));
       }
 
       .control-tile.hidden {
@@ -438,7 +438,7 @@ class PlayerControlsSettingsEditor extends BaseEditor {
       }
 
       .selected .control-art {
-        color: #34d399;
+        color: var(--crm-editor-accent, var(--primary-color, #34d399));
       }
 
       .control-label {
@@ -462,7 +462,7 @@ class PlayerControlsSettingsEditor extends BaseEditor {
       }
 
       .selected .control-status ha-icon {
-        color: #34d399;
+        color: var(--crm-editor-accent, var(--primary-color, #34d399));
       }
 
       .studio-notice {

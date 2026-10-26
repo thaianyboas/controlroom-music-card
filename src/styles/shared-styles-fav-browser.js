@@ -1,4 +1,3 @@
-
 import { css } from 'lit';
 
 /**
@@ -101,6 +100,49 @@ export const sharedStylesFavBrowser = css`
 
     --mdc-text-field-fill-color:
       var(--crm-background-secondary, transparent);
+  }
+
+  /* ControlRoom DEV: graphite search controls in every theme. */
+  .media-browser-controls > ha-input-search.media-browser-control-filter,
+  .search-media-browser-controls > ha-input-search.media-browser-control-filter {
+    display: block;
+    flex: 1 1 auto;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    align-self: center;
+    font-size: 14px;
+    line-height: normal;
+    color: #f5f7fa;
+    --primary-text-color: #f5f7fa;
+    --secondary-text-color: #c3cad3;
+    --md-sys-color-on-surface: #f5f7fa;
+    --md-sys-color-on-surface-variant: #c3cad3;
+    --md-sys-color-surface: #414752;
+    --md-sys-color-surface-container: #414752;
+    --md-sys-color-surface-container-high: #414752;
+    --mdc-text-field-fill-color: #414752;
+    --mdc-text-field-ink-color: #f5f7fa;
+    --mdc-text-field-label-ink-color: #c3cad3;
+    --mdc-text-field-outlined-idle-border-color: #626a76;
+    --mdc-text-field-outlined-hover-border-color: #8b95a2;
+    --mdc-text-field-outlined-focused-border-color: var(--crm-accent, #34d399);
+  }
+
+  .media-browser-controls > ha-input-search.media-browser-control-filter::part(input),
+  .search-media-browser-controls > ha-input-search.media-browser-control-filter::part(input) {
+    height: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+    font-size: 14px;
+    color: #f5f7fa;
+    background-color: #414752;
+  }
+
+  .media-browser-controls > ha-input-search.media-browser-control-filter::part(input)::placeholder,
+  .search-media-browser-controls > ha-input-search.media-browser-control-filter::part(input)::placeholder {
+    color: #c3cad3;
+    opacity: 1;
   }
 
   .media-browser-control-filter ha-textfield,

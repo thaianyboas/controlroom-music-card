@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 // debug logging.
 import Debug from 'debug/src/browser.js';
 import { DEBUG_APP_NAME } from '../constants';
@@ -39,6 +40,23 @@ export function dispatch(type: string, detail?: unknown) {
  * @param escapedHtml Escaped html value.
  * @returns A string with the unescaped html.
  */
+/**
+ * Sanitizes HTML descriptions received from SpotifyPlus.
+ * Only basic formatting and safe links are allowed.
+ */
+export function sanitizeSpotifyHtml(value: string | null | undefined): string {
+  const decoded = unescapeHtml(value || "");
+
+  return DOMPurify.sanitize(decoded, {
+    ALLOWED_TAGS: [
+      "p", "br", "b", "strong", "i", "em",
+      "u", "ul", "ol", "li", "a", "span"
+    ],
+    ALLOWED_ATTR: ["href", "title"],
+    ALLOW_DATA_ATTR: false
+  });
+}
+
 export function unescapeHtml(escapedHtml: string): string {
 
   if (escapedHtml) {
@@ -172,8 +190,6 @@ export function getSectionForConfigArea(configArea: ConfigArea) {
     section = Section.ARTIST_FAVORITES;
   } else if (configArea == ConfigArea.AUDIOBOOK_FAVORITES) {
     section = Section.AUDIOBOOK_FAVORITES;
-  } else if (configArea == ConfigArea.CATEGORY_BROWSER) {
-    section = Section.CATEGORYS;
   } else if (configArea == ConfigArea.DEVICE_BROWSER) {
     section = Section.DEVICES;
   } else if (configArea == ConfigArea.EPISODE_FAVORITES) {
@@ -217,8 +233,6 @@ export function getConfigAreaForSection(section: Section) {
     configArea = ConfigArea.ARTIST_FAVORITES;
   } else if (section == Section.AUDIOBOOK_FAVORITES) {
     configArea = ConfigArea.AUDIOBOOK_FAVORITES;
-  } else if (section == Section.CATEGORYS) {
-    configArea = ConfigArea.CATEGORY_BROWSER;
   } else if (section == Section.DEVICES) {
     configArea = ConfigArea.DEVICE_BROWSER;
   } else if (section == Section.EPISODE_FAVORITES) {

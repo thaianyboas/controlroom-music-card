@@ -23,7 +23,6 @@ import { SearchMediaTypes } from '../types/search-media-types';
 import { IAlbumSimplified } from '../types/spotifyplus/album-simplified';
 import { IArtist } from '../types/spotifyplus/artist';
 import { IAudiobookSimplified, GetAudiobookAuthors } from '../types/spotifyplus/audiobook-simplified';
-import { ICategory } from '../types/spotifyplus/category';
 import { IEpisode } from '../types/spotifyplus/episode';
 import { IMediaBrowserInfo } from '../types/media-browser-item';
 import { IPlaylistSimplified } from '../types/spotifyplus/playlist-simplified';
@@ -152,9 +151,6 @@ export class MediaBrowserBase extends LitElement {
     } else if (this.mediaItemType == Section.AUDIOBOOK_FAVORITES) {
       this.hideTitle = this.config.audiobookFavBrowserItemsHideTitle || false;
       this.hideSubTitle = this.config.audiobookFavBrowserItemsHideSubTitle || false;
-    } else if (this.mediaItemType == Section.CATEGORYS) {
-      this.hideTitle = this.config.categoryBrowserItemsHideTitle || false;
-      this.hideSubTitle = this.config.categoryBrowserItemsHideSubTitle || false;
     } else if (this.mediaItemType == Section.DEVICES) {
       this.hideTitle = this.config.deviceBrowserItemsHideTitle || false;
       this.hideSubTitle = this.config.deviceBrowserItemsHideSubTitle || false;
@@ -587,11 +583,6 @@ export class MediaBrowserBase extends LitElement {
         if (itemInfo.uri == this.store.player.attributes.sp_context_uri) {
           mbi_info.is_active = true;
         }
-
-      } else if (this.mediaItemType == Section.CATEGORYS) {
-
-        const itemInfo = (item as ICategory);
-        mbi_info.subtitle = itemInfo.type;
 
       } else if (this.mediaItemType == Section.DEVICES) {
 

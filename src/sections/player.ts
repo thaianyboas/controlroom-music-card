@@ -145,7 +145,7 @@ export class Player extends AlertUpdatesBase {
         min-height: 235px;
         padding: 20px 22px;
         border-radius: 20px;
-        border: 1px solid rgba(64, 217, 154, 0.13);
+        border: 1px solid color-mix(in srgb, var(--crm-accent, #40d99a) 13%, transparent);
         background: var(--crm-background, #101b19) !important;
         color: var(--crm-text, #f0fdf4);
         text-align: left;
@@ -245,8 +245,7 @@ export class Player extends AlertUpdatesBase {
         min-width: 0;
         max-width: 100%;
         background: transparent;
-        --crm-player-controls-icon-color: var(--crm-text, #f0fdf4);
-        --crm-player-controls-icon-toggle-color: var(--crm-accent, #40d99a);
+        /* Cores herdadas do player: respeitam personalizações individuais. */
       }
       .player-progress-wrap {
         flex: 1 1 110px;
@@ -258,7 +257,7 @@ export class Player extends AlertUpdatesBase {
       .player-progress-wrap crm-player-progress {
         display: block;
         width: 100%;
-        --crm-player-progress-slider-color: var(--crm-accent, #40d99a);
+        /* Mantém a cor de progresso herdada da configuração do player. */
       }
       .idle-progress {
         height: 4px;
@@ -579,8 +578,8 @@ export class Player extends AlertUpdatesBase {
     if (playerVolumeSliderThickness)
       styleInfo['--crm-player-volume-slider-thickness'] = `${playerVolumeSliderThickness}`;
 
-    // Identidade visual ControlRoom: impede que as cores do tema do HA
-    // ou da configuracao antiga deixem os controles azuis.
+    // ControlRoom theme defaults. Explicit per-control settings take priority.
+    // CSS variables from the card remain the source of truth for theme colors.
     const theme = this.store.config.crmTheme ?? 'dark';
     const dark = theme === 'dark' ||
       (theme === 'auto' && this.store.hass?.themes?.darkMode !== false);
@@ -589,29 +588,29 @@ export class Player extends AlertUpdatesBase {
     const themeText = custom
       ? (this.store.config.crmText || '#f0fdf4')
       : dark ? '#f0fdf4' : '#183329';
-
     const themeAccent = custom
       ? (this.store.config.crmAccent || '#34d399')
       : dark ? '#40d99a' : '#16875c';
-
     const muted = dark ? '#a6b7af' : '#657a70';
-    styleInfo['--crm-player-secondary-text'] = custom
+    const textColor = `var(--crm-text, ${themeText})`;
+    const accentColor = `var(--crm-accent, ${themeAccent})`;
+    const secondaryColor = custom
       ? 'color-mix(in srgb, var(--crm-text, #f0fdf4) 80%, var(--crm-background, #101b19))'
       : dark ? '#b5c9bd' : '#657a70';
 
-
-    styleInfo['--crm-player-controls-color'] = 'var(--crm-text, ' + themeText + ')';
-    styleInfo['--crm-player-controls-icon-color'] = 'var(--crm-text, ' + themeText + ')';
-    styleInfo['--crm-player-controls-icon-toggle-color'] = 'var(--crm-accent, ' + themeAccent + ')';
-    styleInfo['--crm-player-progress-slider-color'] = 'var(--crm-accent, ' + themeAccent + ')';
-    styleInfo['--crm-player-progress-label-color'] = custom ? 'var(--crm-text)' : muted;
-    styleInfo['--crm-player-volume-slider-color'] = 'var(--crm-accent, ' + themeAccent + ')';
-    styleInfo['--crm-player-volume-label-color'] = custom ? 'var(--crm-text)' : muted;
-    styleInfo['--crm-player-header-title1-color'] = 'var(--crm-text, ' + themeText + ')';
-    styleInfo['--crm-player-header-title2-color'] = 'var(--crm-text, ' + themeText + ')';
-    styleInfo['--crm-player-header-title3-color'] = custom ? 'var(--crm-text)' : muted;
-    styleInfo['--crm-player-header-bg-color'] = 'transparent';
-    styleInfo['--crm-player-controls-bg-color'] = 'transparent';
+    styleInfo['--crm-player-secondary-text'] = secondaryColor;
+    styleInfo['--crm-player-controls-color'] = playerControlsColor || textColor;
+    styleInfo['--crm-player-controls-icon-color'] = this.config.playerControlsIconColor || textColor;
+    styleInfo['--crm-player-controls-icon-toggle-color'] = playerControlsIconToggleColor || accentColor;
+    styleInfo['--crm-player-progress-slider-color'] = playerProgressSliderColor || accentColor;
+    styleInfo['--crm-player-progress-label-color'] = playerProgressLabelColor || (custom ? textColor : muted);
+    styleInfo['--crm-player-volume-slider-color'] = playerVolumeSliderColor || accentColor;
+    styleInfo['--crm-player-volume-label-color'] = this.config.playerVolumeLabelColor || (custom ? textColor : muted);
+    styleInfo['--crm-player-header-title1-color'] = this.config.playerHeaderTitle1Color || textColor;
+    styleInfo['--crm-player-header-title2-color'] = this.config.playerHeaderTitle2Color || textColor;
+    styleInfo['--crm-player-header-title3-color'] = this.config.playerHeaderTitle3Color || (custom ? textColor : muted);
+    styleInfo['--crm-player-header-bg-color'] = this.config.playerHeaderBackgroundColor || 'transparent';
+    styleInfo['--crm-player-controls-bg-color'] = this.config.playerControlsBackgroundColor || 'transparent';
     return styleMap(styleInfo);
 
   }
