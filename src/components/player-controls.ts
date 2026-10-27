@@ -53,6 +53,10 @@ class PlayerControls extends AlertUpdatesBase {
   // private state properties.
   @state() private isActionFavoritesVisible?: boolean;
   @state() private isQueueItemsVisible?: boolean;
+  @state() private isTrackFavorite?: boolean;
+  @state() private isTrackFavoriteBusy = false;
+  private favoriteTrackId?: string;
+  private favoriteRequestVersion = 0;
 
   /** Card configuration data. */
   private config!: CardConfig;
@@ -121,7 +125,7 @@ class PlayerControls extends AlertUpdatesBase {
     const colorShuffle = (this.player.attributes.shuffle);
     const colorPlay = (this.player.state == MediaPlayerState.PAUSED);
     const colorPower = (this.player.state == MediaPlayerState.OFF);
-    const colorActionFavorites = (this.isActionFavoritesVisible);
+    const colorActionFavorites = (this.isTrackFavorite === true);
     const colorQueueItems = (this.isQueueItemsVisible);
 
     // render html.
@@ -132,7 +136,7 @@ class PlayerControls extends AlertUpdatesBase {
     return html`
       <div class="player-controls-container" style=${this.styleContainer(idle, isOff)}>
           <div class="icons" hide=${stopped}>
-              <ha-icon-button @click=${() => this.onClickAction(ACTION_FAVES)}   hide=${this.hideFeature(ACTION_FAVES)}   .path=${colorActionFavorites ? mdiHeart : mdiHeartOutline} label=${this.controlLabel('favorites')} style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
+              <ha-icon-button @click=${(ev: MouseEvent) => ev.shiftKey ? this.openFavoritesPanel(ev) : void this.toggleTrackFavorite()} @contextmenu=${(ev: MouseEvent) => this.openFavoritesPanel(ev)} ?disabled=${this.isTrackFavoriteBusy || !this.getCurrentTrackId()} hide=${this.hideFeature(ACTION_FAVES)} .path=${colorActionFavorites ? mdiHeart : mdiHeartOutline} label=${this.controlLabel('favorites')} title=${this.controlLabel('favorites')} style=${this.styleIcon(colorActionFavorites)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(SHUFFLE_SET)}    hide=${this.hideFeature(SHUFFLE_SET)}    .path=${this.getShuffleIcon()} label=${this.controlLabel('shuffle')} style=${this.styleIcon(colorShuffle)}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PREVIOUS_TRACK)} hide=${this.hideFeature(PREVIOUS_TRACK)} .path=${mdiSkipPrevious} label=${this.controlLabel('previous')} style=${this.styleIcon()}></ha-icon-button>
               <ha-icon-button @click=${() => this.onClickAction(PLAY)}           hide=${this.hideFeature(PLAY)}           .path=${mdiPlay} label=${this.controlLabel('play')} class="play-pause" style=${this.styleIcon(colorPlay, true)}></ha-icon-button>
@@ -344,6 +348,15 @@ class PlayerControls extends AlertUpdatesBase {
     //  );
     //}
 
+    // Refresh the Spotify Liked Songs state when the playing track changes.
+    const currentTrackId = this.getCurrentTrackId();
+    if (currentTrackId !== this.favoriteTrackId) {
+      this.favoriteTrackId = currentTrackId;
+      this.isTrackFavorite = undefined;
+      this.favoriteRequestVersion++;
+      if (currentTrackId) void this.refreshTrackFavorite(currentTrackId);
+    }
+
     // if media content id changed, then refresh queue items body (if visible).
     if (changedPropKeys.includes('mediaContentId')) {
 
@@ -356,6 +369,76 @@ class PlayerControls extends AlertUpdatesBase {
 
   }
 
+
+  /** Return only a valid Spotify track ID, never a playlist/album ID. */
+  private getCurrentTrackId(): string | undefined {
+    const values = [this.player?.attributes?.media_content_id, this.mediaContentId];
+    for (const value of values) {
+      const raw = String(value || '');
+      const uri = raw.match(/spotify:track:([A-Za-z0-9]{22})(?![A-Za-z0-9])/);
+      if (uri) return uri[1];
+      const url = raw.match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?track\/([A-Za-z0-9]{22})(?![A-Za-z0-9])/);
+      if (url) return url[1];
+    }
+    // A bare Spotify ID is accepted only when HA identifies the content as a track.
+    const type = String(this.player?.attributes?.media_content_type || '').toLowerCase();
+    if (type === 'track' || type === 'music') {
+      for (const value of values) {
+        const raw = String(value || '');
+        if (/^[A-Za-z0-9]{22}$/.test(raw)) return raw;
+      }
+    }
+    return undefined;
+  }
+
+  /** Read the authoritative favorite state from SpotifyPlus. */
+  private async refreshTrackFavorite(trackId: string): Promise<void> {
+    const version = ++this.favoriteRequestVersion;
+    try {
+      const result = await this.spotifyPlusService.CheckTrackFavorites(this.player, trackId);
+      if (version !== this.favoriteRequestVersion || this.getCurrentTrackId() !== trackId) return;
+      const values = result as Record<string, boolean>;
+      const state = values[`spotify:track:${trackId}`] ?? values[trackId];
+      if (typeof state !== 'boolean') throw new Error('SpotifyPlus returned no favorite status for this track');
+      this.isTrackFavorite = state;
+    } catch (error) {
+      if (version !== this.favoriteRequestVersion) return;
+      this.isTrackFavorite = undefined;
+      this.alertErrorSet('Check track favorites failed: ' + getHomeAssistantErrorMessage(error));
+    }
+  }
+
+  /** Toggle Liked Songs, independently of the legacy favorites action panel. */
+  private async toggleTrackFavorite(): Promise<void> {
+    if (this.isTrackFavoriteBusy || this.isCardInEditPreview) return;
+    const trackId = this.getCurrentTrackId();
+    if (!trackId) return;
+    this.isTrackFavoriteBusy = true;
+    try {
+      if (this.isTrackFavorite === undefined) {
+        await this.refreshTrackFavorite(trackId);
+      }
+      if (this.getCurrentTrackId() !== trackId || this.isTrackFavorite === undefined) return;
+      if (this.isTrackFavorite) {
+        await this.spotifyPlusService.RemoveTrackFavorites(this.player, trackId);
+      } else {
+        await this.spotifyPlusService.SaveTrackFavorites(this.player, trackId);
+      }
+      if (this.getCurrentTrackId() === trackId) await this.refreshTrackFavorite(trackId);
+    } catch (error) {
+      this.alertErrorSet('Update track favorites failed: ' + getHomeAssistantErrorMessage(error));
+      if (this.getCurrentTrackId() === trackId) await this.refreshTrackFavorite(trackId);
+    } finally {
+      this.isTrackFavoriteBusy = false;
+    }
+  }
+
+  /** Preserve the original favorites actions: Shift-click or right-click the heart. */
+  private openFavoritesPanel(ev: MouseEvent): void {
+    ev.preventDefault();
+    ev.stopPropagation();
+    void this.onClickAction(ACTION_FAVES);
+  }
 
   /**
    * Toggle action visibility - action favorites body.
