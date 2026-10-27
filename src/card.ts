@@ -1648,7 +1648,8 @@ export class Card extends AlertUpdatesBase {
       // did the content change? if not, then we are done.
       // note that we cannot compare images here, as it's a cached value and the `cache` portion of
       // image url could change even though it's the same content that's playing!
-      if (this.vibrantMediaContentId === playerMediaContentIdSaved) {
+      if (this.vibrantMediaContentId === playerMediaContentIdSaved &&
+          (!playerMediaContentIdSaved?.startsWith('configImage') || this.vibrantImage === playerImageSaved)) {
         this.isUpdateInProgressAsync = false;
         return;
       }
@@ -1715,6 +1716,16 @@ export class Card extends AlertUpdatesBase {
         vibrant.getPalette()
           .then((palette: Palette) => {
 
+            // Ignore artwork results belonging to an older track or configured image.
+            // A new render will process the latest image once this request is released.
+            if (this.playerMediaContentId !== playerMediaContentIdSaved ||
+                (this.playerMediaContentId?.startsWith('configImage') && this.playerImage !== playerImageSaved)) {
+              this.isUpdateInProgressAsync = false;
+              this.requestUpdate();
+              resolve(false);
+              return;
+            }
+
             if (debuglog.enabled) {
               debuglog("%ccheckForBackgroundImageChange - colors found by getPalette:\n- Vibrant      = %s\n- Muted        = %s\n- DarkVibrant  = %s\n- DarkMuted    = %s\n- LightVibrant = %s\n- LightMuted   = %s",
                 "color:orange",
@@ -1751,6 +1762,15 @@ export class Card extends AlertUpdatesBase {
 
           })
           .catch(error => {
+
+            // Do not show an obsolete artwork error after the track has changed.
+            if (this.playerMediaContentId !== playerMediaContentIdSaved ||
+                (this.playerMediaContentId?.startsWith('configImage') && this.playerImage !== playerImageSaved)) {
+              this.isUpdateInProgressAsync = false;
+              this.requestUpdate();
+              resolve(false);
+              return;
+            }
 
             if (debuglog.enabled) {
               debuglog("%ccheckForBackgroundImageChange - Could not retrieve color palette info for player background image\nreason = %s",
@@ -1809,6 +1829,9 @@ export class Card extends AlertUpdatesBase {
 
       // clear the progress indicator.
       //this.progressHide();
+
+      // A synchronous failure must not permanently block future artwork updates.
+      this.isUpdateInProgressAsync = false;
 
       // set alert error message.
       this.checkForBackgroundImageChangeError("Background Image processing error: " + getHomeAssistantErrorMessage(error));
