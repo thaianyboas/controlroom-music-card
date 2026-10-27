@@ -1,78 +1,291 @@
 # 🎵 ControlRoom Music Card
 
-A customizable music dashboard card for Home Assistant, based on the original [SpotifyPlus Card](https://github.com/thlucas1/spotifyplus_card) developed by Todd Lucas (@thlucas1).
+<div align="center">
 
-ControlRoom Music Card builds upon SpotifyPlus Card with additional interface customizations and multilingual support.
+**Your music. Your space. Your ControlRoom.**
 
-## ✨ Features
+*A refined, customizable Spotify experience for Home Assistant.*
 
-- Spotify media player with customizable controls.
-- Search for tracks, albums, artists, playlists, podcasts, audiobooks, and other Spotify content.
-- Browse favorite albums, artists, tracks, and playlists.
-- Manage Spotify Connect playback devices.
-- Customizable player appearance and layout.
+[![Version](https://img.shields.io/github/v/release/thaianyboas/controlroom-music-card?style=for-the-badge&label=VERSION&color=638c79)](https://github.com/thaianyboas/controlroom-music-card/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-638c79?style=for-the-badge)](LICENSE)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Dashboard-638c79?style=for-the-badge&logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
+[![HACS](https://img.shields.io/badge/HACS-Custom%20Repository-638c79?style=for-the-badge)](https://www.hacs.xyz/)
+
+[Features](#-features) · [Installation](#-installation) · [Customization](#-customization) · [Development](#-development) · [Credits](#-credits--acknowledgements)
+
+</div>
+
+---
+
+## ✨ A More Personal Music Experience
+
+**ControlRoom Music Card** brings music playback, discovery, and device management together in a thoughtfully designed Home Assistant dashboard card.
+
+Built upon the original [SpotifyPlus Card](https://github.com/thlucas1/spotifyplus_card) by **Todd Lucas**, ControlRoom introduces a more personalized interface with refined navigation, flexible appearance options, and multilingual support.
+
+Designed to make your everyday music experience feel seamless, intuitive, and distinctly yours.
+
+### Designed around three principles
+
+**Elegance** — A clean, modern interface that feels at home in a premium smart-home dashboard.
+
+**Personalization** — Flexible themes, colors, and layout options that adapt to your environment.
+
+**Functionality** — Convenient access to Spotify playback, music discovery, favorites, and compatible devices.
+
+---
+
+## 🎧 Features
+
+### Music Playback
+
+- Spotify playback controls and media information.
+- Album artwork and playback details.
+- Playback management through the SpotifyPlus integration.
+- Access to compatible Spotify Connect devices.
+
+### Music Discovery
+
+- Search for tracks, albums, artists, and playlists.
+- Explore podcasts, audiobooks, and other supported Spotify content.
+- Browse saved music and favorite content.
+- Navigate your Spotify library from within Home Assistant.
+
+### Premium Interface
+
+- **Floating Glass Smart Navigation** for an elegant navigation experience.
+- **Premium Compact Device Browser** for streamlined device selection.
+- Refined music browsing and favorites interfaces.
+- Customizable player appearance.
+- Responsive layouts for different dashboard configurations.
+
+### Personalization
+
+- Light, dark, automatic, and customizable appearance options.
+- Adjustable colors and visual preferences.
+- Flexible card configuration.
 - Visual configuration editor.
-- Multilingual interface support, including English, German, and Portuguese.
-- Integration with the [SpotifyPlus custom integration](https://github.com/thlucas1/homeassistantcomponent_spotifyplus).
+- Multilingual user interface.
+
+---
+
+## 🎨 Customization
+
+ControlRoom Music Card is designed to complement your Home Assistant dashboard rather than compete with it.
+
+Personalize the experience through the card's configuration editor, including supported themes, colors, and appearance settings.
+
+| Appearance | Description |
+|---|---|
+| ☀️ Light | A clean, bright interface |
+| 🌙 Dark | A sophisticated dark appearance |
+| 🔄 Automatic | Appearance based on the configured theme behavior |
+| 🎨 Custom | Additional control over supported visual settings |
+
+The available options may vary depending on the card version and configuration.
+
+---
 
 ## 🌍 Languages
 
-ControlRoom Music Card includes interface translations for:
+ControlRoom Music Card includes interface support for three languages:
 
-- 🇺🇸 English
-- 🇩🇪 Deutsch
-- 🇧🇷 Português
+| Language | Availability |
+|---|---|
+| 🇺🇸 English | Supported |
+| 🇩🇪 Deutsch | Supported |
+| 🇧🇷 Português | Supported |
 
-Language selection is designed to work with the Home Assistant interface language or the card's language configuration.
+Language selection is designed to work with Home Assistant language preferences and the card's own language settings.
 
-## 📦 Installation via HACS
+---
 
-1. Open HACS in Home Assistant.
-2. Select **Custom repositories**.
-3. Add the following repository:
+## 📦 Installation
+
+### Requirements
+
+Before installing ControlRoom Music Card, make sure you have:
+
+- A working Home Assistant installation.
+- [HACS](https://www.hacs.xyz/) installed for the recommended installation method.
+- The [SpotifyPlus custom integration](https://github.com/thlucas1/homeassistantcomponent_spotifyplus) installed and configured.
+- A Spotify account compatible with the SpotifyPlus features you intend to use.
+
+### Install via HACS
+
+**Step 1 — Add the repository**
+
+1. Open **HACS** in Home Assistant.
+2. Open the menu for **Custom repositories**.
+3. Enter the repository URL:
 
    `https://github.com/thaianyboas/controlroom-music-card`
 
-4. Select **Dashboard** as the repository type.
-5. Open **ControlRoom Music Card** in HACS.
-6. Download the card and select an available version.
-7. Refresh Home Assistant and add the card to your dashboard.
+4. Select **Dashboard** as the repository category.
+5. Confirm to add the repository.
 
-**Note:** This card requires the SpotifyPlus custom integration for its SpotifyPlus-specific features.
+**Step 2 — Install the card**
 
-## 🛠️ Development
+1. Find **ControlRoom Music Card** in HACS.
+2. Open the repository entry.
+3. Download the latest stable version.
+4. Refresh your browser if needed.
 
-To build the card locally:
+**Step 3 — Add it to your dashboard**
+
+1. Open your Home Assistant dashboard.
+2. Enter dashboard editing mode.
+3. Add a new card.
+4. Select or configure **ControlRoom Music Card**.
+5. Choose your SpotifyPlus entity and preferred appearance settings.
+
+> **Important:** ControlRoom Music Card relies on the SpotifyPlus custom integration for its SpotifyPlus-specific functionality. The card itself does not replace that integration.
+
+### Releases and Updates
+
+Stable versions are published through GitHub Releases.
+
+**Latest stable release:** [View releases](https://github.com/thaianyboas/controlroom-music-card/releases/latest)
+
+For regular use, install published stable releases rather than development versions.
+
+---
+
+## ⚙️ Development
+
+ControlRoom Music Card is developed with TypeScript and bundled using Rollup.
+
+### Build locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/thaianyboas/controlroom-music-card.git
+cd controlroom-music-card
+```
+
+Install dependencies:
 
 ```bash
 npm install
+```
+
+Run TypeScript validation:
+
+```bash
+npx tsc --noEmit
+```
+
+Build the card:
+
+```bash
 npm run rollup
 ```
 
-The compiled JavaScript is generated at:
+The generated JavaScript bundle is located at:
 
 `dist/controlroom-music-card.js`
 
+### Branch Structure
+
+| Branch | Purpose |
+|---|---|
+| `master` | Stable, officially approved code |
+| `develop` | Ongoing development and testing |
+
+Official stable releases are identified using version tags, beginning with **v1.0.0**.
+
+---
+
+## 🧭 Project Direction
+
+ControlRoom Music Card focuses on improving the Home Assistant music experience through:
+
+- Consistent and polished interface design.
+- Intuitive music and device navigation.
+- Improved customization and theme compatibility.
+- Multilingual accessibility.
+- Stable, carefully tested updates.
+
+The project continues to evolve while maintaining respect for the original open-source foundation.
+
+---
+
 ## ❤️ Credits & Acknowledgements
 
-ControlRoom Music Card is a modified version of [SpotifyPlus Card](https://github.com/thlucas1/spotifyplus_card), originally created and maintained by **Todd Lucas (@thlucas1)**.
+ControlRoom Music Card exists thanks to the work of developers and contributors in the Home Assistant open-source community.
 
-The original project provides the foundation for the music player, Spotify integration features, and configuration interface.
+### Original Project — SpotifyPlus Card
 
-ControlRoom Music Card introduces additional customizations and multilingual improvements.
+**Todd Lucas ([@thlucas1](https://github.com/thlucas1))**
 
-Special thanks to Todd Lucas for developing and sharing SpotifyPlus Card with the Home Assistant community.
+[SpotifyPlus Card](https://github.com/thlucas1/spotifyplus_card) is the original project on which ControlRoom Music Card is based.
 
-## 📄 License
+Its foundational code and functionality support the music player, Spotify browsing capabilities, and configuration architecture.
 
-This project is distributed under the MIT License.
+The original author's applicable copyright and license notices are preserved.
 
-Original copyright:
+### ControlRoom Music Card
 
-Copyright (c) 2019–2025 Todd Lucas @thlucas1
+**Thaiany Boas ([@thaianyboas](https://github.com/thaianyboas))**
 
-The original copyright and MIT license notices are preserved in the [LICENSE](LICENSE) file.
+ControlRoom Music Card is independently customized and maintained with additional interface enhancements, visual refinements, navigation improvements, and multilingual functionality.
+
+These contributions build upon the original SpotifyPlus Card rather than replace its authorship.
+
+### Related Open-Source Projects
+
+We also recognize the work behind related Home Assistant music integrations:
+
+| Project | Contributors |
+|---|---|
+| [SpotifyPlus Integration](https://github.com/thlucas1/homeassistantcomponent_spotifyplus) | Todd Lucas |
+| [Spotcast](https://github.com/fondberg/spotcast) | Niklas Fondberg — original creator |
+| [Spotcast v6](https://github.com/fondberg/spotcast) | Felix Cusson — rewrite and maintenance |
+| [Spotcast (maintained)](https://github.com/Mincka/spotcast) | Mincka — continued maintenance |
+
+These are independent projects. Acknowledgement does not imply that their source code is included in ControlRoom Music Card or that they endorse this project.
+
+**Special thanks to the developers, maintainers, and contributors who make open-source music integrations possible.**
+
+---
+
+## 📄 License & Copyright
+
+ControlRoom Music Card is distributed under the **MIT License**, subject to the applicable licenses and notices for any third-party components.
+
+### Original SpotifyPlus Card
+
+Copyright (c) 2019–2025 Todd Lucas (@thlucas1)
+
+### ControlRoom Contributions
+
+Original modifications and contributions by Thaiany Boas (@thaianyboas), 2026.
+
+The original copyright notice and MIT License terms are preserved in the [LICENSE](LICENSE) file.
+
+Attribution for ControlRoom contributions does not imply ownership of the original SpotifyPlus Card code or other third-party components.
+
+---
 
 ## ⚠️ Disclaimer
 
-ControlRoom Music Card is an independent community modification and is not an official SpotifyPlus Card release or an official Spotify product.
+ControlRoom Music Card is an independent, community-maintained project.
+
+It is not an official SpotifyPlus Card release and is not affiliated with, endorsed by, or sponsored by Spotify AB, Home Assistant, or the maintainers of the related integrations.
+
+Spotify and other product names and trademarks remain the property of their respective owners.
+
+---
+
+<div align="center">
+
+### 💚 Made for a more beautiful smart home.
+
+**ControlRoom Music Card**
+
+*Your music. Your space. Your ControlRoom.*
+
+[GitHub Repository](https://github.com/thaianyboas/controlroom-music-card) · [Latest Release](https://github.com/thaianyboas/controlroom-music-card/releases/latest)
+
+</div>
