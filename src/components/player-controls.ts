@@ -57,6 +57,7 @@ class PlayerControls extends AlertUpdatesBase {
   @state() private isTrackFavoriteBusy = false;
   private favoriteTrackId?: string;
   private favoriteRequestVersion = 0;
+  private favoriteSyncTimer?: ReturnType<typeof setInterval>;
 
   /** Card configuration data. */
   private config!: CardConfig;
@@ -302,6 +303,17 @@ class PlayerControls extends AlertUpdatesBase {
     // add document level event listeners.
     document.addEventListener("keydown", this.onKeyDown_EventListenerBound);
 
+    // Keep favorite status in sync when another Spotify client changes it.
+    if (!this.favoriteSyncTimer) {
+      this.favoriteSyncTimer = setInterval(() => {
+        if (!this.isConnected || this.isTrackFavoriteBusy || this.isCardInEditPreview) return;
+        const trackId = this.getCurrentTrackId();
+        if (trackId && trackId === this.favoriteTrackId) {
+          void this.refreshTrackFavorite(trackId);
+        }
+      }, 15000);
+    }
+
   }
 
 
@@ -319,6 +331,13 @@ class PlayerControls extends AlertUpdatesBase {
 
     // remove document level event listeners.
     document.removeEventListener("keydown", this.onKeyDown_EventListenerBound);
+
+    if (this.favoriteSyncTimer) {
+      clearInterval(this.favoriteSyncTimer);
+      this.favoriteSyncTimer = undefined;
+    }
+    // Ignore responses from a disconnected card instance.
+    this.favoriteRequestVersion++;
 
     // invoke base class method.
     super.disconnectedCallback();
@@ -414,6 +433,7 @@ class PlayerControls extends AlertUpdatesBase {
     const trackId = this.getCurrentTrackId();
     if (!trackId) return;
     this.isTrackFavoriteBusy = true;
+    this.favoriteRequestVersion++; // invalidate an earlier polling response
     try {
       if (this.isTrackFavorite === undefined) {
         await this.refreshTrackFavorite(trackId);
