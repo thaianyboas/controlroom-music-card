@@ -1,6 +1,6 @@
 {
   "name": "controlroom-music-card",
-  "version": "2.1.0",
+  "version": "1.0.0",
   "description": "ControlRoom Music Card for Home Assistant, powered by the SpotifyPlus integration.",
   "author": "Todd Lucas (original SpotifyPlus Card); ControlRoom contributors",
   "license": "MIT",

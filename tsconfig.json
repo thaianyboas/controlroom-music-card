@@ -11,6 +11,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
 
+    // Compatibility with TypeScript 6
+    "ignoreDeprecations": "6.0",
+
     // Babel handles transpiling
     "noEmit": true,
 
